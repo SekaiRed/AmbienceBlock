@@ -1,0 +1,21 @@
+{
+  "itemGroup.ambiencetab": "Ambience Blocks",
+
+  "block.ambienceblocks.ambience_block": "Ambience Block",
+
+  "ui.ambienceblocks.music_id": "Sound ID",
+  "ui.ambienceblocks.music_par": "Sound Parameters",
+  "ui.ambienceblocks.bounds": "Bounds Detection",
+  "ui.ambienceblocks.delay": "Delay",
+  "ui.ambienceblocks.bounds.sphere": "Sphere",
+  "ui.ambienceblocks.bounds.cylinder": "Cylinder",
+  "ui.ambienceblocks.bounds.cubic": "Cubic",
+  "ui.ambienceblocks.radius": "Radius",
+  "ui.ambienceblocks.height": "Height",
+  "ui.ambienceblocks.priority": "Priority",
+  "ui.ambienceblocks.volume": "Volume",
+  "ui.ambienceblocks.pitch": "Pitch",
+  "ui.ambienceblocks.copy": "Copy",
+  "ui.ambienceblocks.paste": "Paste",
+  "ui.ambienceblocks.offset": "Offset"
+}
