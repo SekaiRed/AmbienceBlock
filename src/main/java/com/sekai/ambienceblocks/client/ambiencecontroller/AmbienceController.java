@@ -69,13 +69,7 @@ public class AmbienceController {
                     continue;
                 }
 
-                if(!slot.getOwner().isGlobal()) {
-                    //slot.getMusicInstance().setVolume((float) (slot.getOwner().data.getVolume() * slot.getOwner().data.getBounds().getPercentageHowCloseIsPlayer(mc.player, slot.getOwner().getPos())));
-                    slot.getMusicInstance().setVolume((float) (slot.getOwner().data.getVolume() * slot.getOwner().data.getPercentageHowCloseIsPlayer(mc.player, slot.getOwner().getPos())));
-                }
-                else {
-                    slot.getMusicInstance().setVolume(slot.getOwner().data.getVolume());
-                }
+                slot.getMusicInstance().setVolume(getVolumeFromTileEntity(slot.getOwner()));
             }
 
             //after
@@ -169,7 +163,7 @@ public class AmbienceController {
     public void playMusic(AmbienceTileEntity tile) {
         //System.out.println("playing " + tile.getMusicName() + " at " + tile.getPos());
         ResourceLocation playingResource = new ResourceLocation(tile.getMusicName());
-        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?tile.data.getVolume():0.01f,tile.data.getPitch(), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), getVolumeFromTileEntity(tile),tile.data.getPitch(), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
         handler.play(playingMusic);
         sounds.add(new CustomSoundSlot(tile.getMusicName(), playingMusic, tile));
     }
@@ -216,6 +210,13 @@ public class AmbienceController {
                 return slot;
         }
         return null;
+    }
+
+    public float getVolumeFromTileEntity(AmbienceTileEntity tile) {
+        if(tile.isGlobal())
+            return tile.data.getVolume();
+        else
+            return (float) (tile.data.getVolume() * tile.data.getPercentageHowCloseIsPlayer(mc.player, tile.getPos()));
     }
 
     public AmbienceTileEntityData getClipboard() {
