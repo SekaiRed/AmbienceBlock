@@ -109,10 +109,10 @@ public class AmbienceTileGUI extends Screen {
     TextFieldWidget priorityNumber;
     CheckboxButton checkPriority;
 
-    TextInstance textDelay;
-    TextFieldWidget minDelay;
-    TextFieldWidget maxDelay;
-    CheckboxButton checkDelay;
+    //TextInstance textDelay;
+    //TextFieldWidget minDelay;
+    //TextFieldWidget maxDelay;
+    //QCheckboxButton checkDelay;
 
     //Widget category
     ArrayList<Widget> boundsSphere = new ArrayList<>();
@@ -272,7 +272,7 @@ public class AmbienceTileGUI extends Screen {
         priorityNumber.setText(String.valueOf(tile.getPriority()));
         checkPriority = this.addButton(new CheckboxButton(getNextToWidgetX(priorityNumber), getRowY(priorityRow) + getOffsetY(checkBoxHeight), checkBoxWidth, checkBoxHeight, "Using priority", tile.isUsingPriority()));
 
-        textDelay = new TextInstance(offsetX, getRowY(delayRow) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.delay") + " :", font);
+        /*textDelay = new TextInstance(offsetX, getRowY(delayRow) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.delay") + " :", font);
         minDelay = new TextFieldWidget(font, getNextToWidgetX(textDelay), getRowY(delayRow) + getOffsetY(20), 20, 20, String.valueOf(tile.data.getMinDelay()));
         this.children.add(minDelay);
         minDelay.setValidator(numberFilter);
@@ -281,7 +281,7 @@ public class AmbienceTileGUI extends Screen {
         this.children.add(maxDelay);
         maxDelay.setValidator(numberFilter);
         maxDelay.setMaxStringLength(4);
-        checkDelay = this.addButton(new CheckboxButton(getNextToWidgetX(maxDelay), getRowY(delayRow) + getOffsetY(checkBoxHeight), checkBoxWidth, checkBoxHeight, "Using delay", tile.data.isUsingDelay()));
+        checkDelay = this.addButton(new CheckboxButton(getNextToWidgetX(maxDelay), getRowY(delayRow) + getOffsetY(checkBoxHeight), checkBoxWidth, checkBoxHeight, "Using delay", tile.data.isUsingDelay()));*/
 
         this.addButton(new Button(offsetX, this.height - offsetY - 20, 98, 20, "Confirm changes", button -> confirmChanges()));
 
@@ -310,9 +310,9 @@ public class AmbienceTileGUI extends Screen {
 
         priorityNumber.setText(String.valueOf(data.getPriority()));
         setCheckBoxChecked(checkPriority, data.isUsingPriority());
-        minDelay.setText(String.valueOf(data.getPriority()));
-        maxDelay.setText(String.valueOf(data.getPriority()));
-        setCheckBoxChecked(checkDelay, data.isUsingDelay());
+        //minDelay.setText(String.valueOf(data.getMaxDelay()));
+        //maxDelay.setText(String.valueOf(data.getPriority()));
+        //setCheckBoxChecked(checkDelay, data.isUsingDelay());
     }
 
     public AmbienceTileEntityData getDataFromFields() {
@@ -588,9 +588,9 @@ public class AmbienceTileGUI extends Screen {
         textPriority.render();
         priorityNumber.render(mouseX, mouseY, partialTicks);
 
-        textDelay.render();
-        maxDelay.render(mouseX, mouseY, partialTicks);
-        minDelay.render(mouseX, mouseY, partialTicks);
+        //textDelay.render();
+        //maxDelay.render(mouseX, mouseY, partialTicks);
+        //minDelay.render(mouseX, mouseY, partialTicks);
 
         //drawString(font, "Position : " + tile.getPos(), width/4, height/2, 0xFFFFFF);
         //drawString(font, "Music : " + tile.getMusicName(), width/4, height/2 + font.FONT_HEIGHT, 0xFFFFFF);

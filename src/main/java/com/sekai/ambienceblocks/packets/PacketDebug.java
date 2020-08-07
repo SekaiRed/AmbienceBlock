@@ -26,10 +26,6 @@ public class PacketDebug {
     }
 
     public static void handle(final PacketDebug pkt, Supplier<NetworkEvent.Context> ctx) {
-        /*ctx.get().enqueueWork(() -> {
-            System.out.println("bruh" + pkt.data);
-        });
-        ctx.get().setPacketHandled(true);*/
         ctx.get().enqueueWork(() -> {
             System.out.println("handler works : " + pkt.data);
             System.out.println(ctx.get().getDirection());

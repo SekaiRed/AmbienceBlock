@@ -21,8 +21,6 @@ public class BoundsUtil {
         int id = nbt.getInt("type");
         AbstractBounds bounds = getBoundsFromType(id);
 
-        if(bounds == null) return null;
-
         bounds.fromNBT(nbt);
         return bounds;
     }
@@ -37,8 +35,6 @@ public class BoundsUtil {
         int id = buf.readInt();
         AbstractBounds bounds = getBoundsFromType(id);
 
-        if(bounds == null) return null;
-
         bounds.fromBuff(buf);
         return bounds;
     }
@@ -48,6 +44,6 @@ public class BoundsUtil {
         if(CylinderBounds.id == id) return new CylinderBounds();
         if(CubicBounds.id == id) return new CubicBounds();
 
-        return null;
+        return new SphereBounds();
     }
 }

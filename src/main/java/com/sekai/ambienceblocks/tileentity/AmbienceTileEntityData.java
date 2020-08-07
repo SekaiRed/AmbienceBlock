@@ -33,9 +33,9 @@ public class AmbienceTileEntityData
     private BlockPos offset = new BlockPos(0, 0, 0);
 
     //delay
-    private int minDelay = 0;
+    /*private int minDelay = 0;
     private int maxDelay = 0;
-    private boolean useDelay = false;
+    private boolean useDelay = false;*/
 
     //other
     private boolean isGlobal = false;
@@ -56,9 +56,9 @@ public class AmbienceTileEntityData
 
         compound.put("offset", NBTUtil.writeBlockPos(offset));
 
-        compound.putInt("minDelay",this.minDelay);
+        /*compound.putInt("minDelay",this.minDelay);
         compound.putInt("maxDelay",this.maxDelay);
-        compound.putBoolean("useDelay", this.useDelay);
+        compound.putBoolean("useDelay", this.useDelay);*/
 
         compound.putBoolean("isGlobal", this.isGlobal);
         return compound;
@@ -79,9 +79,9 @@ public class AmbienceTileEntityData
 
         this.offset = NBTUtil.readBlockPos(compound.getCompound("offset"));
 
-        this.minDelay = compound.getInt("minDelay");
+        /*this.minDelay = compound.getInt("minDelay");
         this.maxDelay = compound.getInt("maxDelay");
-        this.useDelay = compound.getBoolean("useDelay");
+        this.useDelay = compound.getBoolean("useDelay");*/
 
         this.isGlobal = compound.getBoolean("isGlobal");
     }
@@ -105,9 +105,9 @@ public class AmbienceTileEntityData
 
         buf.writeBlockPos(this.offset);
 
-        buf.writeInt(this.minDelay);
+        /*buf.writeInt(this.minDelay);
         buf.writeInt(this.maxDelay);
-        buf.writeBoolean(this.useDelay);
+        buf.writeBoolean(this.useDelay);*/
 
         buf.writeBoolean(this.isGlobal);
     }
@@ -129,9 +129,9 @@ public class AmbienceTileEntityData
 
         this.offset = buf.readBlockPos();
 
-        this.minDelay = buf.readInt();
+        /*this.minDelay = buf.readInt();
         this.maxDelay = buf.readInt();
-        this.useDelay = buf.readBoolean();
+        this.useDelay = buf.readBoolean();*/
 
         this.isGlobal = buf.readBoolean();
     }
@@ -219,7 +219,7 @@ public class AmbienceTileEntityData
         this.offset = offset;
     }
 
-    public int getMinDelay() {
+    /*public int getMinDelay() {
         return minDelay;
     }
 
@@ -241,7 +241,7 @@ public class AmbienceTileEntityData
 
     public void setUseDelay(boolean useDelay) {
         this.useDelay = useDelay;
-    }
+    }*/
 
     public boolean isGlobal() {
         return isGlobal;
