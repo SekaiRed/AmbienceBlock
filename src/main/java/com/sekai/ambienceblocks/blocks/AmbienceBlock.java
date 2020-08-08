@@ -29,11 +29,11 @@ public class AmbienceBlock extends Block {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     public AmbienceBlock() {
-        super(Block.Properties.create(Material.IRON)
-        .hardnessAndResistance(5.0f, 6.0f)
-        .sound(SoundType.METAL)
-        .harvestLevel(0)
-        .harvestTool(ToolType.PICKAXE));
+        super(Block.Properties.create(Material.IRON).hardnessAndResistance(-1.0F, 3600000.0F).sound(SoundType.METAL).noDrops());
+        /*.harvestLevel(0)
+        .harvestTool(ToolType.PICKAXE));*/
+
+        //.hardnessAndResistance(-1.0F, 3600000.0F).noDrops()
     }
 
     @Override
