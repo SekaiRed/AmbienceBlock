@@ -6,13 +6,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 @OnlyIn(Dist.CLIENT)
 public class AmbienceController {
@@ -26,7 +26,8 @@ public class AmbienceController {
     public AmbienceTileEntityData clipboard;
 
     //System lists
-    private ArrayList<CustomSoundSlot> sounds = new ArrayList<>();
+    private ArrayList<CustomSoundSlot> soundsList = new ArrayList<>();
+    private ArrayList<AmbienceDelayRestriction> delayList = new ArrayList<>();
 
     public AmbienceController() {
         instance = this;
@@ -37,7 +38,7 @@ public class AmbienceController {
     @SubscribeEvent
     public void tick(TickEvent.ClientTickEvent event) {
         tick++;
-        if(tick >= 10)
+        if(tick >= 4)
         {
             //there's no world, probably on the main menu or something
             if(mc.world == null)
@@ -52,7 +53,7 @@ public class AmbienceController {
                 return;
 
             //before
-            for(CustomSoundSlot slot : sounds) {
+            for(CustomSoundSlot slot : soundsList) {
                 if(!handler.isPlaying(slot.getMusicInstance()) || !mc.world.loadedTileEntityList.contains(slot.getOwner()) || !slot.getOwner().isWithinBounds(mc.player)) {
                     stopMusic(slot);
                     continue;
@@ -72,15 +73,64 @@ public class AmbienceController {
                 slot.getMusicInstance().setVolume(getVolumeFromTileEntity(slot.getOwner()));
             }
 
+            delayList.removeIf(delay -> !mc.world.loadedTileEntityList.contains(delay.getOrigin()));
+
+            /*for(AmbienceDelayRestriction slot : delayList) {
+                if(!mc.world.loadedTileEntityList.contains(slot.getOrigin())) {
+                    stopMusic(slot);
+                    continue;
+                }
+            }*/
+
             //after
             ArrayList<AmbienceTileEntity> usefulTiles = new ArrayList<>();
 
             for (int i = 0; i < mc.world.loadedTileEntityList.size(); i++) {
                 if (mc.world.loadedTileEntityList.get(i) instanceof AmbienceTileEntity) {
-                    if(((AmbienceTileEntity) mc.world.loadedTileEntityList.get(i)).isWithinBounds(mc.player))
-                        usefulTiles.add((AmbienceTileEntity) mc.world.loadedTileEntityList.get(i));
+                    usefulTiles.add((AmbienceTileEntity) mc.world.loadedTileEntityList.get(i));
+
+                    /*if(tileHasDelayRightNow(tile))
+                    {
+                        getDelayEntry(tile).tick();
+                    }*/
                 }
             }
+
+            for (Iterator<AmbienceTileEntity> iterator = usefulTiles.iterator(); iterator.hasNext();) {
+                AmbienceTileEntity tile = iterator.next();
+
+                //I need to tick the delay even for tiles that are out of reach so they don't always play when you enter their range
+                if(tileHasDelayRightNow(tile))
+                {
+                    AmbienceDelayRestriction delay = getDelayEntry(tile);
+                    if(!delay.isDone())
+                        delay.tick();
+                    else
+                        delay.restart();
+                }
+                else
+                {
+                    if(tile.data.isUsingDelay()) {
+                        delayList.add(new AmbienceDelayRestriction(tile, tile.getDelay()));
+                    }
+                }
+
+                if (!tile.isWithinBounds(mc.player)) {
+                    iterator.remove();
+                }
+            }
+
+            /*for (int i = 0; i < mc.world.loadedTileEntityList.size(); i++) {
+                if (mc.world.loadedTileEntityList.get(i) instanceof AmbienceTileEntity) {
+                    if(((AmbienceTileEntity) mc.world.loadedTileEntityList.get(i)).isWithinBounds(mc.player))
+                        usefulTiles.add((AmbienceTileEntity) mc.world.loadedTileEntityList.get(i));
+
+                    if(tileHasDelayRightNow(tile))
+                    {
+                        getDelayEntry(tile).tick();
+                    }
+                }
+            }*/
 
             //System.out.println(usefulTiles.size() + " in usefulTiles");
 
@@ -112,6 +162,16 @@ public class AmbienceController {
             //System.out.println(finalTiles.size() + " in finalTiles");
 
             for (AmbienceTileEntity tile : finalTiles) {
+                //this tile uses delay which is a special case
+                if (tileHasDelayRightNow(tile) && tile.data.isUsingDelay()) {
+                    if(getDelayEntry(tile).isDone()) {
+                        playMusicNoRepeat(tile);
+                        delayList.remove(getDelayEntry(tile));
+                        continue;
+                    }
+                    continue;
+                }
+
                 //that tile entity already owns a song in the list, check if it has the same song too
                 if (isTileEntityAlreadyPlaying(tile) != null) {
                     if (isTileEntityAlreadyPlaying(tile).getMusicString().equals(tile.getMusicName())) {
@@ -148,11 +208,16 @@ public class AmbienceController {
                 playMusic(tile);
             }
 
-            sounds.removeIf(CustomSoundSlot::isMarkedForDeletion);
+            soundsList.removeIf(CustomSoundSlot::isMarkedForDeletion);
 
             /*System.out.println("List of audio blocks going on");
-            for (CustomSoundSlot slot : sounds) {
+            for (CustomSoundSlot slot : soundsList) {
                 System.out.println(slot.getMusicString() + ", " + slot.getOwner().getPos() + " volume " + slot.getMusicInstance().getVolume() + slot.isMarkedForDeletion());
+            }
+            System.out.println("and");
+            System.out.println("List of audio delays going on");
+            for (AmbienceDelayRestriction slot : delayList) {
+                System.out.println(slot.getOrigin().getMusicName() + ", " + slot.getOrigin().getPos() + " with a tick of " + slot.tickLeft);
             }
             System.out.println("end");*/
 
@@ -165,7 +230,15 @@ public class AmbienceController {
         ResourceLocation playingResource = new ResourceLocation(tile.getMusicName());
         AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), getVolumeFromTileEntity(tile),tile.data.getPitch(), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
         handler.play(playingMusic);
-        sounds.add(new CustomSoundSlot(tile.getMusicName(), playingMusic, tile));
+        soundsList.add(new CustomSoundSlot(tile.getMusicName(), playingMusic, tile));
+    }
+
+    public void playMusicNoRepeat(AmbienceTileEntity tile) {
+        //System.out.println("playing non-looping " + tile.getMusicName() + " at " + tile.getPos());
+        ResourceLocation playingResource = new ResourceLocation(tile.getMusicName());
+        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), getVolumeFromTileEntity(tile),tile.data.getPitch(), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+        handler.play(playingMusic);
+        soundsList.add(new CustomSoundSlot(tile.getMusicName(), playingMusic, tile));
     }
 
     public void stopMusic(CustomSoundSlot soundSlot) {
@@ -174,22 +247,31 @@ public class AmbienceController {
         soundSlot.markForDeletion();
     }
 
+    //Swaps which tiles is currently owning a playing sound, used for relays and fusing
     public void swapOwner(CustomSoundSlot soundSlot, AmbienceTileEntity tile) {
         //System.out.println("swapping " + tile.getMusicName() + " from " + soundSlot.getOwner().getPos() + " to " + tile.getPos());
         soundSlot.setOwner(tile);
         soundSlot.getMusicInstance().setBlockPos(tile.getPos());
     }
 
+    //Mostly used when the tile gets update from a request by the server
     public void stopFromTile(AmbienceTileEntity tile) {
-        for(CustomSoundSlot slot : sounds) {
+        for(CustomSoundSlot slot : soundsList) {
             if(slot.getOwner().equals(tile) && !slot.isMarkedForDeletion())
                 stopMusic(slot);
         }
+
+        delayList.removeIf(delay -> delay.getOrigin() == tile);
+
+        /*for(AmbienceDelayRestriction delay : delayList) {
+            if(delay.getOrigin().equals(tile))
+                fhf
+        }*/
     }
 
     public int getHighestPriority() {
         int highest = 0;
-        for(CustomSoundSlot slot : sounds) {
+        for(CustomSoundSlot slot : soundsList) {
             if(slot.getOwner().getPriority() > highest && slot.getOwner().isUsingPriority() && !slot.isMarkedForDeletion())
                 highest = slot.getOwner().getPriority();
         }
@@ -197,7 +279,7 @@ public class AmbienceController {
     }
 
     public CustomSoundSlot isMusicAlreadyPlaying(String music) {
-        for(CustomSoundSlot slot : sounds) {
+        for(CustomSoundSlot slot : soundsList) {
             if(music.equals(slot.getMusicString()) && !slot.isMarkedForDeletion())
                 return slot;
         }
@@ -205,7 +287,7 @@ public class AmbienceController {
     }
 
     public CustomSoundSlot isTileEntityAlreadyPlaying(AmbienceTileEntity tile) {
-        for(CustomSoundSlot slot : sounds) {
+        for(CustomSoundSlot slot : soundsList) {
             if(slot.getOwner().equals(tile) && !slot.isMarkedForDeletion())
                 return slot;
         }
@@ -263,12 +345,19 @@ public class AmbienceController {
     }
 
     public class AmbienceDelayRestriction {
+        public AmbienceTileEntity getOrigin() {
+            return origin;
+        }
+
         private AmbienceTileEntity origin;
         private int tickLeft;
+
+        private final int originalTick;
 
         public AmbienceDelayRestriction(AmbienceTileEntity origin, int tickLeft) {
             this.origin = origin;
             this.tickLeft = tickLeft;
+            this.originalTick = tickLeft;
         }
 
         public void tick() {
@@ -278,5 +367,20 @@ public class AmbienceController {
         public boolean isDone() {
             return tickLeft <= 0;
         }
+
+        public void restart() {
+            tickLeft = originalTick;
+        }
+    }
+
+    public AmbienceDelayRestriction getDelayEntry(AmbienceTileEntity origin) {
+        for(AmbienceDelayRestriction restriction : delayList) {
+            if(restriction.getOrigin() == origin) return restriction;
+        }
+        return null;
+    }
+
+    public boolean tileHasDelayRightNow(AmbienceTileEntity origin) {
+        return getDelayEntry(origin) != null;
     }
 }

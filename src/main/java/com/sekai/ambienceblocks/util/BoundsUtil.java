@@ -1,14 +1,11 @@
 package com.sekai.ambienceblocks.util;
 
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.AbstractBounds;
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.CubicBounds;
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.CylinderBounds;
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.SphereBounds;
+import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 
 public class BoundsUtil {
-    public static int lastBoundType = 2;
+    public static int lastBoundType = 3;
 
     //nbt stuff
     public static CompoundNBT toNBT(AbstractBounds bounds) {
@@ -43,6 +40,7 @@ public class BoundsUtil {
         if(SphereBounds.id == id) return new SphereBounds();
         if(CylinderBounds.id == id) return new CylinderBounds();
         if(CubicBounds.id == id) return new CubicBounds();
+        if(NoneBounds.id == id) return new NoneBounds();
 
         return new SphereBounds();
     }

@@ -17,5 +17,7 @@
   "ui.ambienceblocks.pitch": "Pitch",
   "ui.ambienceblocks.copy": "Copy",
   "ui.ambienceblocks.paste": "Paste",
-  "ui.ambienceblocks.offset": "Offset"
+  "ui.ambienceblocks.offset": "Offset",
+  "ui.ambienceblocks.min": "Min",
+  "ui.ambienceblocks.max": "Max"
 }

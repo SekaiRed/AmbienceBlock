@@ -4,10 +4,7 @@ import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
 import com.sekai.ambienceblocks.packets.PacketUpdateAmbienceTE;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.AbstractBounds;
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.CubicBounds;
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.CylinderBounds;
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.SphereBounds;
+import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.*;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.PacketHandler;
 import com.sekai.ambienceblocks.util.ParsingUtil;
@@ -109,10 +106,12 @@ public class AmbienceTileGUI extends Screen {
     TextFieldWidget priorityNumber;
     CheckboxButton checkPriority;
 
-    //TextInstance textDelay;
-    //TextFieldWidget minDelay;
-    //TextFieldWidget maxDelay;
-    //QCheckboxButton checkDelay;
+    TextInstance textDelay;
+    TextInstance textMinDelay;
+    TextFieldWidget minDelay;
+    TextInstance textMaxDelay;
+    TextFieldWidget maxDelay;
+    CheckboxButton checkDelay;
 
     //Widget category
     ArrayList<Widget> boundsSphere = new ArrayList<>();
@@ -130,6 +129,23 @@ public class AmbienceTileGUI extends Screen {
 
         }
         return true;
+    };
+
+    private final Predicate<String> negativeNumberFilter = (stringIn) -> {
+        if (net.minecraft.util.StringUtils.isNullOrEmpty(stringIn)) {
+            return true;
+        } else {
+            int strSize = stringIn.length();
+            for (int i = 0; i < strSize; i++)
+            {
+                if (ParsingUtil.isNumber(stringIn.charAt(i)) || (i == 0 && stringIn.charAt(i) == '-'))
+                    continue;
+
+                return false;
+            }
+
+            return true;
+        }
     };
 
     private final Predicate<String> decimalNumberFilter = (stringIn) -> {
@@ -247,19 +263,19 @@ public class AmbienceTileGUI extends Screen {
         textOffsetX = new TextInstance(getNextToWidgetX(textOffset), getRowY(offsetRow) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "X", font);
         tileOffsetX = new TextFieldWidget(font, getNextToWidgetX(textOffsetX), getRowY(offsetRow) + getOffsetY(20), 30, 20, "no");
         this.children.add(tileOffsetX);
-        tileOffsetX.setValidator(numberFilter);
+        tileOffsetX.setValidator(negativeNumberFilter);
         tileOffsetX.setMaxStringLength(8);
 
         textOffsetY = new TextInstance(getNextToWidgetX(tileOffsetX), getRowY(offsetRow) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "Y", font);
         tileOffsetY = new TextFieldWidget(font, getNextToWidgetX(textOffsetY), getRowY(offsetRow) + getOffsetY(20), 30, 20, "no");
         this.children.add(tileOffsetY);
-        tileOffsetY.setValidator(numberFilter);
+        tileOffsetY.setValidator(negativeNumberFilter);
         tileOffsetY.setMaxStringLength(8);
 
         textOffsetZ = new TextInstance(getNextToWidgetX(tileOffsetY), getRowY(offsetRow) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "Z", font);
         tileOffsetZ = new TextFieldWidget(font, getNextToWidgetX(textOffsetZ), getRowY(offsetRow) + getOffsetY(20), 30, 20, "no");
         this.children.add(tileOffsetZ);
-        tileOffsetZ.setValidator(numberFilter);
+        tileOffsetZ.setValidator(negativeNumberFilter);
         tileOffsetZ.setMaxStringLength(8);
 
         //setDefaultBoundType(tile.data.getBounds().getID());
@@ -272,16 +288,18 @@ public class AmbienceTileGUI extends Screen {
         priorityNumber.setText(String.valueOf(tile.getPriority()));
         checkPriority = this.addButton(new CheckboxButton(getNextToWidgetX(priorityNumber), getRowY(priorityRow) + getOffsetY(checkBoxHeight), checkBoxWidth, checkBoxHeight, "Using priority", tile.isUsingPriority()));
 
-        /*textDelay = new TextInstance(offsetX, getRowY(delayRow) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.delay") + " :", font);
-        minDelay = new TextFieldWidget(font, getNextToWidgetX(textDelay), getRowY(delayRow) + getOffsetY(20), 20, 20, String.valueOf(tile.data.getMinDelay()));
+        textDelay = new TextInstance(offsetX, getRowY(delayRow) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.delay") + " :", font);
+        textMinDelay = new TextInstance(getNextToWidgetX(textDelay), getRowY(delayRow) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.min"), font);
+        minDelay = new TextFieldWidget(font, getNextToWidgetX(textMinDelay), getRowY(delayRow) + getOffsetY(20), 50, 20, String.valueOf(tile.data.getMinDelay()));
         this.children.add(minDelay);
         minDelay.setValidator(numberFilter);
         minDelay.setMaxStringLength(4);
-        maxDelay = new TextFieldWidget(font, getNextToWidgetX(minDelay), getRowY(delayRow) + getOffsetY(20), 20, 20, String.valueOf(tile.data.getMaxDelay()));
+        textMaxDelay = new TextInstance(getNextToWidgetX(minDelay), getRowY(delayRow) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.max"), font);
+        maxDelay = new TextFieldWidget(font, getNextToWidgetX(textMaxDelay), getRowY(delayRow) + getOffsetY(20), 50, 20, String.valueOf(tile.data.getMaxDelay()));
         this.children.add(maxDelay);
         maxDelay.setValidator(numberFilter);
         maxDelay.setMaxStringLength(4);
-        checkDelay = this.addButton(new CheckboxButton(getNextToWidgetX(maxDelay), getRowY(delayRow) + getOffsetY(checkBoxHeight), checkBoxWidth, checkBoxHeight, "Using delay", tile.data.isUsingDelay()));*/
+        checkDelay = this.addButton(new CheckboxButton(getNextToWidgetX(maxDelay), getRowY(delayRow) + getOffsetY(checkBoxHeight), checkBoxWidth, checkBoxHeight, "Using delay", tile.data.isUsingDelay()));
 
         this.addButton(new Button(offsetX, this.height - offsetY - 20, 98, 20, "Confirm changes", button -> confirmChanges()));
 
@@ -310,9 +328,9 @@ public class AmbienceTileGUI extends Screen {
 
         priorityNumber.setText(String.valueOf(data.getPriority()));
         setCheckBoxChecked(checkPriority, data.isUsingPriority());
-        //minDelay.setText(String.valueOf(data.getMaxDelay()));
-        //maxDelay.setText(String.valueOf(data.getPriority()));
-        //setCheckBoxChecked(checkDelay, data.isUsingDelay());
+        minDelay.setText(String.valueOf(data.getMinDelay()));
+        maxDelay.setText(String.valueOf(data.getMaxDelay()));
+        setCheckBoxChecked(checkDelay, data.isUsingDelay());
     }
 
     public AmbienceTileEntityData getDataFromFields() {
@@ -352,6 +370,10 @@ public class AmbienceTileGUI extends Screen {
             data.setBounds(bounds);
         }
 
+        if(boundType == NoneBounds.id) {
+            data.setBounds(new NoneBounds());
+        }
+
         data.setOffset(new BlockPos(
                 ParsingUtil.tryParseInt(tileOffsetX.getText()),
                 ParsingUtil.tryParseInt(tileOffsetY.getText()),
@@ -363,6 +385,10 @@ public class AmbienceTileGUI extends Screen {
 
         data.setPriority(ParsingUtil.tryParseInt(priorityNumber.getText()));
         data.setUsePriority(checkPriority.isChecked());
+
+        data.setMinDelay(ParsingUtil.tryParseInt(minDelay.getText()));
+        data.setMaxDelay(ParsingUtil.tryParseInt(maxDelay.getText()));
+        data.setUseDelay(checkDelay.isChecked());
 
         return data;
     }
@@ -398,6 +424,12 @@ public class AmbienceTileGUI extends Screen {
             cubicY.setText(String.valueOf((int) (bounds.getySize())));
             cubicZ.setText(String.valueOf((int) (bounds.getzSize())));
         }
+
+        if(boundType == NoneBounds.id) {
+            //NoneBounds bounds = (NoneBounds) tempBounds;
+
+            resetBoundFields();
+        }
     }
 
     public void setCheckBoxChecked(CheckboxButton check, boolean b) {
@@ -405,39 +437,6 @@ public class AmbienceTileGUI extends Screen {
             check.onPress();
         if(!b && check.isChecked())
             check.onPress();
-    }
-
-    public void setDefaultBoundType(int boundType) {
-        setBoundType(boundType);
-
-        AbstractBounds tempBounds = tile.data.getBounds();
-
-        if(boundType == SphereBounds.id) {
-            SphereBounds bounds = (SphereBounds) tempBounds;
-
-            resetBoundFields();
-
-            sphereRadius.setText(String.valueOf((int) (bounds.getRadius())));
-        }
-
-        if(boundType == CylinderBounds.id) {
-            CylinderBounds bounds = (CylinderBounds) tempBounds;
-
-            resetBoundFields();
-
-            cylinderRadius.setText(String.valueOf((int) (bounds.getRadius())));
-            cylinderHeight.setText(String.valueOf((int) (bounds.getHeight())));
-        }
-
-        if(boundType == CubicBounds.id) {
-            CubicBounds bounds = (CubicBounds) tempBounds;
-
-            resetBoundFields();
-
-            cubicX.setText(String.valueOf((int) (bounds.getxSize())));
-            cubicY.setText(String.valueOf((int) (bounds.getySize())));
-            cubicZ.setText(String.valueOf((int) (bounds.getzSize())));
-        }
     }
 
     public void resetBoundFields() {
@@ -493,6 +492,10 @@ public class AmbienceTileGUI extends Screen {
             }
 
             checkGlobal.x = getNextToWidgetX(cubicZ);//cubicZ.x + cubicZ.getWidth() + separation;
+        }
+
+        if(boundType == NoneBounds.id) {
+            checkGlobal.x = getNextToWidgetX(buttonBounds);//cubicZ.x + cubicZ.getWidth() + separation;
         }
     }
 
@@ -588,9 +591,11 @@ public class AmbienceTileGUI extends Screen {
         textPriority.render();
         priorityNumber.render(mouseX, mouseY, partialTicks);
 
-        //textDelay.render();
-        //maxDelay.render(mouseX, mouseY, partialTicks);
-        //minDelay.render(mouseX, mouseY, partialTicks);
+        textDelay.render();
+        textMinDelay.render();
+        minDelay.render(mouseX, mouseY, partialTicks);
+        textMaxDelay.render();
+        maxDelay.render(mouseX, mouseY, partialTicks);
 
         //drawString(font, "Position : " + tile.getPos(), width/4, height/2, 0xFFFFFF);
         //drawString(font, "Music : " + tile.getMusicName(), width/4, height/2 + font.FONT_HEIGHT, 0xFFFFFF);
@@ -603,6 +608,7 @@ public class AmbienceTileGUI extends Screen {
         HoverChecker musicHover = new HoverChecker(textMusic, 0);
         HoverChecker boundsHover = new HoverChecker(textBounds, 0);
         HoverChecker priorityHover = new HoverChecker(textPriority, 0);
+        HoverChecker delayHover = new HoverChecker(textDelay, 0);
 
         HoverChecker boundsButtonHover = new HoverChecker(buttonBounds, 0);
 
@@ -636,6 +642,14 @@ public class AmbienceTileGUI extends Screen {
             GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
         }
 
+        if (delayHover.checkHover(mouseX, mouseY))
+        {
+            list.add(TextFormatting.RED + "Delay");
+            list.add(TextFormatting.WHITE + "The sound will wait between min and max ticks times 4 before playing again.");
+            list.add(TextFormatting.GRAY + "(You can set min and max to the same value if you don't want the value to be random)");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+
         if (boundsButtonHover.checkHover(mouseX, mouseY))
         {
             if(boundType == SphereBounds.id) {
@@ -656,6 +670,13 @@ public class AmbienceTileGUI extends Screen {
                 list.add(TextFormatting.RED + "Cubic Bounds");
                 list.add(TextFormatting.WHITE + "Cubic bounds that cover a cubic area of origin by the value of x, y and z.");
                 list.add(TextFormatting.GRAY + "(If the sound isn't global, the volume will be scaled as if this was a Sphere Bounds which won't cover the whole area)");
+                GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+            }
+
+            if(boundType == NoneBounds.id) {
+                list.add(TextFormatting.RED + "None Bounds");
+                list.add(TextFormatting.WHITE + "Will always play as long as the tile is loaded on the client.");
+                list.add(TextFormatting.GRAY + "(The volume will not change with distance regardless of if the tile is set to be global)");
                 GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
             }
         }

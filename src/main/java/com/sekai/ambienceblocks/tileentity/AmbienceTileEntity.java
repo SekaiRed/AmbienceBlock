@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 public class AmbienceTileEntity extends TileEntity {
@@ -120,4 +121,9 @@ public class AmbienceTileEntity extends TileEntity {
         data.setGlobal(global);
     }
 
+    public int getDelay() {
+        int min = data.getMinDelay(), max = data.getMaxDelay();
+        if(min > max || min == max) return max;
+        return (int) ((max - min) * Math.random() + min);
+    }
 }
