@@ -8,13 +8,12 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 //data holder class
 public class AmbienceTileEntityData
 {
     //main
-    private String musicName = "";
+    private String soundName = "";
     private boolean shouldFuse = true;
     private boolean needRedstone = false;
 
@@ -42,7 +41,7 @@ public class AmbienceTileEntityData
 
     //NBT util
     public CompoundNBT toNBT(CompoundNBT compound) {
-        compound.putString("musicName", this.musicName);
+        compound.putString("musicName", this.soundName);
         compound.putBoolean("shouldFuse", this.shouldFuse);
         compound.putBoolean("needRedstone", this.needRedstone);
 
@@ -65,7 +64,7 @@ public class AmbienceTileEntityData
     }
 
     public void fromNBT(CompoundNBT compound) {
-        this.musicName = compound.getString("musicName");
+        this.soundName = compound.getString("musicName");
         this.shouldFuse = compound.getBoolean("shouldFuse");
         this.needRedstone = compound.getBoolean("needRedstone");
 
@@ -90,7 +89,7 @@ public class AmbienceTileEntityData
     //Buffer util
     public void toBuff(PacketBuffer buf) {
         //Encode the data for the buffer
-        buf.writeString(this.musicName, 50);
+        buf.writeString(this.soundName, 50);
         buf.writeBoolean(this.shouldFuse);
         buf.writeBoolean(this.needRedstone);
 
@@ -114,7 +113,7 @@ public class AmbienceTileEntityData
 
     public void fromBuff(PacketBuffer buf) {
         //Decode the data from the buffer
-        this.musicName = buf.readString(50);
+        this.soundName = buf.readString(50);
         this.shouldFuse = buf.readBoolean();
         this.needRedstone = buf.readBoolean();
 
@@ -151,12 +150,12 @@ public class AmbienceTileEntityData
     }
 
     //Getter and setter
-    public String getMusicName() {
-        return musicName;
+    public String getSoundName() {
+        return soundName;
     }
 
-    public void setMusicName(String musicName) {
-        this.musicName = musicName;
+    public void setSoundName(String soundName) {
+        this.soundName = soundName;
     }
 
     public boolean shouldFuse() {

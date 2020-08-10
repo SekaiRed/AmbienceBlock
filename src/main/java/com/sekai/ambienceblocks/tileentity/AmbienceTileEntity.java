@@ -1,14 +1,10 @@
 package com.sekai.ambienceblocks.tileentity;
 
 import com.sekai.ambienceblocks.util.RegistryHandler;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 
 public class AmbienceTileEntity extends TileEntity {
     public AmbienceTileEntityData data = new AmbienceTileEntityData();
@@ -89,7 +85,7 @@ public class AmbienceTileEntity extends TileEntity {
     }
 
     //Getter and setters
-    public String getMusicName() { return data.getMusicName(); }
+    public String getMusicName() { return data.getSoundName(); }
 
     public int getPriority() { return data.getPriority(); }
 
@@ -104,7 +100,7 @@ public class AmbienceTileEntity extends TileEntity {
     }
 
     public void setMusicName(String musicName) {
-        data.setMusicName(musicName);
+        data.setSoundName(musicName);
     }
 
     public void setPriority(int priority) {

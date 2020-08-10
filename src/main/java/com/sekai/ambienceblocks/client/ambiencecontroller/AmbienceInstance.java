@@ -12,7 +12,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class AmbienceInstance extends TickableSound {
-    private float internalVolume = 0f;
+    private float internalVolume = 1f;
+    private float internalPitch = 1f;
     private BlockPos internalPos;
 
     public AmbienceInstance(ResourceLocation soundId, SoundCategory categoryIn, BlockPos pos, float volume, float pitch, boolean repeat) {
@@ -20,6 +21,7 @@ public class AmbienceInstance extends TickableSound {
         this.volume = volume;
         internalVolume = volume;
         this.pitch = pitch;
+        internalPitch = pitch;
         this.x = pos.getX();
         this.y = pos.getY();
         this.z = pos.getZ();
@@ -42,6 +44,15 @@ public class AmbienceInstance extends TickableSound {
         internalVolume = volume;
     }
 
+    public void setPitch(float pitch) {
+        if(pitch < 0f) {
+            internalPitch = 0f;
+            return;
+        }
+
+        internalPitch = pitch;
+    }
+
     public void setBlockPos(BlockPos pos) {
         if(pos != null)
             internalPos = pos;
@@ -49,10 +60,12 @@ public class AmbienceInstance extends TickableSound {
 
     @Override
     public void tick() {
-        if(internalVolume != volume) {
-            //update volume if it changed
+        //update volume if it changed
+        if(internalVolume != volume)
             this.volume = internalVolume;
-        }
+
+        if(internalPitch != pitch)
+            this.pitch = internalPitch;
 
         if(internalPos.getX() != x || internalPos.getY() != y || internalPos.getZ() != z)
         {

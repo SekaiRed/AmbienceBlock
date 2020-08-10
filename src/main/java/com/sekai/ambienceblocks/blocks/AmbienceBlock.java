@@ -1,9 +1,7 @@
 package com.sekai.ambienceblocks.blocks;
 
-import com.sekai.ambienceblocks.client.gui.AmbienceTileGUI;
-import com.sekai.ambienceblocks.packets.PacketOpenAmbienceGui;
+import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
-import com.sekai.ambienceblocks.util.PacketHandler;
 import com.sekai.ambienceblocks.util.RegistryHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -11,7 +9,6 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
@@ -22,8 +19,6 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
-import net.minecraftforge.fml.network.PacketDistributor;
 
 public class AmbienceBlock extends Block {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
@@ -71,7 +66,8 @@ public class AmbienceBlock extends Block {
         if(!(Minecraft.getInstance().world.getTileEntity(pos) instanceof AmbienceTileEntity))
             return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
 
-        Minecraft.getInstance().displayGuiScreen(new AmbienceTileGUI((AmbienceTileEntity)Minecraft.getInstance().world.getTileEntity(pos)));
+        //Minecraft.getInstance().displayGuiScreen(new AmbienceTileGUI((AmbienceTileEntity)Minecraft.getInstance().world.getTileEntity(pos)));
+        Minecraft.getInstance().displayGuiScreen(new AmbienceGUI((AmbienceTileEntity)Minecraft.getInstance().world.getTileEntity(pos)));
 
         return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
         /*if(worldIn.isRemote())

@@ -4,6 +4,7 @@ import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraftforge.api.distmarker.Dist;
@@ -11,8 +12,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 @OnlyIn(Dist.CLIENT)
 public class AmbienceController {
@@ -70,7 +70,33 @@ public class AmbienceController {
                     continue;
                 }
 
-                slot.getMusicInstance().setVolume(getVolumeFromTileEntity(slot.getOwner()));
+                float volume = getVolumeFromTileEntity(slot.getOwner()), pitch = getPitchFromTileEntity(slot.getOwner());
+                if(slot.getOwner().data.shouldFuse()) {
+                    //setting original bias
+                    //pitch *= slot.getOwner().data.getPercentageHowCloseIsPlayer(mc.player, slot.getOwner().getPos());
+                    List<TileEntity> tileEntityList = mc.world.loadedTileEntityList;
+                    tileEntityList.removeIf(lambda -> !(lambda instanceof AmbienceTileEntity));
+                    ArrayList<AmbienceTileEntity> ambienceTileEntityList = new ArrayList<>();
+                    for (TileEntity target : tileEntityList) {
+                        ambienceTileEntityList.add((AmbienceTileEntity) target);
+                    }
+                    for (AmbienceTileEntity target : ambienceTileEntityList) {
+                        if (target == slot.getOwner())
+                            continue;
+
+                        if (target.getMusicName().equals(slot.getMusicString()) && target.isWithinBounds(mc.player)) {
+                            //additive
+                            volume += getVolumeFromTileEntity(target);
+                            //averaging
+                            //pitch = (float) ((pitch * getPitchFromTileEntity(target) * target.data.getPercentageHowCloseIsPlayer(mc.player, slot.getOwner().getPos())) / 2);
+                            //pitch = pitch + getPitchFromTileEntity(target) * (1 - )
+                        }
+                    }
+                }
+                slot.setVolume(volume);
+                slot.setPitch(pitch);
+
+                //slot.getMusicInstance().setVolume(getVolumeFromTileEntity(slot.getOwner()));
             }
 
             delayList.removeIf(delay -> !mc.world.loadedTileEntityList.contains(delay.getOrigin()));
@@ -301,6 +327,10 @@ public class AmbienceController {
             return (float) (tile.data.getVolume() * tile.data.getPercentageHowCloseIsPlayer(mc.player, tile.getPos()));
     }
 
+    public float getPitchFromTileEntity(AmbienceTileEntity tile) {
+        return tile.data.getPitch();
+    }
+
     public AmbienceTileEntityData getClipboard() {
         return clipboard;
     }
@@ -337,6 +367,19 @@ public class AmbienceController {
 
         public void markForDeletion() {
             this.markForDeletion = true;
+        }
+
+        public float getVolume() {
+            return musicRef.getVolume();
+        }
+        public void setVolume(float volume) {
+            musicRef.setVolume(volume);
+        }
+        public float getPitch() {
+            return musicRef.getPitch();
+        }
+        public void setPitch(float pitch) {
+            musicRef.setPitch(pitch);
         }
 
         public CustomSoundSlot clone() {

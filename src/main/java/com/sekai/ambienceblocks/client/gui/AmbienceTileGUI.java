@@ -8,7 +8,6 @@ import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.*;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.PacketHandler;
 import com.sekai.ambienceblocks.util.ParsingUtil;
-import jdk.nashorn.internal.ir.Block;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
@@ -16,14 +15,12 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 import net.minecraftforge.fml.client.gui.HoverChecker;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -313,7 +310,7 @@ public class AmbienceTileGUI extends Screen {
     }
 
     public void getFieldsFromData(AmbienceTileEntityData data) {
-        musicName.setText(data.getMusicName());
+        musicName.setText(data.getSoundName());
         setCheckBoxChecked(checkFuse, data.shouldFuse());
         soundVolume.setText(String.valueOf(data.getVolume()));
         soundPitch.setText(String.valueOf(data.getPitch()));
@@ -336,7 +333,7 @@ public class AmbienceTileGUI extends Screen {
     public AmbienceTileEntityData getDataFromFields() {
         AmbienceTileEntityData data = new AmbienceTileEntityData();
 
-        data.setMusicName(musicName.getText());
+        data.setSoundName(musicName.getText());
         data.setShouldFuse(checkFuse.isChecked());
         data.setNeedRedstone(checkRedstone.isChecked());
 

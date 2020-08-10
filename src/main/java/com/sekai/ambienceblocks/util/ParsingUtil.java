@@ -1,5 +1,7 @@
 package com.sekai.ambienceblocks.util;
 
+import java.util.function.Predicate;
+
 public class ParsingUtil {
     public static int tryParseInt(String value, int defaultVal) {
         try {
@@ -69,4 +71,52 @@ public class ParsingUtil {
         }
         return count;
     }
+
+    //Predicate
+    public static final Predicate<String> numberFilter = (stringIn) -> {
+        if (!net.minecraft.util.StringUtils.isNullOrEmpty(stringIn)) {
+            int strSize = stringIn.length();
+            for (int i = 0; i < strSize; i++) {
+                if (!ParsingUtil.isNumber(stringIn.charAt(i)))
+                    return false;
+            }
+
+        }
+        return true;
+    };
+
+    public static final Predicate<String> negativeNumberFilter = (stringIn) -> {
+        if (net.minecraft.util.StringUtils.isNullOrEmpty(stringIn)) {
+            return true;
+        } else {
+            int strSize = stringIn.length();
+            for (int i = 0; i < strSize; i++)
+            {
+                if (ParsingUtil.isNumber(stringIn.charAt(i)) || (i == 0 && stringIn.charAt(i) == '-'))
+                    continue;
+
+                return false;
+            }
+
+            return true;
+        }
+    };
+
+    public static final Predicate<String> decimalNumberFilter = (stringIn) -> {
+        if (net.minecraft.util.StringUtils.isNullOrEmpty(stringIn)) {
+            return true;
+        } else {
+            int strSize = stringIn.length();
+            for (int i = 0; i < strSize; i++)
+            {
+                if (!ParsingUtil.isNumberOrDot(stringIn.charAt(i)))
+                    return false;
+            }
+
+            if(ParsingUtil.countChar(stringIn, '.') > 1)
+                return false;
+
+            return true;
+        }
+    };
 }
