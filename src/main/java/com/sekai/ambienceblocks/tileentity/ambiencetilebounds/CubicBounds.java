@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class CubicBounds extends AbstractBounds {
-    public static final int id = 2;
+    public static final int id = 3;
 
     private double xSize;
     private double ySize;
@@ -40,22 +40,37 @@ public class CubicBounds extends AbstractBounds {
     }
 
     @Override
-    public boolean isWithinBounds(PlayerEntity player, BlockPos origin) {
+    public boolean isWithinBounds(PlayerEntity player, Vec3d origin) {
         return player.getPosX() >= origin.getX() - xSize && player.getPosY() >= origin.getY() - ySize && player.getPosZ() >= origin.getZ() - zSize
                 && player.getPosX() <= origin.getX() + 1 + xSize && player.getPosY() <= origin.getY() + 1 + ySize && player.getPosZ() <= origin.getZ() + 1 + zSize;
     }
 
     @Override
-    public double distanceFromCenter(PlayerEntity player, BlockPos origin) {
-        Vec3d vecPlayer = new Vec3d(player.getPosX(), player.getPosY(), player.getPosZ());
+    public double distanceFromCenter(PlayerEntity player, Vec3d origin) {
+        /*Vec3d vecPlayer = new Vec3d(player.getPosX(), player.getPosY(), player.getPosZ());
         Vec3d vecTile = new Vec3d(origin.getX(), origin.getY(), origin.getZ());
 
-        return vecPlayer.distanceTo(vecTile);
+        return vecPlayer.distanceTo(vecTile);*/
+
+        double x = player.getPosX() - origin.getX(), y = player.getPosY() - origin.getY(), z = player.getPosZ() - origin.getZ();
+        double sum = Math.abs(x) + Math.abs(y) + Math.abs(z);
+
+        return sum;
+    }
+
+    public double maxDistanceFromCenter(Vec3d origin) {
+        //double x = getxSize() - origin.getX(), y = player.getPosY() - origin.getY(), z = player.getPosZ() - origin.getZ();
+        double sum = getxSize() + getySize() + getzSize();
+
+        return sum;
     }
 
     @Override
-    public double getPercentageHowCloseIsPlayer(PlayerEntity player, BlockPos origin) {
-        return (getAverage() - distanceFromCenter(player, origin)) / getAverage();//distanceFromCenter(player, origin) / getAverage();
+    public double getPercentageHowCloseIsPlayer(PlayerEntity player, Vec3d origin) {
+        //return (getAverage() - distanceFromCenter(player, origin)) / getAverage();//distanceFromCenter(player, origin) / getAverage();
+        return 1 - (distanceFromCenter(player, origin) / maxDistanceFromCenter(origin));
+        /*double x = Math.abs(player.getPosX() - origin.getX()), y = Math.abs(player.getPosY() - origin.getY()), z = Math.abs(player.getPosZ() - origin.getZ());
+        return 1 - ((x / xSize) * (y / ySize) * (z / zSize));*/
     }
 
     @Override

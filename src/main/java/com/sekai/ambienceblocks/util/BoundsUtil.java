@@ -5,7 +5,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 
 public class BoundsUtil {
-    public static int lastBoundType = 3;
+    public static int lastBoundType = 4;
 
     //nbt stuff
     public static CompoundNBT toNBT(AbstractBounds bounds) {
@@ -39,6 +39,7 @@ public class BoundsUtil {
     public static AbstractBounds getBoundsFromType(int id) {
         if(SphereBounds.id == id) return new SphereBounds();
         if(CylinderBounds.id == id) return new CylinderBounds();
+        if(CapsuleBounds.id == id) return new CapsuleBounds();
         if(CubicBounds.id == id) return new CubicBounds();
         if(NoneBounds.id == id) return new NoneBounds();
 

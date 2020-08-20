@@ -1,5 +1,9 @@
 package com.sekai.ambienceblocks.util;
 
+import net.minecraft.block.Blocks;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+
 import java.util.function.Predicate;
 
 public class ParsingUtil {
@@ -72,6 +76,10 @@ public class ParsingUtil {
         return count;
     }
 
+    public static Vec3d blockPosToVec3d(BlockPos pos) {
+        return new Vec3d(pos.getX(), pos.getY(), pos.getZ());
+    }
+
     //Predicate
     public static final Predicate<String> numberFilter = (stringIn) -> {
         if (!net.minecraft.util.StringUtils.isNullOrEmpty(stringIn)) {
@@ -111,6 +119,26 @@ public class ParsingUtil {
             {
                 if (!ParsingUtil.isNumberOrDot(stringIn.charAt(i)))
                     return false;
+            }
+
+            if(ParsingUtil.countChar(stringIn, '.') > 1)
+                return false;
+
+            return true;
+        }
+    };
+
+    public static final Predicate<String> negativeDecimalNumberFilter = (stringIn) -> {
+        if (net.minecraft.util.StringUtils.isNullOrEmpty(stringIn)) {
+            return true;
+        } else {
+            int strSize = stringIn.length();
+            for (int i = 0; i < strSize; i++)
+            {
+                if (ParsingUtil.isNumberOrDot(stringIn.charAt(i)) || (i == 0 && stringIn.charAt(i) == '-'))
+                    continue;
+
+                return false;
             }
 
             if(ParsingUtil.countChar(stringIn, '.') > 1)

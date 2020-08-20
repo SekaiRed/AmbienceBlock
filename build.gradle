@@ -32,7 +32,6 @@ minecraft {
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
-
     runs {
         client {
             workingDirectory project.file('run')
@@ -42,8 +41,6 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
-
-            //args '--username', 'bruh'
 
             mods {
                 examplemod {

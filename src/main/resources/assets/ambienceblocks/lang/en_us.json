@@ -11,13 +11,16 @@
   "ui.ambienceblocks.bounds.cylinder": "Cylinder",
   "ui.ambienceblocks.bounds.cubic": "Cubic",
   "ui.ambienceblocks.radius": "Radius",
-  "ui.ambienceblocks.height": "Height",
+  "ui.ambienceblocks.length": "Length",
   "ui.ambienceblocks.priority": "Priority",
+  "ui.ambienceblocks.channel": "Channel",
   "ui.ambienceblocks.volume": "Volume",
   "ui.ambienceblocks.pitch": "Pitch",
   "ui.ambienceblocks.copy": "Copy",
   "ui.ambienceblocks.paste": "Paste",
   "ui.ambienceblocks.offset": "Offset",
   "ui.ambienceblocks.min": "Min",
-  "ui.ambienceblocks.max": "Max"
+  "ui.ambienceblocks.max": "Max",
+  "ui.ambienceblocks.type": "Type",
+  "ui.ambienceblocks.axis": "Axis"
 }

@@ -1,6 +1,6 @@
 package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
-import com.sekai.ambienceblocks.client.gui.TextInstance;
+import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import com.sekai.ambienceblocks.util.ParsingUtil;
@@ -62,5 +62,15 @@ public class DelayTab extends AbstractTab {
     public void setDataFromField(AmbienceTileEntityData data) {
         data.setMinDelay(ParsingUtil.tryParseInt(minDelay.getText()));
         data.setMaxDelay(ParsingUtil.tryParseInt(maxDelay.getText()));
+    }
+
+    @Override
+    public void onActivate() {
+
+    }
+
+    @Override
+    public void onDeactivate() {
+
     }
 }

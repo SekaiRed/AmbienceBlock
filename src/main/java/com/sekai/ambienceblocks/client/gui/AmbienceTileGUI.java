@@ -1,6 +1,7 @@
 package com.sekai.ambienceblocks.client.gui;
 
 import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
+import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.packets.PacketUpdateAmbienceTE;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
@@ -14,7 +15,6 @@ import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -352,7 +352,7 @@ public class AmbienceTileGUI extends Screen {
             CylinderBounds bounds = new CylinderBounds();
 
             bounds.setRadius(ParsingUtil.tryParseDouble(cylinderRadius.getText()));
-            bounds.setHeight(ParsingUtil.tryParseDouble(cylinderHeight.getText()));
+            bounds.setLength(ParsingUtil.tryParseDouble(cylinderHeight.getText()));
 
             data.setBounds(bounds);
         }
@@ -371,11 +371,11 @@ public class AmbienceTileGUI extends Screen {
             data.setBounds(new NoneBounds());
         }
 
-        data.setOffset(new BlockPos(
+        /*data.setOffset(new BlockPos(
                 ParsingUtil.tryParseInt(tileOffsetX.getText()),
                 ParsingUtil.tryParseInt(tileOffsetY.getText()),
                 ParsingUtil.tryParseInt(tileOffsetZ.getText())
-        ));
+        ));*/
 
         //((SphereBounds)data.getBounds()).setRadius(ParsingUtil.tryParseDouble(sphereRadius.getText()));
         data.setGlobal(checkGlobal.isChecked());
@@ -409,7 +409,7 @@ public class AmbienceTileGUI extends Screen {
             resetBoundFields();
 
             cylinderRadius.setText(String.valueOf((int) (bounds.getRadius())));
-            cylinderHeight.setText(String.valueOf((int) (bounds.getHeight())));
+            cylinderHeight.setText(String.valueOf((int) (bounds.getLength())));
         }
 
         if(boundType == CubicBounds.id) {

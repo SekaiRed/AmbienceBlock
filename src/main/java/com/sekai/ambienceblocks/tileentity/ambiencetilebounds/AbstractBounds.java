@@ -20,13 +20,36 @@ public abstract class AbstractBounds {
         this.offset = pos;
     }*/
 
-    public abstract boolean isWithinBounds(PlayerEntity player, BlockPos origin);
-    public abstract double distanceFromCenter(PlayerEntity player, BlockPos origin);
-    public abstract double getPercentageHowCloseIsPlayer(PlayerEntity player, BlockPos origin);
+    public abstract boolean isWithinBounds(PlayerEntity player, Vec3d origin);
+    public abstract double distanceFromCenter(PlayerEntity player, Vec3d origin);
+    public abstract double getPercentageHowCloseIsPlayer(PlayerEntity player, Vec3d origin);
 
     public abstract CompoundNBT toNBT();
     public abstract void fromNBT(CompoundNBT compound);
 
     public abstract void toBuff(PacketBuffer buf);
     public abstract void fromBuff(PacketBuffer buf);
+
+    //util
+    public Vec3d getFixedOrigin(Vec3d origin) {
+        return new Vec3d(origin.getX(), origin.getY(), origin.getZ()).add(blockOffset);
+    }
+
+    public double getPlayerPosByAxis(PlayerEntity player, BoundsAxis axis) {
+        switch(axis) {
+            case X:return player.getPosX();
+            case Y:return player.getPosY();
+            case Z:return player.getPosZ();
+        }
+        return 0;
+    }
+
+    public double getVec3dPosByAxis(Vec3d vec, BoundsAxis axis) {
+        switch(axis) {
+            case X:return vec.getX();
+            case Y:return vec.getY();
+            case Z:return vec.getZ();
+        }
+        return 0;
+    }
 }

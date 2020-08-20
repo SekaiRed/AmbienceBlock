@@ -1,4 +1,4 @@
-package com.sekai.ambienceblocks.client.gui;
+package com.sekai.ambienceblocks.client.gui.widgets;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.Widget;
@@ -25,6 +25,14 @@ public class TextInstance extends Widget {
         this.height = font.FONT_HEIGHT;
 
         this.font = font;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public void render() {

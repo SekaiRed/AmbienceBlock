@@ -3,15 +3,21 @@ package com.sekai.ambienceblocks.tileentity;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.AbstractBounds;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.SphereBounds;
 import com.sekai.ambienceblocks.util.BoundsUtil;
+import com.sekai.ambienceblocks.util.NBTHelper;
+import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 //data holder class
 public class AmbienceTileEntityData
 {
+    public static final int maxPriorities = 99;
+    public static final int maxChannels = 5;
+
     //main
     private String soundName = "";
     private boolean shouldFuse = true;
@@ -22,14 +28,15 @@ public class AmbienceTileEntityData
     private float pitch = 1.0f;
 
     //priority
-    private int priority = 0;
     private boolean usePriority = false;
+    private int priority = 0;
+    private int channel = 0;
 
     //bounds
     private AbstractBounds bounds = new SphereBounds(16D);
 
     //offset
-    private BlockPos offset = new BlockPos(0, 0, 0);
+    private Vec3d offset = new Vec3d(0, 0, 0);
 
     //delay
     private int minDelay = 0;
@@ -49,11 +56,13 @@ public class AmbienceTileEntityData
         compound.putFloat("pitch", this.pitch);
 
         compound.putInt("priority",this.priority);
+        compound.putInt("channel",this.channel);
         compound.putBoolean("usePriority",this.usePriority);
 
         compound.put("bounds", BoundsUtil.toNBT(this.bounds));
 
-        compound.put("offset", NBTUtil.writeBlockPos(offset));
+        ///compound.put("offset", NBTUtil.writeBlockPos(offset));
+        compound.put("offset", NBTHelper.writeVec3d(this.offset));
 
         compound.putInt("minDelay",this.minDelay);
         compound.putInt("maxDelay",this.maxDelay);
@@ -72,11 +81,13 @@ public class AmbienceTileEntityData
         this.pitch = compound.getFloat("pitch");
 
         this.priority = compound.getInt("priority");
+        this.channel = compound.getInt("channel");
         this.usePriority = compound.getBoolean("usePriority");
 
         this.bounds = BoundsUtil.fromNBT(compound.getCompound("bounds"));
 
-        this.offset = NBTUtil.readBlockPos(compound.getCompound("offset"));
+        //this.offset = NBTUtil.readBlockPos(compound.getCompound("offset"));
+        this.offset = NBTHelper.readVec3d(compound.getCompound("offset"));
 
         this.minDelay = compound.getInt("minDelay");
         this.maxDelay = compound.getInt("maxDelay");
@@ -97,12 +108,16 @@ public class AmbienceTileEntityData
         buf.writeFloat(this.pitch);
 
         buf.writeInt(this.priority);
+        buf.writeInt(this.channel);
         buf.writeBoolean(this.usePriority);
 
         //buf.writeDouble(this.offDistance);
         BoundsUtil.toBuff(this.bounds, buf);
 
-        buf.writeBlockPos(this.offset);
+        //buf.writeBlockPos(this.offset);
+        buf.writeDouble(this.offset.x);
+        buf.writeDouble(this.offset.y);
+        buf.writeDouble(this.offset.z);
 
         buf.writeInt(this.minDelay);
         buf.writeInt(this.maxDelay);
@@ -121,12 +136,13 @@ public class AmbienceTileEntityData
         this.pitch = buf.readFloat();
 
         this.priority = buf.readInt();
+        this.channel = buf.readInt();
         this.usePriority = buf.readBoolean();
 
-        //this.offDistance = buf.readDouble();
         this.bounds = BoundsUtil.fromBuff(buf);
 
-        this.offset = buf.readBlockPos();
+        //this.offset = buf.readBlockPos();
+        this.offset = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
 
         this.minDelay = buf.readInt();
         this.maxDelay = buf.readInt();
@@ -138,15 +154,15 @@ public class AmbienceTileEntityData
 
     //Bounds
     public boolean isWithinBounds(PlayerEntity player, BlockPos origin) {
-        return bounds.isWithinBounds(player, origin.add(getOffset()));
+        return bounds.isWithinBounds(player, ParsingUtil.blockPosToVec3d(origin).add(getOffset()));
     }
 
     public double distanceFromCenter(PlayerEntity player, BlockPos origin) {
-        return bounds.distanceFromCenter(player, origin.add(getOffset()));
+        return bounds.distanceFromCenter(player, ParsingUtil.blockPosToVec3d(origin).add(getOffset()));
     }
 
     public double getPercentageHowCloseIsPlayer(PlayerEntity player, BlockPos origin) {
-        return bounds.getPercentageHowCloseIsPlayer(player, origin.add(getOffset()));
+        return bounds.getPercentageHowCloseIsPlayer(player, ParsingUtil.blockPosToVec3d(origin).add(getOffset()));
     }
 
     //Getter and setter
@@ -196,6 +212,14 @@ public class AmbienceTileEntityData
         this.priority = priority;
     }
 
+    public int getChannel() {
+        return channel;
+    }
+
+    public void setChannel(int channel) {
+        this.channel = channel;
+    }
+
     public boolean isUsingPriority() {
         return usePriority;
     }
@@ -210,11 +234,11 @@ public class AmbienceTileEntityData
 
     public void setBounds(AbstractBounds bounds) { this.bounds = bounds; }
 
-    public BlockPos getOffset() {
+    public Vec3d getOffset() {
         return offset;
     }
 
-    public void setOffset(BlockPos offset) {
+    public void setOffset(Vec3d offset) {
         this.offset = offset;
     }
 

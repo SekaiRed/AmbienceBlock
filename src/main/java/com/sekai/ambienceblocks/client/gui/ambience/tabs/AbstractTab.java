@@ -31,27 +31,27 @@ public abstract class AbstractTab {
     }
 
     //util stuff
-    public int getBaseX() {
+    protected int getBaseX() {
         return x + separation;
     }
 
-    public int getEndX() {
+    protected int getEndX() {
         return x + width - separation;
     }
 
-    public int getNeighbourX(Widget widget) {
+    protected int getNeighbourX(Widget widget) {
         return widget.x + widget.getWidth() + separation;
     }
 
-    public int getRowY(int row) {
+    protected int getRowY(int row) {
         return y + rowHeight * row + separation * (row + 1) + AmbienceGUI.tabHeight;
     }
 
-    public int getOffsetY(int height) {
+    protected int getOffsetY(int height) {
         return (rowHeight - height) / 2;
     }
 
-    public int getWidthFromTwoX(int x1, int x2) {
+    protected int getWidthFromTwoX(int x1, int x2) {
         if(x1 < x2)
             return x2 - x1 - separation * 2;
 
@@ -74,26 +74,6 @@ public abstract class AbstractTab {
         widgets.add(widget);
     }
 
-    public void activate() {
-        active = true;
-        for(Widget widget : widgets) {
-            widget.visible = true;
-            widget.active = true;
-        }
-    }
-
-    public void deactivate() {
-        active = false;
-        for(Widget widget : widgets) {
-            widget.visible = false;
-            widget.active = false;
-        }
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
     public abstract String getName();
 
     public abstract void init();
@@ -110,4 +90,30 @@ public abstract class AbstractTab {
      * @param data to pass into the tile from the gui.
      */
     public abstract void setDataFromField(AmbienceTileEntityData data);
+
+    public void activate() {
+        active = true;
+        for(Widget widget : widgets) {
+            widget.visible = true;
+            widget.active = true;
+        }
+        onActivate();
+    }
+
+    public abstract void onActivate();
+
+    public void deactivate() {
+        active = false;
+        for(Widget widget : widgets) {
+            widget.visible = false;
+            widget.active = false;
+        }
+        onDeactivate();
+    }
+
+    public abstract void onDeactivate();
+
+    public boolean isActive() {
+        return active;
+    }
 }

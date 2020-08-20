@@ -38,14 +38,14 @@ public class SphereBounds extends AbstractBounds {
     }
 
     @Override
-    public boolean isWithinBounds(PlayerEntity player, BlockPos origin) {
+    public boolean isWithinBounds(PlayerEntity player, Vec3d origin) {
         double dist = distanceFromCenter(player, origin);
 
         return dist < radius;
     }
 
     @Override
-    public double distanceFromCenter(PlayerEntity player, BlockPos origin) {
+    public double distanceFromCenter(PlayerEntity player, Vec3d origin) {
         Vec3d vecPlayer = new Vec3d(player.getPosX(), player.getPosY(), player.getPosZ());
         Vec3d vecTile = new Vec3d(origin.getX(), origin.getY(), origin.getZ()).add(blockOffset);
 
@@ -53,7 +53,7 @@ public class SphereBounds extends AbstractBounds {
     }
 
     @Override
-    public double getPercentageHowCloseIsPlayer(PlayerEntity player, BlockPos origin) {
+    public double getPercentageHowCloseIsPlayer(PlayerEntity player, Vec3d origin) {
         return (radius - distanceFromCenter(player, origin)) / radius;//distanceFromCenter(player, origin) / radius;
     }
 

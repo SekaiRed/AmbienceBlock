@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class NoneBounds extends AbstractBounds {
-    public static final int id = 3;
+    public static final int id = 4;
 
     public NoneBounds() { }
 
@@ -22,17 +22,17 @@ public class NoneBounds extends AbstractBounds {
     }
 
     @Override
-    public boolean isWithinBounds(PlayerEntity player, BlockPos origin) {
+    public boolean isWithinBounds(PlayerEntity player, Vec3d origin) {
         return true;
     }
 
     @Override
-    public double distanceFromCenter(PlayerEntity player, BlockPos origin) {
+    public double distanceFromCenter(PlayerEntity player, Vec3d origin) {
         return 0;
     }
 
     @Override
-    public double getPercentageHowCloseIsPlayer(PlayerEntity player, BlockPos origin) {
+    public double getPercentageHowCloseIsPlayer(PlayerEntity player, Vec3d origin) {
         return 1;
     }
 
