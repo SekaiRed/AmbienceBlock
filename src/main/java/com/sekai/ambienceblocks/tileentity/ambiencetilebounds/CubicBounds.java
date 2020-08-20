@@ -41,8 +41,8 @@ public class CubicBounds extends AbstractBounds {
 
     @Override
     public boolean isWithinBounds(PlayerEntity player, Vec3d origin) {
-        return player.getPosX() >= origin.getX() - xSize && player.getPosY() >= origin.getY() - ySize && player.getPosZ() >= origin.getZ() - zSize
-                && player.getPosX() <= origin.getX() + 1 + xSize && player.getPosY() <= origin.getY() + 1 + ySize && player.getPosZ() <= origin.getZ() + 1 + zSize;
+        return player.getPosX() >= origin.getX() - xSize / 2 && player.getPosY() >= origin.getY() - ySize / 2 && player.getPosZ() >= origin.getZ() - zSize / 2
+                && player.getPosX() <= origin.getX() + 1 + xSize / 2 && player.getPosY() <= origin.getY() + 1 + ySize / 2 && player.getPosZ() <= origin.getZ() + 1 + zSize / 2;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class CubicBounds extends AbstractBounds {
         //return 1 - (distanceFromCenter(player, origin) / maxDistanceFromCenter(origin));
         //double x = Math.abs(player.getPosX() - origin.getX()), y = Math.abs(player.getPosY() - origin.getY()), z = Math.abs(player.getPosZ() - origin.getZ());
         double x = Math.abs(player.getPosX() - getFixedOrigin(origin).getX()), y = Math.abs(player.getPosY() - getFixedOrigin(origin).getY()), z = Math.abs(player.getPosZ() - getFixedOrigin(origin).getZ());
-        return ((1 - (x / xSize)) * (1 - (y / ySize)) * (1 - (z / zSize)));
+        return ((1 - (x / xSize / 2)) * (1 - (y / ySize / 2)) * (1 - (z / zSize / 2)));
     }
 
     @Override
