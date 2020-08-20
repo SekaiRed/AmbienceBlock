@@ -47,6 +47,9 @@ public class AmbienceGUI extends Screen {
 
     private Button confirmChanges;
 
+    private boolean help;
+    private Button bHelp;
+
     //private List<String> options = Arrays.asList("Main", "Bounds", "Priority", "Delay");
 
     public AmbienceGUI(AmbienceTileEntity target) {
@@ -65,6 +68,11 @@ public class AmbienceGUI extends Screen {
 
         if(highlightedTab != null)
             highlightedTab.render(mouseX, mouseY, partialTicks);
+
+        if(help && highlightedTab != null)
+            highlightedTab.renderToolTip(mouseX, mouseY);
+
+        drawHelp();
 
         /*if(highlightIndex == 0)
             mainTab.render(mouseX, mouseY, partialTicks);*/
@@ -101,7 +109,14 @@ public class AmbienceGUI extends Screen {
             saveDataToTile();
         }));
 
+        help = false;
+        bHelp = addButton(new Button(xTopLeft + texWidth - 16 - 8, yTopLeft + texHeight - 16 - 8, 16, 16, "", button -> { clickHelp(); }));
+
         loadDataFromTile();
+    }
+
+    private void clickHelp() {
+        help = !help;
     }
 
     private void loadDataFromTile() {
@@ -249,6 +264,17 @@ public class AmbienceGUI extends Screen {
         for(int i = 0; i < options.size(); i++) {
             drawTab(tabSize * i, tabSize, options.get(i).getName(), getTabState(mouseX, mouseY, options.get(i)));
         }
+    }
+
+    private void drawHelp() {
+        this.minecraft.getTextureManager().bindTexture(BACKGROUND_TEXTURE);
+        this.blit(xTopLeft + texWidth - 16 - 8, yTopLeft + texHeight - 16 - 8, 48, getHelpState().getySpriteOffset(), 16, 16);
+    }
+
+    private TabState getHelpState() {
+        if(bHelp.isHovered()) return TabState.HOVERED;
+        if(help) return TabState.HIGHLIGHTED;
+        return TabState.NEUTRAL;
     }
 
     //meta

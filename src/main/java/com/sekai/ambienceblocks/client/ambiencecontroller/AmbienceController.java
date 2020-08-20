@@ -115,7 +115,7 @@ public class AmbienceController {
         for(int i = 0; i < AmbienceTileEntityData.maxChannels; i++) {
             maxPriorityByChannel[i] = 0;
             for (AmbienceTileEntity tile : usefulTiles) {
-                if (tile.data.getChannel() == i && tile.getPriority() > maxPriorityByChannel[i] && tile.isUsingPriority())
+                if (tile.data.getChannel() == i && tile.getPriority() > maxPriorityByChannel[i] && tile.isUsingPriority() && canTilePlay(tile))
                     maxPriorityByChannel[i] = tile.getPriority();
             }
         }
@@ -124,7 +124,6 @@ public class AmbienceController {
 
         for(AmbienceTileEntity tile : usefulTiles)
         {
-            System.out.println(canTilePlay(tile));
             //this tile cannot play
             if(!canTilePlay(tile))
                 continue;
@@ -132,10 +131,11 @@ public class AmbienceController {
             /*if(tile.data.needsRedstone() && !mc.world.isBlockPowered(tile.getPos()))
                 continue;*/
 
-            //this tile is using priority and is of a lower priority
-            if(tile.isUsingPriority())
-                if(tile.getPriority() >= maxPriorityByChannel[tile.data.getChannel()])
-                    ambienceTilesToPlay.add(tile);
+            //this tile is using priority and is of a high enough priority
+            if(tile.isUsingPriority() && tile.data.getChannel() < AmbienceTileEntityData.maxChannels)
+                if(tile.getPriority() < maxPriorityByChannel[tile.data.getChannel()])
+                    continue;
+                //ambienceTilesToPlay.add(tile);
 
             ambienceTilesToPlay.add(tile);
         }
@@ -144,9 +144,22 @@ public class AmbienceController {
             //this tile uses delay which is a special case
             if (tileHasDelayRightNow(tile) && tile.data.isUsingDelay()) {
                 if(getDelayEntry(tile).isDone()) {
-                    playMusicNoRepeat(tile);
-                    delayList.remove(getDelayEntry(tile));
-                    continue;
+                    if(isTileEntityAlreadyPlaying(tile) == null){
+                        playMusicNoRepeat(tile);
+                        delayList.remove(getDelayEntry(tile));
+                        continue;
+                    }
+                    else
+                    {
+                        if(tile.data.canPlayOverSelf()){
+                            if(tile.data.shouldStopPrevious()) {
+                                stopMusic(isTileEntityAlreadyPlaying(tile), "delay stopped it since it's playing again");
+                            }
+                            playMusicNoRepeat(tile);
+                            delayList.remove(getDelayEntry(tile));
+                            continue;
+                        }
+                    }
                 }
                 continue;
             }
@@ -163,7 +176,7 @@ public class AmbienceController {
             }
 
             //if the music is already playing, check if you can't replace it with the new tile
-            if (isMusicAlreadyPlaying(tile.getMusicName()) != null && tile.data.shouldFuse() && tile.data.needsRedstone()?mc.world.isBlockPowered(tile.getPos()):true) {
+            if (isMusicAlreadyPlaying(tile.getMusicName()) != null && canTilePlay(tile) && tile.data.shouldFuse()) {
                 CustomSoundSlot slot = isMusicAlreadyPlaying(tile.getMusicName());
                 if(slot != null) {
                     if(!(slot.getOwner().data.shouldFuse() && canTilePlay(slot.getOwner())))
@@ -198,12 +211,12 @@ public class AmbienceController {
                 System.out.println(slot.toString());
                 //System.out.println(slot.getMusicString() + ", " + slot.getOwner().getPos() + " volume " + slot.getMusicInstance().getVolume() + " pitch " + slot.getMusicInstance().getPitch());
             }
-            //System.out.println("and");
-            /*System.out.println("List of audio delays going on");
+            System.out.println("and");
+            System.out.println("List of audio delays going on");
             for (AmbienceDelayRestriction slot : delayList) {
                 System.out.println(slot.getOrigin().getMusicName() + ", " + slot.getOrigin().getPos() + " with a tick of " + slot.tickLeft);
             }
-            System.out.println("end");*/
+            System.out.println("end");
     }
 
     public void playMusic(AmbienceTileEntity tile, String source) {

@@ -6,6 +6,11 @@ import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.client.gui.GuiUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PriorityTab extends AbstractTab {
     public TextInstance textPriority;
@@ -39,11 +44,29 @@ public class PriorityTab extends AbstractTab {
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        textPriority.render();
+        textPriority.render(mouseX, mouseY);
         priority.render(mouseX, mouseY, partialTicks);
 
-        textChannel.render();
+        textChannel.render(mouseX, mouseY);
         channel.render(mouseX, mouseY, partialTicks);
+    }
+
+    @Override
+    public void renderToolTip(int mouseX, int mouseY) {
+        List<String> list = new ArrayList<String>();
+
+        if(textPriority.isHovered()) {
+            list.add(TextFormatting.RED + "Priority");
+            list.add("Choose this block's priority, higher is more likely to be played.");
+            list.add(TextFormatting.DARK_GRAY + "0 to 99");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+        if(textChannel.isHovered()) {
+            list.add(TextFormatting.RED + "Channel");
+            list.add("Only blocks of the same channel will interact with eachother in regard to priority.");
+            list.add(TextFormatting.DARK_GRAY + "0 to 9");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
     }
 
     @Override

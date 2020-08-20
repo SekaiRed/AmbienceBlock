@@ -5,6 +5,7 @@ import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.SphereBounds;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.NBTHelper;
 import com.sekai.ambienceblocks.util.ParsingUtil;
+import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -16,11 +17,11 @@ import net.minecraft.util.math.Vec3d;
 public class AmbienceTileEntityData
 {
     public static final int maxPriorities = 99;
-    public static final int maxChannels = 5;
+    public static final int maxChannels = 9;
 
     //main
     private String soundName = "";
-    private boolean shouldFuse = true;
+    private boolean shouldFuse = false;
     private boolean needRedstone = false;
 
     //sounds
@@ -34,6 +35,7 @@ public class AmbienceTileEntityData
 
     //bounds
     private AbstractBounds bounds = new SphereBounds(16D);
+    private boolean isGlobal = false;
 
     //offset
     private Vec3d offset = new Vec3d(0, 0, 0);
@@ -42,9 +44,8 @@ public class AmbienceTileEntityData
     private int minDelay = 0;
     private int maxDelay = 0;
     private boolean useDelay = false;
-
-    //other
-    private boolean isGlobal = false;
+    private boolean canPlayOverSelf = false;
+    private boolean shouldStopPrevious = false;
 
     //NBT util
     public CompoundNBT toNBT(CompoundNBT compound) {
@@ -55,20 +56,24 @@ public class AmbienceTileEntityData
         compound.putFloat("volume", this.volume);
         compound.putFloat("pitch", this.pitch);
 
-        compound.putInt("priority",this.priority);
-        compound.putInt("channel",this.channel);
         compound.putBoolean("usePriority",this.usePriority);
+        if(usePriority) {
+            compound.putInt("priority", this.priority);
+            compound.putInt("channel", this.channel);
+        }
 
         compound.put("bounds", BoundsUtil.toNBT(this.bounds));
-
-        ///compound.put("offset", NBTUtil.writeBlockPos(offset));
         compound.put("offset", NBTHelper.writeVec3d(this.offset));
-
-        compound.putInt("minDelay",this.minDelay);
-        compound.putInt("maxDelay",this.maxDelay);
-        compound.putBoolean("useDelay", this.useDelay);
-
         compound.putBoolean("isGlobal", this.isGlobal);
+
+        compound.putBoolean("useDelay", this.useDelay);
+        if(useDelay) {
+            compound.putInt("minDelay", this.minDelay);
+            compound.putInt("maxDelay", this.maxDelay);
+            compound.putBoolean("canPlayOverSelf", this.canPlayOverSelf);
+            compound.putBoolean("shouldStopPrevious", this.shouldStopPrevious);
+        }
+
         return compound;
     }
 
@@ -80,20 +85,25 @@ public class AmbienceTileEntityData
         this.volume = compound.getFloat("volume");
         this.pitch = compound.getFloat("pitch");
 
-        this.priority = compound.getInt("priority");
-        this.channel = compound.getInt("channel");
         this.usePriority = compound.getBoolean("usePriority");
+        if(usePriority) {
+            this.priority = compound.getInt("priority");
+            this.channel = compound.getInt("channel");
+        }
+
 
         this.bounds = BoundsUtil.fromNBT(compound.getCompound("bounds"));
-
-        //this.offset = NBTUtil.readBlockPos(compound.getCompound("offset"));
         this.offset = NBTHelper.readVec3d(compound.getCompound("offset"));
-
-        this.minDelay = compound.getInt("minDelay");
-        this.maxDelay = compound.getInt("maxDelay");
-        this.useDelay = compound.getBoolean("useDelay");
-
         this.isGlobal = compound.getBoolean("isGlobal");
+
+        this.useDelay = compound.getBoolean("useDelay");
+        if(useDelay) {
+            this.minDelay = compound.getInt("minDelay");
+            this.maxDelay = compound.getInt("maxDelay");
+            this.canPlayOverSelf = compound.getBoolean("canPlayOverSelf");
+            this.shouldStopPrevious = compound.getBoolean("shouldStopPrevious");
+        }
+
     }
     ////
 
@@ -107,23 +117,26 @@ public class AmbienceTileEntityData
         buf.writeFloat(this.volume);
         buf.writeFloat(this.pitch);
 
-        buf.writeInt(this.priority);
-        buf.writeInt(this.channel);
         buf.writeBoolean(this.usePriority);
+        if(usePriority) {
+            buf.writeInt(this.priority);
+            buf.writeInt(this.channel);
+        }
 
         //buf.writeDouble(this.offDistance);
         BoundsUtil.toBuff(this.bounds, buf);
-
-        //buf.writeBlockPos(this.offset);
         buf.writeDouble(this.offset.x);
         buf.writeDouble(this.offset.y);
         buf.writeDouble(this.offset.z);
-
-        buf.writeInt(this.minDelay);
-        buf.writeInt(this.maxDelay);
-        buf.writeBoolean(this.useDelay);
-
         buf.writeBoolean(this.isGlobal);
+
+        buf.writeBoolean(this.useDelay);
+        if(useDelay) {
+            buf.writeInt(this.minDelay);
+            buf.writeInt(this.maxDelay);
+            buf.writeBoolean(this.canPlayOverSelf);
+            buf.writeBoolean(this.shouldStopPrevious);
+        }
     }
 
     public void fromBuff(PacketBuffer buf) {
@@ -135,20 +148,23 @@ public class AmbienceTileEntityData
         this.volume = buf.readFloat();
         this.pitch = buf.readFloat();
 
-        this.priority = buf.readInt();
-        this.channel = buf.readInt();
         this.usePriority = buf.readBoolean();
+        if(usePriority) {
+            this.priority = buf.readInt();
+            this.channel = buf.readInt();
+        }
 
         this.bounds = BoundsUtil.fromBuff(buf);
-
-        //this.offset = buf.readBlockPos();
         this.offset = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
-
-        this.minDelay = buf.readInt();
-        this.maxDelay = buf.readInt();
-        this.useDelay = buf.readBoolean();
-
         this.isGlobal = buf.readBoolean();
+
+        this.useDelay = buf.readBoolean();
+        if(useDelay) {
+            this.minDelay = buf.readInt();
+            this.maxDelay = buf.readInt();
+            this.canPlayOverSelf = buf.readBoolean();
+            this.shouldStopPrevious = buf.readBoolean();
+        }
     }
     ////
 
@@ -209,6 +225,12 @@ public class AmbienceTileEntityData
     public int getPriority() { return priority; }
 
     public void setPriority(int priority) {
+        if(priority < 0)
+            this.priority = 0;
+
+        if(priority >= maxPriorities)
+            this.priority = maxPriorities - 1;
+
         this.priority = priority;
     }
 
@@ -217,6 +239,13 @@ public class AmbienceTileEntityData
     }
 
     public void setChannel(int channel) {
+        /*this.channel = channel;*/
+        if(channel < 0)
+            this.channel = 0;
+
+        if(channel >= maxChannels)
+            this.channel = maxChannels - 1;
+
         this.channel = channel;
     }
 
@@ -272,5 +301,21 @@ public class AmbienceTileEntityData
 
     public void setGlobal(boolean global) {
         isGlobal = global;
+    }
+
+    public boolean canPlayOverSelf() {
+        return canPlayOverSelf;
+    }
+
+    public void setCanPlayOverSelf(boolean canPlayOverSelf) {
+        this.canPlayOverSelf = canPlayOverSelf;
+    }
+
+    public boolean shouldStopPrevious() {
+        return shouldStopPrevious;
+    }
+
+    public void setShouldStopPrevious(boolean shouldStopPrevious) {
+        this.shouldStopPrevious = shouldStopPrevious;
     }
 }

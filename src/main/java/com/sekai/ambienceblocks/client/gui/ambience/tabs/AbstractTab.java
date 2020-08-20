@@ -5,6 +5,7 @@ import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -60,9 +61,16 @@ public abstract class AbstractTab {
 
         return 0;
     }
+
+    protected void setCheckBoxChecked(CheckboxButton check, boolean b) {
+        if(b && !check.isChecked())
+            check.onPress();
+        if(!b && check.isChecked())
+            check.onPress();
+    }
     //
 
-    public void updateMetaValues(AmbienceGUI guiRef) {
+    private void updateMetaValues(AmbienceGUI guiRef) {
         this.x = guiRef.xTopLeft;
         this.y = guiRef.yTopLeft;
         this.width = AmbienceGUI.texWidth;
@@ -79,6 +87,8 @@ public abstract class AbstractTab {
     public abstract void init();
 
     public abstract void render(int mouseX, int mouseY, float partialTicks);
+
+    public abstract void renderToolTip(int mouseX, int mouseY);
 
     public abstract void tick();
 

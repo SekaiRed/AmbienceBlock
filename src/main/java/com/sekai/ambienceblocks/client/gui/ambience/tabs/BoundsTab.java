@@ -1,16 +1,21 @@
 package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
+import com.sekai.ambienceblocks.client.gui.widgets.CheckboxWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.*;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.ParsingUtil;
+import javafx.scene.control.CheckBox;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.client.gui.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +25,7 @@ public class BoundsTab extends AbstractTab {
 
     TextInstance textBounds;
     Button buttonBounds;
+    CheckboxWidget isGlobal;
 
     TextInstance textSphereRadius;
     TextFieldWidget sphereRadius;
@@ -82,6 +88,8 @@ public class BoundsTab extends AbstractTab {
         addWidget(buttonBounds = guiRef.addButton(new Button(getNeighbourX(textBounds), getRowY(0) + getOffsetY(20), 60, 20, "no", button -> {
             moveToNextBoundType();
         })));
+
+        addWidget(isGlobal = new CheckboxWidget(getNeighbourX(buttonBounds), getRowY(0), 20 + font.getStringWidth("Global"), 20, "Global", false));
 
         textSphereRadius = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.radius"), font);
         sphereWidgets.add(textSphereRadius);
@@ -174,40 +182,97 @@ public class BoundsTab extends AbstractTab {
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        textBounds.render();
+        textBounds.render(mouseX, mouseY);
         buttonBounds.render(mouseX, mouseY, partialTicks);
+        isGlobal.render(mouseX, mouseY, partialTicks);
 
-        textSphereRadius.render();
+        textSphereRadius.render(mouseX, mouseY);
         sphereRadius.render(mouseX, mouseY, partialTicks);
 
-        textCylRadius.render();
+        textCylRadius.render(mouseX, mouseY);
         cylRadius.render(mouseX, mouseY, partialTicks);
-        textCylLength.render();
+        textCylLength.render(mouseX, mouseY);
         cylLength.render(mouseX, mouseY, partialTicks);
-        textCylAxis.render();
+        textCylAxis.render(mouseX, mouseY);
         cylAxisButton.render(mouseX, mouseY, partialTicks);
 
-        textCapRadius.render();
+        textCapRadius.render(mouseX, mouseY);
         capRadius.render(mouseX, mouseY, partialTicks);
-        textCapLength.render();
+        textCapLength.render(mouseX, mouseY);
         capLength.render(mouseX, mouseY, partialTicks);
-        textCapAxis.render();
+        textCapAxis.render(mouseX, mouseY);
         capAxisButton.render(mouseX, mouseY, partialTicks);
 
-        textCubicX.render();
+        textCubicX.render(mouseX, mouseY);
         cubicX.render(mouseX, mouseY, partialTicks);
-        textCubicY.render();
+        textCubicY.render(mouseX, mouseY);
         cubicY.render(mouseX, mouseY, partialTicks);
-        textCubicZ.render();
+        textCubicZ.render(mouseX, mouseY);
         cubicZ.render(mouseX, mouseY, partialTicks);
 
-        textOffset.render();
-        textOffsetX.render();
+        textOffset.render(mouseX, mouseY);
+        textOffsetX.render(mouseX, mouseY);
         offsetX.render(mouseX, mouseY, partialTicks);
-        textOffsetY.render();
+        textOffsetY.render(mouseX, mouseY);
         offsetY.render(mouseX, mouseY, partialTicks);
-        textOffsetZ.render();
+        textOffsetZ.render(mouseX, mouseY);
         offsetZ.render(mouseX, mouseY, partialTicks);
+    }
+
+    @Override
+    public void renderToolTip(int mouseX, int mouseY) {
+        List<String> list = new ArrayList<String>();
+
+        if (buttonBounds.isHovered())
+        {
+            if(boundType == SphereBounds.id) {
+                list.add(TextFormatting.RED + "Sphere Bounds");
+                list.add(TextFormatting.WHITE + "Sphere bounds that cover a radius all around it.");
+                list.add(TextFormatting.GRAY + "(If the sound isn't global, the volume will be scaled by the distance of the player from the source)");
+                GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+            }
+
+            if(boundType == CylinderBounds.id) {
+                list.add(TextFormatting.RED + "Cylinder Bounds");
+                list.add(TextFormatting.WHITE + "Cylinder bounds that cover a radius all around it except the height which can be changed.");
+                list.add(TextFormatting.GRAY + "(If the sound isn't global, the volume will be unaffected by height and only scaled by horizontal distance)");
+                GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+            }
+
+            if(boundType == CapsuleBounds.id) {
+                list.add(TextFormatting.RED + "Capsule Bounds");
+                list.add(TextFormatting.WHITE + "Capsule bounds that work almost exactly like the cylinder variant, it adds two sphere detection to each end.");
+                list.add(TextFormatting.GRAY + "(If the sound isn't global, the volume will be unaffected by height and only scaled by horizontal distance (and regular sphere stuff on each ends))");
+                GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+            }
+
+            if(boundType == CubicBounds.id) {
+                list.add(TextFormatting.RED + "Cubic Bounds");
+                list.add(TextFormatting.WHITE + "Cubic bounds that cover a cubic area of origin by the value of x, y and z.");
+                list.add(TextFormatting.GRAY + "(If the sound isn't global, the volume will be scaled as if this was a Sphere Bounds which won't cover the whole area)");
+                GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+            }
+
+            if(boundType == NoneBounds.id) {
+                list.add(TextFormatting.RED + "None Bounds");
+                list.add(TextFormatting.WHITE + "Will always play as long as the tile is loaded on the client.");
+                list.add(TextFormatting.GRAY + "(The volume will not change with distance regardless of if the tile is set to be global)");
+                GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+            }
+        }
+
+        if(isGlobal.isHovered()) {
+            list.add(TextFormatting.RED + "Global");
+            list.add("If global is checked the volume won't scale with distance, otherwise it will.");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+
+        if(textOffset.isHovered()) {
+            list.add(TextFormatting.RED + "Offset");
+            list.add("Shifts the origin of the bounds to a certain position.");
+            list.add(TextFormatting.GRAY + "(Useful for hiding the block)");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
     }
 
     @Override
@@ -216,10 +281,17 @@ public class BoundsTab extends AbstractTab {
 
         cylRadius.tick();
         cylLength.tick();
+
+        cubicX.tick();
+        cubicY.tick();
+        cubicZ.tick();
     }
 
     @Override
     public void setFieldFromData(AmbienceTileEntityData data) {
+        //setCheckBoxChecked(isGlobal, data.isGlobal());
+        isGlobal.setChecked(data.isGlobal());
+
         loadBoundType(data);
 
         Vec3d pos = data.getOffset();
@@ -230,8 +302,8 @@ public class BoundsTab extends AbstractTab {
 
     @Override
     public void setDataFromField(AmbienceTileEntityData data) {
-        /*AbstractBounds bounds = BoundsUtil.getBoundsFromType(boundType);
-        data.setBounds(BoundsUtil.getBoundsFromType(boundType));*/
+        data.setGlobal(isGlobal.isChecked());
+
         if(boundType == SphereBounds.id) {
             SphereBounds bounds = new SphereBounds();
 

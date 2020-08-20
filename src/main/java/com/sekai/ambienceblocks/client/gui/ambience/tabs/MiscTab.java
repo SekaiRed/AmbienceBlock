@@ -4,6 +4,11 @@ import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.client.gui.GuiUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MiscTab extends AbstractTab {
     Button copy;
@@ -39,6 +44,22 @@ public class MiscTab extends AbstractTab {
         paste.render(mouseX, mouseY, partialTicks);
 
         //presets.render();
+    }
+
+    @Override
+    public void renderToolTip(int mouseX, int mouseY) {
+        List<String> list = new ArrayList<String>();
+
+        if(copy.isHovered()) {
+            list.add(TextFormatting.RED + "Copy");
+            list.add("Copy the current GUIs parameters.");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+        if(paste.isHovered()) {
+            list.add(TextFormatting.RED + "Paste");
+            list.add("Paste the copied parameters onto this block.");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
     }
 
     @Override

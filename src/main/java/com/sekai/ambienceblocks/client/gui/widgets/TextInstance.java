@@ -35,9 +35,11 @@ public class TextInstance extends Widget {
         this.text = text;
     }
 
-    public void render() {
+    public void render(int mouseX, int mouseY) {
         if(this.visible && text != null)
             font.drawStringWithShadow(text, (float)x, (float)y, color);
+
+        this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
     }
 
     public int getWidth() {

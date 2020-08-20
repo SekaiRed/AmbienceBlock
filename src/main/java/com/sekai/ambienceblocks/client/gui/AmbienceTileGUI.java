@@ -552,46 +552,46 @@ public class AmbienceTileGUI extends Screen {
             return;
 
         //drawString(font, "Music ID :", offsetX, offsetY + (musicName.getHeight() - font.FONT_HEIGHT) / 2, 0xFFFFFF);
-        textMusic.render();
+        textMusic.render(mouseX, mouseY);
         musicName.render(mouseX, mouseY, partialTicks);
 
-        textSoundOption.render();
-        textSoundVolume.render();
+        textSoundOption.render(mouseX, mouseY);
+        textSoundVolume.render(mouseX, mouseY);
         soundVolume.render(mouseX, mouseY, partialTicks);
-        textSoundPitch.render();
+        textSoundPitch.render(mouseX, mouseY);
         soundPitch.render(mouseX, mouseY, partialTicks);
 
         //drawString(font, "Max distance :", offsetX, sphereRadius.y + (sphereRadius.getHeight() - font.FONT_HEIGHT) / 2, 0xFFFFFF);
-        textBounds.render();
-        textSphereRadius.render();
+        textBounds.render(mouseX, mouseY);
+        textSphereRadius.render(mouseX, mouseY);
         sphereRadius.render(mouseX, mouseY, partialTicks);
-        textCylinderRadius.render();
+        textCylinderRadius.render(mouseX, mouseY);
         cylinderRadius.render(mouseX, mouseY, partialTicks);
-        textCylinderHeight.render();
+        textCylinderHeight.render(mouseX, mouseY);
         cylinderHeight.render(mouseX, mouseY, partialTicks);
-        textCubicX.render();
+        textCubicX.render(mouseX, mouseY);
         cubicX.render(mouseX, mouseY, partialTicks);
-        textCubicY.render();
+        textCubicY.render(mouseX, mouseY);
         cubicY.render(mouseX, mouseY, partialTicks);
-        textCubicZ.render();
+        textCubicZ.render(mouseX, mouseY);
         cubicZ.render(mouseX, mouseY, partialTicks);
 
-        textOffset.render();
-        textOffsetX.render();
+        textOffset.render(mouseX, mouseY);
+        textOffsetX.render(mouseX, mouseY);
         tileOffsetX.render(mouseX, mouseY, partialTicks);
-        textOffsetY.render();
+        textOffsetY.render(mouseX, mouseY);
         tileOffsetY.render(mouseX, mouseY, partialTicks);
-        textOffsetZ.render();
+        textOffsetZ.render(mouseX, mouseY);
         tileOffsetZ.render(mouseX, mouseY, partialTicks);
 
         //drawString(font, "Priority :", offsetX, priorityNumber.y + (priorityNumber.getHeight() - font.FONT_HEIGHT) / 2, 0xFFFFFF);
-        textPriority.render();
+        textPriority.render(mouseX, mouseY);
         priorityNumber.render(mouseX, mouseY, partialTicks);
 
-        textDelay.render();
-        textMinDelay.render();
+        textDelay.render(mouseX, mouseY);
+        textMinDelay.render(mouseX, mouseY);
         minDelay.render(mouseX, mouseY, partialTicks);
-        textMaxDelay.render();
+        textMaxDelay.render(mouseX, mouseY);
         maxDelay.render(mouseX, mouseY, partialTicks);
 
         //drawString(font, "Position : " + tile.getPos(), width/4, height/2, 0xFFFFFF);

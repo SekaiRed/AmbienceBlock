@@ -68,9 +68,10 @@ public class CubicBounds extends AbstractBounds {
     @Override
     public double getPercentageHowCloseIsPlayer(PlayerEntity player, Vec3d origin) {
         //return (getAverage() - distanceFromCenter(player, origin)) / getAverage();//distanceFromCenter(player, origin) / getAverage();
-        return 1 - (distanceFromCenter(player, origin) / maxDistanceFromCenter(origin));
-        /*double x = Math.abs(player.getPosX() - origin.getX()), y = Math.abs(player.getPosY() - origin.getY()), z = Math.abs(player.getPosZ() - origin.getZ());
-        return 1 - ((x / xSize) * (y / ySize) * (z / zSize));*/
+        //return 1 - (distanceFromCenter(player, origin) / maxDistanceFromCenter(origin));
+        //double x = Math.abs(player.getPosX() - origin.getX()), y = Math.abs(player.getPosY() - origin.getY()), z = Math.abs(player.getPosZ() - origin.getZ());
+        double x = Math.abs(player.getPosX() - getFixedOrigin(origin).getX()), y = Math.abs(player.getPosY() - getFixedOrigin(origin).getY()), z = Math.abs(player.getPosZ() - getFixedOrigin(origin).getZ());
+        return ((1 - (x / xSize)) * (1 - (y / ySize)) * (1 - (z / zSize)));
     }
 
     @Override
