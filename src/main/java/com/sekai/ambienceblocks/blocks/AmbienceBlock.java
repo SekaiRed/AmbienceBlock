@@ -22,6 +22,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class AmbienceBlock extends Block {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final ActionResultType RESULT = ActionResultType.SUCCESS;
 
     public AmbienceBlock() {
         super(Block.Properties.create(Material.IRON).hardnessAndResistance(-1.0F, 3600000.0F).sound(SoundType.METAL).noDrops());
@@ -58,18 +59,21 @@ public class AmbienceBlock extends Block {
     @OnlyIn(Dist.CLIENT)
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         if(!worldIn.isRemote())
-            return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+            //return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+            return RESULT;
 
         if(Minecraft.getInstance().world.getTileEntity(pos) == null)
-            return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+            return RESULT;
 
         if(!(Minecraft.getInstance().world.getTileEntity(pos) instanceof AmbienceTileEntity))
-            return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+            //return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+            return RESULT;
 
         //Minecraft.getInstance().displayGuiScreen(new AmbienceTileGUI((AmbienceTileEntity)Minecraft.getInstance().world.getTileEntity(pos)));
         Minecraft.getInstance().displayGuiScreen(new AmbienceGUI((AmbienceTileEntity)Minecraft.getInstance().world.getTileEntity(pos)));
 
-        return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+        //return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+        return RESULT;
         /*if(worldIn.isRemote())
             return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
 

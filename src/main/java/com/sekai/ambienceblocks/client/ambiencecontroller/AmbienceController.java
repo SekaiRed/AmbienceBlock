@@ -51,8 +51,25 @@ public class AmbienceController {
 
         //check if a sound needs to be stopped and change volume and pitch
         for(CustomSoundSlot slot : soundsList) {
-            if(!handler.isPlaying(slot.getMusicInstance()) || !mc.world.loadedTileEntityList.contains(slot.getOwner()) || !slot.getOwner().isWithinBounds(mc.player)) {
+            if(!handler.isPlaying(slot.getMusicInstance()) || !mc.world.loadedTileEntityList.contains(slot.getOwner())) {
                 stopMusic(slot, "music wasn't playing, the owner didn't exist anymore, the player isn't within it's bounds");
+                continue;
+            }
+
+            //the tile is out of bounds
+            if(!slot.getOwner().isWithinBounds(mc.player)) {
+                //it could be fused
+                if (slot.getOwner().data.shouldFuse()) {
+                    List<AmbienceTileEntity> ambienceTileEntityList = getListOfLoadedAmbienceTiles();
+                    ambienceTileEntityList.removeIf(tile -> !tile.data.shouldFuse() || !tile.getMusicName().equals(slot.getMusicString()) || !canTilePlay(tile));
+
+                    if(ambienceTileEntityList.size() != 0) {
+                        swapOwner(slot, ambienceTileEntityList.get(0));
+                        continue;
+                    }
+                }
+
+                stopMusic(slot, "not within bounds and couldn't find another block to fuse with");
                 continue;
             }
 
@@ -60,7 +77,7 @@ public class AmbienceController {
             {
                 int priority = getHighestPriorityByChannel(slot.getOwner().data.getChannel());
                 if (slot.getOwner().getPriority() < priority) {
-                    stopMusic(slot, "lower priority than the maximul one : slot priority " + slot.getOwner().getPriority() + " and max priority " + priority);
+                    stopMusic(slot, "lower priority than the maximal one : slot priority " + slot.getOwner().getPriority() + " and max priority " + priority);
                     continue;
                 }
             }
@@ -248,7 +265,7 @@ public class AmbienceController {
 
     //Swaps which tiles is currently owning a playing sound, used for relays and fusing
     public void swapOwner(CustomSoundSlot soundSlot, AmbienceTileEntity tile) {
-        //System.out.println("swapping " + tile.getMusicName() + " from " + soundSlot.getOwner().getPos() + " to " + tile.getPos());
+        System.out.println("swapping " + tile.getMusicName() + " from " + soundSlot.getOwner().getPos() + " to " + tile.getPos());
         soundSlot.setOwner(tile);
         soundSlot.getMusicInstance().setBlockPos(tile.getPos());
     }
@@ -371,7 +388,7 @@ public class AmbienceController {
 
         public void setOwner(AmbienceTileEntity owner) {
             this.owner = owner;
-            //getMusicInstance().setBlockPos(owner.getPos());
+            getMusicInstance().setBlockPos(owner.getPos());
         }
 
         public boolean isMarkedForDeletion() {
