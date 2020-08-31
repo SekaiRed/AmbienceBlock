@@ -15,14 +15,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DelayTab extends AbstractTab {
-    public TextInstance textMinDelay;
-    public TextFieldWidget minDelay;
+    private static final String MIN_DELAY = I18n.format("ui.ambienceblocks.min") + " " + I18n.format("ui.ambienceblocks.delay");
+    private static final String MAX_DELAY = I18n.format("ui.ambienceblocks.max") + " " + I18n.format("ui.ambienceblocks.delay");
 
-    public TextInstance textMaxDelay;
-    public TextFieldWidget maxDelay;
+    private static final String MIN_VOLUME = I18n.format("ui.ambienceblocks.min") + " " + I18n.format("ui.ambienceblocks.volume");
+    private static final String MAX_VOLUME = I18n.format("ui.ambienceblocks.max") + " " + I18n.format("ui.ambienceblocks.volume");
 
-    public CheckboxWidget canPlayOverSelf;
-    public CheckboxWidget shouldStopPrevious;
+    private static final String MIN_PITCH = I18n.format("ui.ambienceblocks.min") + " " + I18n.format("ui.ambienceblocks.pitch");
+    private static final String MAX_PITCH = I18n.format("ui.ambienceblocks.max") + " " + I18n.format("ui.ambienceblocks.pitch");
+
+    public TextInstance textMinDelay = new TextInstance(getBaseX(), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, MIN_DELAY + " :", font);
+    public TextFieldWidget minDelay = new TextFieldWidget(font, getNeighbourX(textMinDelay), getRowY(0), 50, 20, "name");
+
+    public TextInstance textMaxDelay = new TextInstance(getNeighbourX(minDelay), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, MAX_DELAY + " :", font);
+    public TextFieldWidget maxDelay = new TextFieldWidget(font, getNeighbourX(textMaxDelay), getRowY(0), 50, 20, "name");
+
+    public TextInstance textMinVolume = new TextInstance(0, 0, 0xFFFFFF, MIN_VOLUME + " :", font);
+    public TextFieldWidget minVolume = new TextFieldWidget(font, 0, 0, 50, 20, "name");
+
+    public TextInstance textMaxVolume = new TextInstance(0, 0, 0xFFFFFF, MAX_VOLUME + " :", font);
+    public TextFieldWidget maxVolume = new TextFieldWidget(font, 0, 0, 50, 20, "name");
+
+    public TextInstance textMinPitch = new TextInstance(0, 0, 0xFFFFFF, MIN_PITCH + " :", font);
+    public TextFieldWidget minPitch = new TextFieldWidget(font, 0, 0, 50, 20, "name");
+
+    public TextInstance textMaxPitch = new TextInstance(0, 0, 0xFFFFFF, MAX_PITCH + " :", font);
+    public TextFieldWidget maxPitch = new TextFieldWidget(font, 0, 0, 50, 20, "name");
+
+    public CheckboxWidget canPlayOverSelf = new CheckboxWidget(getBaseX(), getRowY(1), 20 + font.getStringWidth("Can play over itself"), 20, "Can play over itself", false);
+    public CheckboxWidget shouldStopPrevious = new CheckboxWidget(getBaseX(), getRowY(2), 20 + font.getStringWidth("Should stop previous instance"), 20, "Should stop previous instance", false);
 
     public DelayTab(AmbienceGUI guiRef) {
         super(guiRef);
@@ -34,22 +55,63 @@ public class DelayTab extends AbstractTab {
     }
 
     @Override
-    public void init() {
-        textMinDelay = new TextInstance(getBaseX(), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.min") + " :", font);
-        addWidget(minDelay = new TextFieldWidget(font, getNeighbourX(textMinDelay), getRowY(0), 50, 20, "name"));
+    public void initialInit() {
         minDelay.setValidator(ParsingUtil.numberFilter);
         minDelay.setMaxStringLength(8);
-
-        textMaxDelay = new TextInstance(getNeighbourX(minDelay), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.max") + " :", font);
-        addWidget(maxDelay = new TextFieldWidget(font, getNeighbourX(textMaxDelay), getRowY(0), 50, 20, "name"));
+        minDelay.setText(String.valueOf(0));
         maxDelay.setValidator(ParsingUtil.numberFilter);
         maxDelay.setMaxStringLength(8);
+        maxDelay.setText(String.valueOf(0));
 
-        //canPlayOverSelf = new CheckboxButton(getBaseX(), getRowY(0) + getOffsetY())
-        addWidget(canPlayOverSelf = new CheckboxWidget(getBaseX(), getRowY(1), 20 + font.getStringWidth("Can play over itself"), 20, "Can play over itself", false));
-        addWidget(shouldStopPrevious = new CheckboxWidget(getBaseX(), getRowY(2), 20 + font.getStringWidth("Should stop previous instance"), 20, "Should stop previous instance", false));
+        minVolume.setValidator(ParsingUtil.decimalNumberFilter);
+        minVolume.setMaxStringLength(8);
+        minVolume.setText(String.valueOf(0));
+        maxVolume.setValidator(ParsingUtil.decimalNumberFilter);
+        maxVolume.setMaxStringLength(8);
+        maxVolume.setText(String.valueOf(0));
+
+        minPitch.setValidator(ParsingUtil.decimalNumberFilter);
+        minPitch.setMaxStringLength(8);
+        minPitch.setText(String.valueOf(0));
+        maxPitch.setValidator(ParsingUtil.decimalNumberFilter);
+        maxPitch.setMaxStringLength(8);
+        maxPitch.setText(String.valueOf(0));
+
         shouldStopPrevious.active = false;
         shouldStopPrevious.visible = false;
+
+        addWidget(minDelay);
+        addWidget(maxDelay);
+
+        addWidget(minVolume);
+        addWidget(maxVolume);
+
+        addWidget(minPitch);
+        addWidget(maxPitch);
+
+        addWidget(canPlayOverSelf);
+        addWidget(shouldStopPrevious);
+    }
+
+    @Override
+    public void updateWidgetPosition() {
+        textMinDelay.x = getBaseX(); textMinDelay.y = getRowY(0) + getOffsetY(font.FONT_HEIGHT);
+        minDelay.x = getNeighbourX(textMinDelay); minDelay.y = getRowY(0);
+        textMaxDelay.x = getNeighbourX(minDelay); textMaxDelay.y = getRowY(0) + getOffsetY(font.FONT_HEIGHT);
+        maxDelay.x = getNeighbourX(textMaxDelay); maxDelay.y = getRowY(0);
+
+        textMinVolume.x = getBaseX(); textMinVolume.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        minVolume.x = getNeighbourX(textMinVolume); minVolume.y = getRowY(1);
+        textMaxVolume.x = getNeighbourX(minVolume); textMaxVolume.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        maxVolume.x = getNeighbourX(textMaxVolume); maxVolume.y = getRowY(1);
+
+        textMinPitch.x = getBaseX(); textMinPitch.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
+        minPitch.x = getNeighbourX(textMinPitch); minPitch.y = getRowY(2);
+        textMaxPitch.x = getNeighbourX(minPitch); textMaxPitch.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
+        maxPitch.x = getNeighbourX(textMaxPitch); maxPitch.y = getRowY(2);
+
+        canPlayOverSelf.x = getBaseX(); canPlayOverSelf.y = getRowY(3);
+        shouldStopPrevious.x = getBaseX(); shouldStopPrevious.y = getRowY(4);
     }
 
     @Override
@@ -59,6 +121,15 @@ public class DelayTab extends AbstractTab {
 
         textMaxDelay.render(mouseX, mouseY);
         maxDelay.render(mouseX, mouseY, partialTicks);
+
+        textMinVolume.render(mouseX, mouseY);
+        minVolume.render(mouseX, mouseY, partialTicks);
+        textMaxVolume.render(mouseX, mouseY);
+        maxVolume.render(mouseX, mouseY, partialTicks);
+        textMinPitch.render(mouseX, mouseY);
+        minPitch.render(mouseX, mouseY, partialTicks);
+        textMaxPitch.render(mouseX, mouseY);
+        maxPitch.render(mouseX, mouseY, partialTicks);
 
         canPlayOverSelf.render(mouseX, mouseY, partialTicks);
         shouldStopPrevious.render(mouseX, mouseY, partialTicks);
@@ -92,8 +163,13 @@ public class DelayTab extends AbstractTab {
     @Override
     public void tick() {
         minDelay.tick();
-
         maxDelay.tick();
+
+        minVolume.tick();
+        maxVolume.tick();
+
+        minPitch.tick();
+        maxPitch.tick();
 
         shouldStopPrevious.active = canPlayOverSelf.isChecked();
         shouldStopPrevious.visible = canPlayOverSelf.isChecked();
@@ -104,8 +180,12 @@ public class DelayTab extends AbstractTab {
         minDelay.setText(String.valueOf(data.getMinDelay()));
         maxDelay.setText(String.valueOf(data.getMaxDelay()));
 
-        //setCheckBoxChecked(canPlayOverSelf, data.canPlayOverSelf());
-        //setCheckBoxChecked(shouldStopPrevious, data.shouldStopPrevious());
+        minVolume.setText(String.valueOf(data.getMinRandVolume()));
+        maxVolume.setText(String.valueOf(data.getMaxRandVolume()));
+
+        minPitch.setText(String.valueOf(data.getMinRandPitch()));
+        maxPitch.setText(String.valueOf(data.getMaxRandPitch()));
+
         canPlayOverSelf.setChecked(data.canPlayOverSelf());
         shouldStopPrevious.setChecked(data.shouldStopPrevious());
     }
@@ -114,6 +194,12 @@ public class DelayTab extends AbstractTab {
     public void setDataFromField(AmbienceTileEntityData data) {
         data.setMinDelay(ParsingUtil.tryParseInt(minDelay.getText()));
         data.setMaxDelay(ParsingUtil.tryParseInt(maxDelay.getText()));
+
+        data.setMinRandVolume(ParsingUtil.tryParseFloat(minVolume.getText()));
+        data.setMaxRandVolume(ParsingUtil.tryParseFloat(maxVolume.getText()));
+
+        data.setMinRandPitch(ParsingUtil.tryParseFloat(minPitch.getText()));
+        data.setMaxRandPitch(ParsingUtil.tryParseFloat(maxPitch.getText()));
 
         data.setCanPlayOverSelf(canPlayOverSelf.isChecked());
         if(data.canPlayOverSelf()) data.setShouldStopPrevious(shouldStopPrevious.isChecked());

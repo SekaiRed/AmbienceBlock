@@ -4,8 +4,8 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.Widget;
 
 public class TextInstance extends Widget {
-    public int x;
-    public int y;
+    //public int x;
+    //public int y;
     public int color;
     public String text;
 

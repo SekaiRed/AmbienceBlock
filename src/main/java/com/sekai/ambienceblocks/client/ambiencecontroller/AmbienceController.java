@@ -20,6 +20,7 @@ public class AmbienceController {
     public static AmbienceController instance;
     public static Minecraft mc;
     public static SoundHandler handler;
+    private static final boolean debugMode = true;
 
     //System variables
     public int tick = 0;
@@ -87,17 +88,22 @@ public class AmbienceController {
                 continue;
             }
 
+            //volume stuff
             float volume = getVolumeFromTileEntity(slot.getOwner()), pitch = getPitchFromTileEntity(slot.getOwner());
+
+            AmbienceTileEntityData data = slot.getOwner().data;
+
+            if(slot.hasCachedVolume()) volume = data.isGlobal() ? slot.getCachedVolume() : (float) (slot.getCachedVolume() * data.getPercentageHowCloseIsPlayer(mc.player, slot.getOwner().getPos()));
+            if(slot.hasCachedPitch()) pitch = slot.getCachedPitch();
+
             if(slot.getOwner().data.shouldFuse()) {
                 volume = 0; pitch = 0; double totalBias = 0;
                 List<TileEntity> tileEntityList = mc.world.loadedTileEntityList;
                 tileEntityList.removeIf(lambda -> !(lambda instanceof AmbienceTileEntity));
                 List<AmbienceTileEntity> ambienceTileEntityList = getListOfLoadedAmbienceTiles();
                 ambienceTileEntityList.removeIf(lambda -> !lambda.getMusicName().equals(slot.getMusicString()) || !canTilePlay(lambda));
-                System.out.println(ambienceTileEntityList.size());
                 for(AmbienceTileEntity tile : ambienceTileEntityList) {
                     volume += getVolumeFromTileEntity(tile);
-                    System.out.println(tile.getPos() + " : " + tile.data.getPercentageHowCloseIsPlayer(mc.player, tile.getPos()));
                     totalBias += tile.data.getPercentageHowCloseIsPlayer(mc.player, tile.getPos());
                 }
                 for(AmbienceTileEntity tile : ambienceTileEntityList) {
@@ -223,6 +229,7 @@ public class AmbienceController {
 
         soundsList.removeIf(CustomSoundSlot::isMarkedForDeletion);
 
+        if(debugMode) {
             System.out.println("List of audio blocks going on");
             for (CustomSoundSlot slot : soundsList) {
                 System.out.println(slot.toString());
@@ -234,38 +241,76 @@ public class AmbienceController {
                 System.out.println(slot.getOrigin().getMusicName() + ", " + slot.getOrigin().getPos() + " with a tick of " + slot.tickLeft);
             }
             System.out.println("end");
+        }
     }
 
     public void playMusic(AmbienceTileEntity tile, String source) {
-        System.out.print("playing " + tile.getMusicName() + " at " + tile.getPos());
-        System.out.print(" from " + source);
-        System.out.println(" ");
+        if(debugMode) {
+            System.out.print("playing " + tile.getMusicName() + " at " + tile.getPos());
+            System.out.print(" from " + source);
+            System.out.println(" ");
+        }
         //System.out.println("playing " + tile.getMusicName() + " at " + tile.getPos());
         ResourceLocation playingResource = new ResourceLocation(tile.getMusicName());
-        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), getVolumeFromTileEntity(tile),tile.data.getPitch(), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), getVolumeFromTileEntity(tile),tile.data.getPitch(), tile.data.getFadeIn(), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
         handler.play(playingMusic);
         soundsList.add(new CustomSoundSlot(tile.getMusicName(), playingMusic, tile));
     }
 
     public void playMusicNoRepeat(AmbienceTileEntity tile) {
         //System.out.println("playing non-looping " + tile.getMusicName() + " at " + tile.getPos());
+        float volume = getVolumeFromTileEntity(tile), pitch = tile.data.getPitch();
+
+        boolean usingRandomVolume = false;
+        if(tile.data.isUsingRandomVolume()) usingRandomVolume = true;
+        boolean usingRandomPitch = false;
+        if(tile.data.isUsingRandomPitch()) usingRandomPitch = true;
+
+        if(usingRandomVolume) volume = (float) (tile.data.getMinRandomVolume() + Math.random() * (tile.data.getMaxRandomVolume() - tile.data.getMinRandomVolume()));
+        if(usingRandomPitch) pitch = (float) (tile.data.getMinRandomPitch() + Math.random() * (tile.data.getMaxRandomPitch() - tile.data.getMinRandomPitch()));
+
+        if(usingRandomPitch) {
+            System.out.println("for " + tile.getMusicName());
+            System.out.println(pitch);
+        }
+
         ResourceLocation playingResource = new ResourceLocation(tile.getMusicName());
-        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), getVolumeFromTileEntity(tile),tile.data.getPitch(), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), volume, pitch, tile.data.getFadeIn(), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
         handler.play(playingMusic);
-        soundsList.add(new CustomSoundSlot(tile.getMusicName(), playingMusic, tile));
+        CustomSoundSlot custom = new CustomSoundSlot(tile.getMusicName(), playingMusic, tile);
+        soundsList.add(custom);
+        if(usingRandomVolume) custom.setCachedVolume(volume);
+        if(usingRandomPitch) custom.setCachedPitch(pitch);
     }
 
     public void stopMusic(CustomSoundSlot soundSlot, String source) {
-        System.out.print("stopping " + soundSlot.getMusicString() + " at " + soundSlot.getOwner().getPos());
-        System.out.print(" from " + source);
-        System.out.println(" ");
+        if(debugMode) {
+            System.out.print("stopping " + soundSlot.getMusicString() + " at " + soundSlot.getOwner().getPos());
+            System.out.print(" from " + source);
+            System.out.println(" ");
+        }
+        if(soundSlot.getOwner().data.getFadeOut() != 0f && !soundSlot.getOwner().data.isUsingDelay())
+            soundSlot.getMusicInstance().stop(soundSlot.getOwner().data.getFadeOut());
+        else
+            handler.stop(soundSlot.getMusicInstance());
+        soundSlot.markForDeletion();
+    }
+
+    public void stopMusicNoFadeOut(CustomSoundSlot soundSlot, String source) {
+        if(debugMode) {
+            System.out.print("stopping " + soundSlot.getMusicString() + " at " + soundSlot.getOwner().getPos());
+            System.out.print(" from " + source);
+            System.out.println(" ");
+        }
         handler.stop(soundSlot.getMusicInstance());
         soundSlot.markForDeletion();
     }
 
     //Swaps which tiles is currently owning a playing sound, used for relays and fusing
     public void swapOwner(CustomSoundSlot soundSlot, AmbienceTileEntity tile) {
-        System.out.println("swapping " + tile.getMusicName() + " from " + soundSlot.getOwner().getPos() + " to " + tile.getPos());
+        if(debugMode) {
+            System.out.println("swapping " + tile.getMusicName() + " from " + soundSlot.getOwner().getPos() + " to " + tile.getPos());
+        }
         soundSlot.setOwner(tile);
         soundSlot.getMusicInstance().setBlockPos(tile.getPos());
     }
@@ -374,6 +419,11 @@ public class AmbienceController {
         private AmbienceInstance musicRef;
         private AmbienceTileEntity owner;
 
+        private boolean hasCachedVolume = false;
+        private float cachedVolume = 0f;
+        private boolean hasCachedPitch = false;
+        private float cachedPitch = 0f;
+
         private boolean markForDeletion = false;
 
         public CustomSoundSlot(String musicName, AmbienceInstance musicRef, AmbienceTileEntity owner) {
@@ -410,6 +460,32 @@ public class AmbienceController {
         }
         public void setPitch(float pitch) {
             musicRef.setPitch(pitch);
+        }
+
+        public boolean hasCachedVolume() {
+            return hasCachedVolume;
+        }
+
+        public float getCachedVolume() {
+            return cachedVolume;
+        }
+
+        public void setCachedVolume(float cachedVolume) {
+            this.cachedVolume = cachedVolume;
+            hasCachedVolume = true;
+        }
+
+        public boolean hasCachedPitch() {
+            return hasCachedPitch;
+        }
+
+        public float getCachedPitch() {
+            return cachedPitch;
+        }
+
+        public void setCachedPitch(float cachedPitch) {
+            this.cachedPitch = cachedPitch;
+            hasCachedPitch = true;
         }
 
         public CustomSoundSlot clone() {

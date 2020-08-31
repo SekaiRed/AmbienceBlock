@@ -13,10 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PriorityTab extends AbstractTab {
-    public TextInstance textPriority;
-    public TextFieldWidget priority;
-    public TextInstance textChannel;
-    public TextFieldWidget channel;
+    public TextInstance textPriority = new TextInstance(getBaseX(), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.priority") + " :", font);
+    public TextFieldWidget priority = new TextFieldWidget(font, getNeighbourX(textPriority), getRowY(0), 40, 20, "name");
+    public TextInstance textChannel = new TextInstance(getNeighbourX(priority), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.channel") + " :", font);
+    public TextFieldWidget channel = new TextFieldWidget(font, getNeighbourX(textChannel), getRowY(0), 20, 20, "name");
 
     public PriorityTab(AmbienceGUI guiRef) {
         super(guiRef);
@@ -28,18 +28,24 @@ public class PriorityTab extends AbstractTab {
     }
 
     @Override
-    public void init() {
-        textPriority = new TextInstance(getBaseX(), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.priority") + " :", font);
-        addWidget(priority = new TextFieldWidget(font, getNeighbourX(textPriority), getRowY(0), 40, 20, "name"));
+    public void initialInit() {
+        addWidget(priority);
         priority.setValidator(ParsingUtil.numberFilter);
         priority.setMaxStringLength(2);
         priority.setText(String.valueOf(0));
 
-        textChannel = new TextInstance(getNeighbourX(priority), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.channel") + " :", font);
-        addWidget(channel = new TextFieldWidget(font, getNeighbourX(textChannel), getRowY(0), 20, 20, "name"));
+        addWidget(channel);
         channel.setValidator(ParsingUtil.numberFilter);
         channel.setMaxStringLength(1);
         channel.setText(String.valueOf(0));
+    }
+
+    @Override
+    public void updateWidgetPosition() {
+        textPriority.x = getBaseX(); textPriority.y = getRowY(0) + getOffsetY(font.FONT_HEIGHT);
+        priority.x = getNeighbourX(textPriority); priority.y = getRowY(0);
+        textChannel.x = getNeighbourX(priority); textChannel.y = getRowY(0) + getOffsetY(font.FONT_HEIGHT);
+        channel.x = getNeighbourX(textChannel); channel.y = getRowY(0);
     }
 
     @Override

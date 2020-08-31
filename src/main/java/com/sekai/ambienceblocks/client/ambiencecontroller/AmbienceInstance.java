@@ -1,7 +1,5 @@
 package com.sekai.ambienceblocks.client.ambiencecontroller;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.LocatableSound;
 import net.minecraft.client.audio.TickableSound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -16,7 +14,17 @@ public class AmbienceInstance extends TickableSound {
     private float internalPitch = 1f;
     private BlockPos internalPos;
 
-    public AmbienceInstance(ResourceLocation soundId, SoundCategory categoryIn, BlockPos pos, float volume, float pitch, boolean repeat) {
+    //fade in
+    private int fadingInCounter;
+    private boolean fadingIn;
+    private final int fadeIn;
+
+    //fade out
+    private int fadingOutCounter;
+    private boolean fadingOut;
+    private int fadeOut;
+
+    public AmbienceInstance(ResourceLocation soundId, SoundCategory categoryIn, BlockPos pos, float volume, float pitch, int fadeIn, boolean repeat) {
         super(new SoundEvent(soundId), categoryIn);
         this.volume = volume;
         internalVolume = volume;
@@ -33,6 +41,17 @@ public class AmbienceInstance extends TickableSound {
         //experiment
         this.repeat = repeat;
         this.repeatDelay = 0;
+
+        this.fadeIn = fadeIn;
+
+        if(fadeIn != 0) {
+            this.volume = 0.00001f;
+            fadingInCounter = 0;
+            fadingIn = true;
+        } else {
+            fadingInCounter = 0;
+            fadingIn = false;
+        }
     }
 
     public void setVolume(float volume) {
@@ -60,9 +79,32 @@ public class AmbienceInstance extends TickableSound {
 
     @Override
     public void tick() {
+        float audioMult = 1f;
+
+        if(fadingIn) {
+            if(fadingInCounter >= fadeIn) {
+                fadingIn = false;
+            } else {
+                audioMult *= fadingInCounter / (float)fadeIn;
+                fadingInCounter++;
+            }
+        }
+
+        if(fadingOut) {
+            System.out.println("stopping " + fadingOutCounter + " out of " + fadeOut);
+            if(fadingOutCounter <= 0) {
+                //fadingOut = false;
+                donePlaying = true;
+            } else {
+                audioMult *= fadingOutCounter / (float)fadeOut;
+                fadingOutCounter--;
+            }
+        }
+
         //update volume if it changed
-        if(internalVolume != volume)
-            this.volume = internalVolume;
+        if(internalVolume != volume || audioMult != 1f) {
+            this.volume = internalVolume * audioMult;
+        }
 
         if(internalPitch != pitch)
             this.pitch = internalPitch;
@@ -72,5 +114,11 @@ public class AmbienceInstance extends TickableSound {
             //update position if it changed
             x = internalPos.getX(); y = internalPos.getY(); z = internalPos.getZ();
         }
+    }
+
+    public void stop(int fadeOut) {
+        this.fadeOut = fadeOut;
+        fadingOutCounter = fadeOut;
+        fadingOut = true;
     }
 }

@@ -23,43 +23,49 @@ import java.util.List;
 public class BoundsTab extends AbstractTab {
     private int boundType;
 
-    TextInstance textBounds;
-    Button buttonBounds;
-    CheckboxWidget isGlobal;
+    TextInstance textBounds = new TextInstance(getBaseX(), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.type") + " :", font);
+    Button buttonBounds = guiRef.addButton(new Button(getNeighbourX(textBounds), getRowY(0) + getOffsetY(20), 60, 20, "no", button -> {
+        moveToNextBoundType();
+    }));
+    CheckboxWidget isGlobal = new CheckboxWidget(getNeighbourX(buttonBounds), getRowY(0), 20 + font.getStringWidth("Global"), 20, "Global", false);
 
-    TextInstance textSphereRadius;
-    TextFieldWidget sphereRadius;
+    TextInstance textSphereRadius = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.radius"), font);
+    TextFieldWidget sphereRadius = new TextFieldWidget(font, getNeighbourX(textSphereRadius), getRowY(1), 40, 20, "name");
 
-    TextInstance textCylRadius;
-    TextFieldWidget cylRadius;
-    TextInstance textCylLength;
-    TextFieldWidget cylLength;
-    TextInstance textCylAxis;
-    Button cylAxisButton;
+    TextInstance textCylRadius = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.radius"), font);
+    TextFieldWidget cylRadius = new TextFieldWidget(font, getNeighbourX(textCylRadius), getRowY(1), 40, 20, "name");
+    TextInstance textCylLength = new TextInstance(getNeighbourX(cylRadius), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.length"), font);
+    TextFieldWidget cylLength = new TextFieldWidget(font, getNeighbourX(textCylLength), getRowY(1), 40, 20, "name");
+    TextInstance textCylAxis = new TextInstance(getNeighbourX(cylLength), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.axis"), font);
+    Button cylAxisButton = guiRef.addButton(new Button(getNeighbourX(textCylAxis), getRowY(1) + getOffsetY(20), 20, 20, "X", button -> {
+        moveToNextAxisCylinder();
+    }));
     BoundsAxis cylAxis;
 
-    TextInstance textCapRadius;
-    TextFieldWidget capRadius;
-    TextInstance textCapLength;
-    TextFieldWidget capLength;
-    TextInstance textCapAxis;
-    Button capAxisButton;
+    TextInstance textCapRadius = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.radius"), font);
+    TextFieldWidget capRadius = new TextFieldWidget(font, getNeighbourX(textCapRadius), getRowY(1), 40, 20, "name");
+    TextInstance textCapLength = new TextInstance(getNeighbourX(capRadius), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.length"), font);
+    TextFieldWidget capLength = new TextFieldWidget(font, getNeighbourX(textCapLength), getRowY(1), 40, 20, "name");
+    TextInstance textCapAxis = new TextInstance(getNeighbourX(capLength), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.axis"), font);
+    Button capAxisButton = guiRef.addButton(new Button(getNeighbourX(textCapAxis), getRowY(1) + getOffsetY(20), 20, 20, "X", button -> {
+        moveToNextAxisCapsule();
+    }));
     BoundsAxis capAxis;
 
-    TextInstance textCubicX;
-    TextFieldWidget cubicX;
-    TextInstance textCubicY;
-    TextFieldWidget cubicY;
-    TextInstance textCubicZ;
-    TextFieldWidget cubicZ;
+    TextInstance textCubicX = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "X", font);
+    TextFieldWidget cubicX = new TextFieldWidget(font, getNeighbourX(textCubicX), getRowY(1), 40, 20, "name");
+    TextInstance textCubicY = new TextInstance(getNeighbourX(cubicX), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "Y", font);
+    TextFieldWidget cubicY = new TextFieldWidget(font, getNeighbourX(textCubicY), getRowY(1), 40, 20, "name");
+    TextInstance textCubicZ = new TextInstance(getNeighbourX(cubicY), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "Z", font);
+    TextFieldWidget cubicZ = new TextFieldWidget(font, getNeighbourX(textCubicZ), getRowY(1), 40, 20, "name");
 
-    TextInstance textOffset;
-    TextInstance textOffsetX;
-    TextFieldWidget offsetX;
-    TextInstance textOffsetY;
-    TextFieldWidget offsetY;
-    TextInstance textOffsetZ;
-    TextFieldWidget offsetZ;
+    TextInstance textOffset = new TextInstance(getBaseX(), getRowY(2) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.offset") + " :", font);
+    TextInstance textOffsetX = new TextInstance(getNeighbourX(textOffset), getRowY(2) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "X", font);
+    TextFieldWidget offsetX = new TextFieldWidget(font, getNeighbourX(textOffsetX), getRowY(2), 40, 20, "name");
+    TextInstance textOffsetY = new TextInstance(getNeighbourX(offsetX), getRowY(2) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "Y", font);
+    TextFieldWidget offsetY = new TextFieldWidget(font, getNeighbourX(textOffsetY), getRowY(2), 40, 20, "name");
+    TextInstance textOffsetZ = new TextInstance(getNeighbourX(offsetY), getRowY(2) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "Z", font);
+    TextFieldWidget offsetZ = new TextFieldWidget(font, getNeighbourX(textOffsetZ), getRowY(2), 40, 20, "name");
 
     private List<Widget> sphereWidgets;// = new ArrayList<>();
     private List<Widget> cylinderWidgets;// = new ArrayList<>();
@@ -76,8 +82,8 @@ public class BoundsTab extends AbstractTab {
         return "Bounds";
     }
 
-    @Override
-    public void init() {
+    /*@Override
+    public void initialInit() {
         sphereWidgets = new ArrayList<>();
         cylinderWidgets = new ArrayList<>();
         capsuleWidgets = new ArrayList<>();
@@ -168,6 +174,121 @@ public class BoundsTab extends AbstractTab {
 
         resetBoundFields();
         setBoundType(0);
+    }*/
+
+    @Override
+    public void initialInit() {
+        sphereWidgets = new ArrayList<>();
+        cylinderWidgets = new ArrayList<>();
+        capsuleWidgets = new ArrayList<>();
+        cubicWidgets = new ArrayList<>();
+        noneWidgets = new ArrayList<>();
+
+        addButton(buttonBounds);
+        addWidget(isGlobal);
+
+        sphereWidgets.add(textSphereRadius);
+        sphereWidgets.add(sphereRadius);
+        sphereRadius.setValidator(ParsingUtil.decimalNumberFilter);
+        sphereRadius.setMaxStringLength(6);
+        addWidget(sphereRadius);
+
+        cylinderWidgets.add(textCylRadius);
+        cylinderWidgets.add(cylRadius);
+        cylRadius.setValidator(ParsingUtil.decimalNumberFilter);
+        cylRadius.setMaxStringLength(6);
+        addWidget(cylRadius);
+        cylinderWidgets.add(textCylLength);
+        cylinderWidgets.add(cylLength);
+        cylLength.setValidator(ParsingUtil.decimalNumberFilter);
+        cylLength.setMaxStringLength(6);
+        addWidget(cylLength);
+        cylinderWidgets.add(textCylAxis);
+        cylinderWidgets.add(cylAxisButton);
+        addButton(cylAxisButton);
+
+        capsuleWidgets.add(textCapRadius);
+        capsuleWidgets.add(capRadius);
+        capRadius.setValidator(ParsingUtil.decimalNumberFilter);
+        capRadius.setMaxStringLength(6);
+        addWidget(capRadius);
+        capsuleWidgets.add(textCapLength);
+        capsuleWidgets.add(capLength);
+        capLength.setValidator(ParsingUtil.decimalNumberFilter);
+        capLength.setMaxStringLength(6);
+        addWidget(capLength);
+        capsuleWidgets.add(textCapAxis);
+        capsuleWidgets.add(capAxisButton);
+        addButton(capAxisButton);
+
+        cubicWidgets.add(textCubicX);
+        cubicWidgets.add(cubicX);
+        cubicX.setValidator(ParsingUtil.decimalNumberFilter);
+        cubicX.setMaxStringLength(6);
+        addWidget(cubicX);
+        cubicWidgets.add(textCubicY);
+        cubicWidgets.add(cubicY);
+        cubicY.setValidator(ParsingUtil.decimalNumberFilter);
+        cubicY.setMaxStringLength(6);
+        addWidget(cubicY);
+        cubicWidgets.add(textCubicZ);
+        cubicWidgets.add(cubicZ);
+        cubicZ.setValidator(ParsingUtil.decimalNumberFilter);
+        cubicZ.setMaxStringLength(6);
+        addWidget(cubicZ);
+
+        offsetX.setValidator(ParsingUtil.negativeDecimalNumberFilter);
+        offsetX.setMaxStringLength(8);
+        addWidget(offsetX);
+        offsetY.setValidator(ParsingUtil.negativeDecimalNumberFilter);
+        offsetY.setMaxStringLength(8);
+        addWidget(offsetY);
+        offsetZ.setValidator(ParsingUtil.negativeDecimalNumberFilter);
+        offsetZ.setMaxStringLength(8);
+        addWidget(offsetZ);
+
+        resetBoundFields();
+        setBoundType(0);
+    }
+
+    @Override
+    public void updateWidgetPosition() {
+        textBounds.x = getBaseX(); textBounds.y = getRowY(0) + getOffsetY(font.FONT_HEIGHT);
+        buttonBounds.x = getNeighbourX(textBounds); buttonBounds.y = getRowY(0) + getOffsetY(20);
+
+        isGlobal.x = getNeighbourX(buttonBounds); isGlobal.y = getRowY(0);
+
+        textSphereRadius.x = getBaseX(); textSphereRadius.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        sphereRadius.x = getNeighbourX(textSphereRadius); sphereRadius.y = getRowY(1);
+
+        textCylRadius.x = getBaseX(); textCylRadius.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        cylRadius.x = getNeighbourX(textCylRadius); cylRadius.y = getRowY(1);
+        textCylLength.x = getNeighbourX(cylRadius); textCylLength.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        cylLength.x = getNeighbourX(textCylLength); cylLength.y = getRowY(1);
+        textCylAxis.x = getNeighbourX(cylLength); textCylAxis.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        cylAxisButton.x = getNeighbourX(textCylAxis); cylAxisButton.y = getRowY(1) + getOffsetY(20);
+
+        textCapRadius.x = getBaseX(); textCapRadius.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        capRadius.x = getNeighbourX(textCapRadius); capRadius.y = getRowY(1);
+        textCapLength.x = getNeighbourX(capRadius); textCapLength.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        capLength.x = getNeighbourX(textCapLength); capLength.y = getRowY(1);
+        textCapAxis.x = getNeighbourX(capLength); textCapAxis.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        capAxisButton.x = getNeighbourX(textCapAxis); capAxisButton.y = getRowY(1) + getOffsetY(20);
+
+        textCubicX.x = getBaseX(); textCubicX.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        cubicX.x = getNeighbourX(textCubicX); cubicX.y = getRowY(1);
+        textCubicY.x = getNeighbourX(cubicX); textCubicY.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        cubicY.x = getNeighbourX(textCubicY); cubicY.y = getRowY(1);
+        textCubicZ.x = getNeighbourX(cubicY); textCubicZ.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        cubicZ.x = getNeighbourX(textCubicZ); cubicZ.y = getRowY(1);
+
+        textOffset.x = getBaseX(); textOffset.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
+        textOffsetX.x = getNeighbourX(textOffset); textOffsetX.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
+        offsetX.x = getNeighbourX(textOffsetX); offsetX.y = getRowY(2);
+        textOffsetY.x = getNeighbourX(offsetX); textOffsetY.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
+        offsetY.x = getNeighbourX(textOffsetY); offsetY.y = getRowY(2);
+        textOffsetZ.x = getNeighbourX(offsetY); textOffsetZ.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
+        offsetZ.x = getNeighbourX(textOffsetZ); offsetZ.y = getRowY(2);
     }
 
     private void moveToNextAxisCapsule() {

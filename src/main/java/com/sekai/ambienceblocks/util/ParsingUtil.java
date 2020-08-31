@@ -57,6 +57,11 @@ public class ParsingUtil {
         return true;
     }
 
+    public static int nthLastIndexOf(int nth, String ch, String string) {
+        if (nth <= 0) return string.length();
+        return nthLastIndexOf(--nth, ch, string.substring(0, string.lastIndexOf(ch)));
+    }
+
     public static boolean isNumberOrDot(char c) {
         return (c >= '0' && c <= '9') || c == '.';
     }

@@ -21,20 +21,28 @@ import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
 public class MainTab extends AbstractTab {
-    public TextInstance textSoundName;
-    public TextFieldWidget soundName;
-    //public Button soundButton;
+    public TextInstance textSoundName = new TextInstance(getBaseX(), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.music_id") + " :", font);
+    public TextFieldWidget soundName = new TextFieldWidget(font, getNeighbourX(textSoundName), getRowY(0), getEndX() - getNeighbourX(textSoundName) - 20 - separation, 20, "name");
+    public Button soundButton = guiRef.addButton(new Button(getNeighbourX(soundName), getRowY(0) + getOffsetY(20), 20, 20, "...", button -> {
+        Minecraft.getInstance().displayGuiScreen(new ChooseSoundGUI(this.guiRef, soundName));
+    }));
 
-    public TextInstance textVolume;
-    public TextFieldWidget soundVolume;
+    public TextInstance textVolume = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.volume") + " :", font);
+    public TextFieldWidget soundVolume = new TextFieldWidget(font, getNeighbourX(textVolume), getRowY(1), 40, 20, "name");
 
-    public TextInstance textPitch;
-    public TextFieldWidget soundPitch;
+    public TextInstance textPitch = new TextInstance(getNeighbourX(soundVolume), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.pitch") + " :", font);
+    public TextFieldWidget soundPitch = new TextFieldWidget(font, getNeighbourX(textPitch), getRowY(1), 40, 20, "name");
 
-    public CheckboxWidget shouldFuse;
-    public CheckboxWidget useDelay;
-    public CheckboxWidget usePriority;
-    public CheckboxWidget needRedstone;
+    public TextInstance textFadeIn = new TextInstance(0, 0, 0xFFFFFF, "Fade In :", font);
+    public TextFieldWidget soundFadeIn = new TextFieldWidget(font, 0, 0, 40, 20, "name");
+
+    public TextInstance textFadeOut = new TextInstance(0, 0, 0xFFFFFF, "Fade Out :", font);
+    public TextFieldWidget soundFadeOut = new TextFieldWidget(font, 0, 0, 40, 20, "name");
+
+    public CheckboxWidget shouldFuse = new CheckboxWidget(getBaseX(), getRowY(2), 20 + font.getStringWidth("Should fuse"), 20, "Should fuse", false);
+    public CheckboxWidget useDelay = new CheckboxWidget(getBaseX(), getRowY(3), 20 + font.getStringWidth("Using delay"), 20, "Using delay", false);
+    public CheckboxWidget usePriority = new CheckboxWidget(getNeighbourX(shouldFuse), getRowY(2), 20 + font.getStringWidth("Using priority"), 20, "Using priority", false);
+    public CheckboxWidget needRedstone = new CheckboxWidget(getNeighbourX(useDelay), getRowY(3), 20 + font.getStringWidth("Needs redstone"), 20, "Needs redstone", false);
 
     public MainTab(AmbienceGUI guiRef) {
         super(guiRef);
@@ -46,41 +54,74 @@ public class MainTab extends AbstractTab {
     }
 
     @Override
-    public void init() {
-        textSoundName = new TextInstance(getBaseX(), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.music_id") + " :", font);
-        addWidget(soundName = new TextFieldWidget(font, getNeighbourX(textSoundName), getRowY(0), getEndX() - getNeighbourX(textSoundName), 20, "name"));
+    public void initialInit() {
         soundName.setMaxStringLength(50);
-        /*addWidget(soundButton = guiRef.addButton(new Button(getNeighbourX(soundName), getRowY(0) + getOffsetY(20), 20, 20, "...", button -> {
-            Minecraft.getInstance().displayGuiScreen(new ChooseSoundGUI(this.guiRef));
-        })));*/
 
-        textVolume = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.volume") + " :", font);
-        addWidget(soundVolume = new TextFieldWidget(font, getNeighbourX(textVolume), getRowY(1), 40, 20, "name"));
         soundVolume.setValidator(ParsingUtil.decimalNumberFilter);
         soundVolume.setMaxStringLength(6);
 
-        textPitch = new TextInstance(getNeighbourX(soundVolume), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.pitch") + " :", font);
-        addWidget(soundPitch = new TextFieldWidget(font, getNeighbourX(textPitch), getRowY(1), 40, 20, "name"));
         soundPitch.setValidator(ParsingUtil.decimalNumberFilter);
         soundPitch.setMaxStringLength(6);
 
-        addWidget(shouldFuse = new CheckboxWidget(getBaseX(), getRowY(2), 20 + font.getStringWidth("Should fuse"), 20, "Should fuse", false));
-        addWidget(usePriority = new CheckboxWidget(getNeighbourX(shouldFuse), getRowY(2), 20 + font.getStringWidth("Using priority"), 20, "Using priority", false));
-        addWidget(useDelay = new CheckboxWidget(getBaseX(), getRowY(3), 20 + font.getStringWidth("Using delay"), 20, "Using delay", false));
-        addWidget(needRedstone = new CheckboxWidget(getNeighbourX(useDelay), getRowY(3), 20 + font.getStringWidth("Needs redstone"), 20, "Needs redstone", false));
+        soundFadeIn.setValidator(ParsingUtil.numberFilter);
+        soundFadeIn.setMaxStringLength(6);
+
+        soundFadeOut.setValidator(ParsingUtil.numberFilter);
+        soundFadeOut.setMaxStringLength(6);
+
+        //add widgets to the list
+        addWidget(soundName);
+        addButton(soundButton);
+        addWidget(soundVolume);
+        addWidget(soundPitch);
+        addWidget(soundFadeIn);
+        addWidget(soundFadeOut);
+        addWidget(shouldFuse);
+        addWidget(usePriority);
+        addWidget(useDelay);
+        addWidget(needRedstone);
+    }
+
+    @Override
+    public void updateWidgetPosition() {
+        textSoundName.x = getBaseX(); textSoundName.y = getRowY(0) + getOffsetY(font.FONT_HEIGHT);
+        soundName.x = getNeighbourX(textSoundName); soundName.y = getRowY(0); soundName.setWidth(getEndX() - getNeighbourX(textSoundName) - 20 - separation);
+        soundButton.x = getNeighbourX(soundName); soundButton.y = getRowY(0) + getOffsetY(20);
+
+        textVolume.x = getBaseX(); textVolume.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        soundVolume.x = getNeighbourX(textVolume); soundVolume.y = getRowY(1);
+
+        textPitch.x = getNeighbourX(soundVolume); textPitch.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        soundPitch.x = getNeighbourX(textPitch); soundPitch.y = getRowY(1);
+
+        textFadeIn.x = getBaseX(); textFadeIn.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
+        soundFadeIn.x = getNeighbourX(textFadeIn); soundFadeIn.y = getRowY(2);
+
+        textFadeOut.x = getNeighbourX(soundFadeIn); textFadeOut.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
+        soundFadeOut.x = getNeighbourX(textFadeOut); soundFadeOut.y = getRowY(2);
+
+        shouldFuse.x = getBaseX(); shouldFuse.y = getRowY(3);
+        usePriority.x = getNeighbourX(shouldFuse); usePriority.y = getRowY(3);
+        useDelay.x = getBaseX(); useDelay.y = getRowY(4);
+        needRedstone.x = getNeighbourX(useDelay); needRedstone.y = getRowY(4);
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         textSoundName.render(mouseX, mouseY);
         soundName.render(mouseX, mouseY, partialTicks);
-        //soundButton.render(mouseX, mouseY, partialTicks);
+        soundButton.render(mouseX, mouseY, partialTicks);
 
         textVolume.render(mouseX, mouseY);
         soundVolume.render(mouseX, mouseY, partialTicks);
 
         textPitch.render(mouseX, mouseY);
         soundPitch.render(mouseX, mouseY, partialTicks);
+
+        textFadeIn.render(mouseX, mouseY);
+        soundFadeIn.render(mouseX, mouseY, partialTicks);
+        textFadeOut.render(mouseX, mouseY);
+        soundFadeOut.render(mouseX, mouseY, partialTicks);
 
         shouldFuse.render(mouseX, mouseY, partialTicks);
         useDelay.render(mouseX, mouseY, partialTicks);
@@ -95,6 +136,14 @@ public class MainTab extends AbstractTab {
         if(textSoundName.isHovered()) {
             list.add(TextFormatting.RED + "Sound ID");
             list.add("Choose the sound to play.");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+        if(soundButton.isHovered()) {
+            list.add(TextFormatting.RED + "Tree selection");
+            list.add("Select the sound in the list of loaded sounds.");
+            list.add(TextFormatting.GRAY + "You first choose the namespace of the sound.");
+            list.add(TextFormatting.GRAY + "Sounds are separated into folders by '.' (dot), folders are annotated with <>.");
+            list.add(TextFormatting.GRAY + "Anything that isn't a folder is an actual sound, double clicking it will select it.");
             GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
         }
         if(textVolume.isHovered()) {
@@ -138,6 +187,9 @@ public class MainTab extends AbstractTab {
         soundVolume.tick();
 
         soundPitch.tick();
+
+        soundFadeIn.tick();
+        soundFadeOut.tick();
     }
 
     @Override
@@ -145,6 +197,8 @@ public class MainTab extends AbstractTab {
         soundName.setText(data.getSoundName());
         soundVolume.setText(String.valueOf(data.getVolume()));
         soundPitch.setText(String.valueOf(data.getPitch()));
+        soundFadeIn.setText(String.valueOf(data.getFadeIn()));
+        soundFadeOut.setText(String.valueOf(data.getFadeOut()));
 
         shouldFuse.setChecked(data.shouldFuse());
         useDelay.setChecked(data.isUsingDelay());
@@ -157,6 +211,8 @@ public class MainTab extends AbstractTab {
         data.setSoundName(soundName.getText());
         data.setVolume(ParsingUtil.tryParseFloat(soundVolume.getText()));
         data.setPitch(ParsingUtil.tryParseFloat(soundPitch.getText()));
+        data.setFadeIn(ParsingUtil.tryParseInt(soundFadeIn.getText()));
+        data.setFadeOut(ParsingUtil.tryParseInt(soundFadeOut.getText()));
 
         data.setShouldFuse(shouldFuse.isChecked());
         data.setUseDelay(useDelay.isChecked());
@@ -172,5 +228,9 @@ public class MainTab extends AbstractTab {
     @Override
     public void onDeactivate() {
 
+    }
+
+    public int getChildren() {
+        return guiRef.children().size();
     }
 }

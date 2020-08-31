@@ -22,5 +22,6 @@
   "ui.ambienceblocks.min": "Min",
   "ui.ambienceblocks.max": "Max",
   "ui.ambienceblocks.type": "Type",
-  "ui.ambienceblocks.axis": "Axis"
+  "ui.ambienceblocks.axis": "Axis",
+  "ui.ambienceblocks.random": "Random"
 }

@@ -2,8 +2,11 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
 import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
+import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
@@ -11,8 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MiscTab extends AbstractTab {
-    Button copy;
-    Button paste;
+    Button copy = new Button(getBaseX(), getRowY(0) + getOffsetY(20), 60, 20, "Copy", button -> {
+        AmbienceController.instance.setClipboard(guiRef.getData());
+    });
+    Button paste = new Button(getNeighbourX(copy), getRowY(0) + getOffsetY(20), 60, 20, "Paste", button -> {
+        guiRef.setData(AmbienceController.instance.getClipboard());
+    });
+    StringListWidget musicList = new StringListWidget(getBaseX(), getRowY(1), getEndX() - getBaseX(), getEndY() - getRowY(1), 4, 16, font, null);
 
     //TextInstance presets;
 
@@ -25,23 +33,50 @@ public class MiscTab extends AbstractTab {
         return "Misc";
     }
 
-    @Override
-    public void init() {
-        addWidget(copy = guiRef.addButton(new Button(getBaseX(), getRowY(0) + getOffsetY(20), 60, 20, "Copy", button -> {
+    /*@Override
+    public void initialInit() {
+        copy = guiRef.addButton(new Button(getBaseX(), getRowY(0) + getOffsetY(20), 60, 20, "Copy", button -> {
             AmbienceController.instance.setClipboard(guiRef.getData());
-        })));
+        }));
 
-        addWidget(paste = guiRef.addButton(new Button(getNeighbourX(copy), getRowY(0) + getOffsetY(20), 60, 20, "Paste", button -> {
+        paste = guiRef.addButton(new Button(getNeighbourX(copy), getRowY(0) + getOffsetY(20), 60, 20, "Paste", button -> {
             guiRef.setData(AmbienceController.instance.getClipboard());
-        })));
+        }));
 
-        //presets = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "Presets :", font);
+        musicList = new StringListWidget(getBaseX(), getRowY(1), getEndX() - getBaseX(), getEndY() - getRowY(1), 4, 16, font, null);
+        for (ResourceLocation element : Minecraft.getInstance().getSoundHandler().getAvailableSounds()) {
+            if(element.getPath().contains("ambients")) musicList.addElement(element.getPath());
+        }
+    }*/
+
+    @Override
+    public void initialInit() {
+        for (ResourceLocation element : Minecraft.getInstance().getSoundHandler().getAvailableSounds()) {
+            if(element.getPath().contains("ambients")) musicList.addElement(element.getPath());
+        }
+
+        addButton(copy);
+        addButton(paste);
+        addWidget(musicList);
+    }
+
+    @Override
+    public void updateWidgetPosition() {
+        copy.x = getBaseX(); copy.y = getRowY(0);
+        paste.x = getNeighbourX(copy); paste.y = getRowY(0);
+        musicList.x = getBaseX(); musicList.y = getRowY(1);// musicList.setWidth(getEndX() - getBaseX()); musicList.setHeight(getEndY() - getRowY(1));
+    }
+
+    public void doubleClicked() {
+        System.out.println("double clicked");
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         copy.render(mouseX, mouseY, partialTicks);
         paste.render(mouseX, mouseY, partialTicks);
+
+        musicList.render(mouseX, mouseY);
 
         //presets.render();
     }
@@ -64,7 +99,10 @@ public class MiscTab extends AbstractTab {
 
     @Override
     public void tick() {
-
+        /*if(musicList.scrollIndex < 1f)
+            musicList.scrollIndex += 0.01f;
+        else
+            musicList.scrollIndex = 0f;*/
     }
 
     @Override

@@ -27,6 +27,8 @@ public class AmbienceTileEntityData
     //sounds
     private float volume = 1.0f;
     private float pitch = 1.0f;
+    private int fadeIn = 0;
+    private int fadeOut = 0;
 
     //priority
     private boolean usePriority = false;
@@ -41,9 +43,13 @@ public class AmbienceTileEntityData
     private Vec3d offset = new Vec3d(0, 0, 0);
 
     //delay
+    private boolean useDelay = false;
     private int minDelay = 0;
     private int maxDelay = 0;
-    private boolean useDelay = false;
+    private float minRandVolume = 0;
+    private float maxRandVolume = 0;
+    private float minRandPitch = 0;
+    private float maxRandPitch = 0;
     private boolean canPlayOverSelf = false;
     private boolean shouldStopPrevious = false;
 
@@ -55,6 +61,8 @@ public class AmbienceTileEntityData
 
         compound.putFloat("volume", this.volume);
         compound.putFloat("pitch", this.pitch);
+        compound.putInt("fadeIn", this.fadeIn);
+        compound.putInt("fadeOut", this.fadeOut);
 
         compound.putBoolean("usePriority",this.usePriority);
         if(usePriority) {
@@ -72,6 +80,12 @@ public class AmbienceTileEntityData
             compound.putInt("maxDelay", this.maxDelay);
             compound.putBoolean("canPlayOverSelf", this.canPlayOverSelf);
             compound.putBoolean("shouldStopPrevious", this.shouldStopPrevious);
+
+            compound.putFloat("minRandVolume", this.minRandVolume);
+            compound.putFloat("maxRandVolume", this.maxRandVolume);
+
+            compound.putFloat("minRandPitch", this.minRandPitch);
+            compound.putFloat("maxRandPitch", this.maxRandPitch);
         }
 
         return compound;
@@ -84,6 +98,8 @@ public class AmbienceTileEntityData
 
         this.volume = compound.getFloat("volume");
         this.pitch = compound.getFloat("pitch");
+        this.fadeIn = compound.getInt("fadeIn");
+        this.fadeOut = compound.getInt("fadeOut");
 
         this.usePriority = compound.getBoolean("usePriority");
         if(usePriority) {
@@ -102,6 +118,12 @@ public class AmbienceTileEntityData
             this.maxDelay = compound.getInt("maxDelay");
             this.canPlayOverSelf = compound.getBoolean("canPlayOverSelf");
             this.shouldStopPrevious = compound.getBoolean("shouldStopPrevious");
+
+            this.minRandVolume = compound.getFloat("minRandVolume");
+            this.maxRandVolume = compound.getFloat("maxRandVolume");
+
+            this.minRandPitch = compound.getFloat("minRandPitch");
+            this.maxRandPitch = compound.getFloat("maxRandPitch");
         }
 
     }
@@ -116,6 +138,8 @@ public class AmbienceTileEntityData
 
         buf.writeFloat(this.volume);
         buf.writeFloat(this.pitch);
+        buf.writeInt(this.fadeIn);
+        buf.writeInt(this.fadeOut);
 
         buf.writeBoolean(this.usePriority);
         if(usePriority) {
@@ -136,6 +160,12 @@ public class AmbienceTileEntityData
             buf.writeInt(this.maxDelay);
             buf.writeBoolean(this.canPlayOverSelf);
             buf.writeBoolean(this.shouldStopPrevious);
+
+            buf.writeFloat(this.minRandVolume);
+            buf.writeFloat(this.maxRandVolume);
+
+            buf.writeFloat(this.minRandPitch);
+            buf.writeFloat(this.maxRandPitch);
         }
     }
 
@@ -147,6 +177,8 @@ public class AmbienceTileEntityData
 
         this.volume = buf.readFloat();
         this.pitch = buf.readFloat();
+        this.fadeIn = buf.readInt();
+        this.fadeOut = buf.readInt();
 
         this.usePriority = buf.readBoolean();
         if(usePriority) {
@@ -164,6 +196,12 @@ public class AmbienceTileEntityData
             this.maxDelay = buf.readInt();
             this.canPlayOverSelf = buf.readBoolean();
             this.shouldStopPrevious = buf.readBoolean();
+
+            this.minRandVolume = buf.readFloat();
+            this.maxRandVolume = buf.readFloat();
+
+            this.minRandPitch = buf.readFloat();
+            this.maxRandPitch = buf.readFloat();
         }
     }
     ////
@@ -184,10 +222,6 @@ public class AmbienceTileEntityData
     //Getter and setter
     public String getSoundName() {
         return soundName;
-    }
-
-    public void setSoundName(String soundName) {
-        this.soundName = soundName;
     }
 
     public boolean shouldFuse() {
@@ -220,6 +254,26 @@ public class AmbienceTileEntityData
 
     public void setPitch(float pitch) {
         this.pitch = pitch;
+    }
+
+    public void setSoundName(String soundName) {
+        this.soundName = soundName;
+    }
+
+    public int getFadeIn() {
+        return fadeIn;
+    }
+
+    public void setFadeIn(int fadeIn) {
+        this.fadeIn = fadeIn;
+    }
+
+    public int getFadeOut() {
+        return fadeOut;
+    }
+
+    public void setFadeOut(int fadeOut) {
+        this.fadeOut = fadeOut;
     }
 
     public int getPriority() { return priority; }
@@ -293,6 +347,62 @@ public class AmbienceTileEntityData
 
     public void setUseDelay(boolean useDelay) {
         this.useDelay = useDelay;
+    }
+
+    public float getMinRandVolume() {
+        return minRandVolume;
+    }
+
+    public void setMinRandVolume(float minRandVolume) {
+        this.minRandVolume = minRandVolume;
+    }
+
+    public float getMaxRandVolume() {
+        return maxRandVolume;
+    }
+
+    public void setMaxRandVolume(float maxRandVolume) {
+        this.maxRandVolume = maxRandVolume;
+    }
+
+    public float getMinRandPitch() {
+        return minRandPitch;
+    }
+
+    public void setMinRandPitch(float minRandPitch) {
+        this.minRandPitch = minRandPitch;
+    }
+
+    public float getMaxRandPitch() {
+        return maxRandPitch;
+    }
+
+    public void setMaxRandPitch(float maxRandPitch) {
+        this.maxRandPitch = maxRandPitch;
+    }
+
+    public boolean isUsingRandomVolume() {
+        return minRandVolume != 0f || maxRandVolume != 0f;
+    }
+
+    public float getMinRandomVolume() {
+        return getVolume() - minRandVolume;
+    }
+
+    public float getMaxRandomVolume() {
+        return getVolume() + maxRandVolume;
+    }
+
+    public boolean isUsingRandomPitch() {
+        return minRandPitch != 0f || maxRandPitch != 0f;
+    }
+
+    public float getMinRandomPitch() {
+        return getPitch() - minRandPitch;
+    }
+
+    public float getMaxRandomPitch() {
+        return getPitch() + maxRandPitch;
     }
 
     public boolean isGlobal() {

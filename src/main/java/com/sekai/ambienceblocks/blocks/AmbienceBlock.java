@@ -20,16 +20,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.Nonnull;
+
 public class AmbienceBlock extends Block {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final ActionResultType RESULT = ActionResultType.SUCCESS;
 
     public AmbienceBlock() {
         super(Block.Properties.create(Material.IRON).hardnessAndResistance(-1.0F, 3600000.0F).sound(SoundType.METAL).noDrops());
-        /*.harvestLevel(0)
-        .harvestTool(ToolType.PICKAXE));*/
-
-        //.hardnessAndResistance(-1.0F, 3600000.0F).noDrops()
     }
 
     @Override
@@ -42,51 +40,21 @@ public class AmbienceBlock extends Block {
         return RegistryHandler.AMBIENCE_TILE_ENTITY.get().create();
     }
 
-    /*@Override
-    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-        boolean flag = worldIn.isBlockPowered(pos);
-        if (flag != state.get(POWERED)) {
-            if (flag) {
-                this.triggerNote(worldIn, pos);
-            }
-
-            worldIn.setBlockState(pos, state.with(POWERED, Boolean.valueOf(flag)), 3);
-        }
-
-    }*/
-
+    @Nonnull
     @Override
     @OnlyIn(Dist.CLIENT)
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         if(!worldIn.isRemote())
-            //return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
             return RESULT;
 
         if(Minecraft.getInstance().world.getTileEntity(pos) == null)
             return RESULT;
 
         if(!(Minecraft.getInstance().world.getTileEntity(pos) instanceof AmbienceTileEntity))
-            //return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
             return RESULT;
 
-        //Minecraft.getInstance().displayGuiScreen(new AmbienceTileGUI((AmbienceTileEntity)Minecraft.getInstance().world.getTileEntity(pos)));
         Minecraft.getInstance().displayGuiScreen(new AmbienceGUI((AmbienceTileEntity)Minecraft.getInstance().world.getTileEntity(pos)));
 
-        //return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
         return RESULT;
-        /*if(worldIn.isRemote())
-            return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
-
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if(tileEntity == null)
-            return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
-
-        if(!AmbienceTileEntity.class.isInstance(tileEntity))
-            return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
-
-        //((GlobalAmbienceTileEntity) tileEntity).setServerMusicName("towns.smalltownnight", (ServerPlayerEntity)player);
-        PacketHandler.NET.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new PacketOpenAmbienceGui(pos));
-
-        return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);*/
     }
 }

@@ -5,6 +5,7 @@ import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -20,6 +21,7 @@ public abstract class AbstractTab {
 
     private boolean active;
     private List<Widget> widgets = new ArrayList<>();
+    private List<Widget> buttons = new ArrayList<>();
 
     protected static final int separation = 8;
     protected static final int rowHeight = 20;
@@ -28,49 +30,22 @@ public abstract class AbstractTab {
         font = Minecraft.getInstance().fontRenderer;
         this.guiRef = guiRef;
         updateMetaValues(guiRef);
-        init();
+        //init();
     }
 
-    //util stuff
-    protected int getBaseX() {
-        return x + separation;
+    public void refreshWidgets() {
+        for(Widget widget : widgets) {
+            if(!guiRef.children().contains(widget))
+                guiRef.addWidget(widget);
+        }
+
+        for(Widget widget : buttons) {
+            if(!guiRef.children().contains(widget))
+                guiRef.addButton(widget);
+        }
     }
 
-    protected int getEndX() {
-        return x + width - separation;
-    }
-
-    protected int getNeighbourX(Widget widget) {
-        return widget.x + widget.getWidth() + separation;
-    }
-
-    protected int getRowY(int row) {
-        return y + rowHeight * row + separation * (row + 1) + AmbienceGUI.tabHeight;
-    }
-
-    protected int getOffsetY(int height) {
-        return (rowHeight - height) / 2;
-    }
-
-    protected int getWidthFromTwoX(int x1, int x2) {
-        if(x1 < x2)
-            return x2 - x1 - separation * 2;
-
-        if(x1 > x2)
-            return x1 - x2 - separation * 2;
-
-        return 0;
-    }
-
-    protected void setCheckBoxChecked(CheckboxButton check, boolean b) {
-        if(b && !check.isChecked())
-            check.onPress();
-        if(!b && check.isChecked())
-            check.onPress();
-    }
-    //
-
-    private void updateMetaValues(AmbienceGUI guiRef) {
+    public void updateMetaValues(AmbienceGUI guiRef) {
         this.x = guiRef.xTopLeft;
         this.y = guiRef.yTopLeft;
         this.width = AmbienceGUI.texWidth;
@@ -82,9 +57,21 @@ public abstract class AbstractTab {
         widgets.add(widget);
     }
 
+    public void addButton(Widget widget) {
+        guiRef.addButton(widget);
+        buttons.add(widget);
+    }
+
     public abstract String getName();
 
-    public abstract void init();
+    public abstract void initialInit();
+
+    public abstract void updateWidgetPosition();
+
+    //public void secondInit() {}
+    /*public void init() {
+
+    }*/
 
     public abstract void render(int mouseX, int mouseY, float partialTicks);
 
@@ -107,6 +94,10 @@ public abstract class AbstractTab {
             widget.visible = true;
             widget.active = true;
         }
+        for(Widget widget : buttons) {
+            widget.visible = true;
+            widget.active = true;
+        }
         onActivate();
     }
 
@@ -118,6 +109,10 @@ public abstract class AbstractTab {
             widget.visible = false;
             widget.active = false;
         }
+        for(Widget widget : buttons) {
+            widget.visible = false;
+            widget.active = false;
+        }
         onDeactivate();
     }
 
@@ -126,4 +121,30 @@ public abstract class AbstractTab {
     public boolean isActive() {
         return active;
     }
+
+    //util stuff
+    protected int getBaseX() {
+        return x + separation;
+    }
+
+    protected int getEndX() {
+        return x + width - separation;
+    }
+
+    protected int getEndY() {
+        return y + height - separation;
+    }
+
+    protected int getNeighbourX(Widget widget) {
+        return widget.x + widget.getWidth() + separation;
+    }
+
+    protected int getRowY(int row) {
+        return y + rowHeight * row + separation * (row + 1) + AmbienceGUI.tabHeight;
+    }
+
+    protected int getOffsetY(int height) {
+        return (rowHeight - height) / 2;
+    }
+    //
 }

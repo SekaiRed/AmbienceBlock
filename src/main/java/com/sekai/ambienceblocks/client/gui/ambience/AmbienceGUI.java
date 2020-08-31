@@ -9,21 +9,16 @@ import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import com.sekai.ambienceblocks.util.PacketHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.client.audio.SoundList;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class AmbienceGUI extends Screen {
     private final AmbienceTileEntity target;
@@ -37,11 +32,16 @@ public class AmbienceGUI extends Screen {
 
     private static final int intNull = Integer.MAX_VALUE;
 
-    private MainTab mainTab;
+    /*private MainTab mainTab;
     private BoundsTab boundsTab;
     private PriorityTab priorityTab;
     private DelayTab delayTab;
-    private MiscTab miscTab;
+    private MiscTab miscTab;*/
+    private MainTab mainTab = new MainTab(this);
+    private BoundsTab boundsTab = new BoundsTab(this);
+    private PriorityTab priorityTab = new PriorityTab(this);
+    private DelayTab delayTab = new DelayTab(this);
+    private MiscTab miscTab = new MiscTab(this);
 
     private AbstractTab highlightedTab;
 
@@ -50,7 +50,7 @@ public class AmbienceGUI extends Screen {
     private boolean help;
     private Button bHelp;
 
-    //private List<String> options = Arrays.asList("Main", "Bounds", "Priority", "Delay");
+    private boolean initialized = false;
 
     public AmbienceGUI(AmbienceTileEntity target) {
         super(new TranslationTextComponent("narrator.screen.globalambiencegui"));
@@ -82,28 +82,61 @@ public class AmbienceGUI extends Screen {
     protected void init() {
         super.init();
 
-        //SoundHandler handler = Minecraft.getMinecraft().getSoundHandler();
-        /*for (ResourceLocation element : Minecraft.getInstance().getSoundHandler().getAvailableSounds()) {
-            System.out.println(element.getNamespace() + ":" + element.getPath());
-        }*/
-
         xTopLeft = (this.width - texWidth) / 2;
         yTopLeft = (this.height - texHeight) / 2;
 
-        mainTab = new MainTab(this);
-        setHighlightedTab(mainTab);
+        List<AbstractTab> tabs = getAllTabs();
 
-        boundsTab = new BoundsTab(this);
-        boundsTab.deactivate();
+        if(!initialized)
+        {
+            /*mainTab = new MainTab(this);
+            mainTab.initialInit();
+            mainTab.guiOpenedInit();
+            setHighlightedTab(mainTab);
 
-        priorityTab = new PriorityTab(this);
-        priorityTab.deactivate();
+            boundsTab = new BoundsTab(this);
+            boundsTab.initialInit();
+            boundsTab.guiOpenedInit();
+            boundsTab.deactivate();
 
-        delayTab = new DelayTab(this);
-        delayTab.deactivate();
+            priorityTab = new PriorityTab(this);
+            priorityTab.initialInit();
+            priorityTab.guiOpenedInit();
+            priorityTab.deactivate();
 
-        miscTab = new MiscTab(this);
-        miscTab.deactivate();
+            delayTab = new DelayTab(this);
+            delayTab.initialInit();
+            delayTab.guiOpenedInit();
+            delayTab.deactivate();
+
+            miscTab = new MiscTab(this);
+            miscTab.initialInit();
+            miscTab.guiOpenedInit();
+            miscTab.deactivate();*/
+
+            //set up in advance to get the correct amount of active tabs
+            //mainTab.setFieldFromData(target.data);
+
+            for(AbstractTab tab : tabs) {
+                tab.updateMetaValues(this);
+                tab.initialInit();
+                tab.updateWidgetPosition();
+                if(tab instanceof MainTab) setHighlightedTab(tab);
+                else tab.deactivate();
+            }
+
+            loadDataFromTile();
+
+            initialized = true;
+        }
+        else
+        {
+            for(AbstractTab tab : tabs) {
+                tab.updateMetaValues(this);
+                tab.updateWidgetPosition();
+                tab.refreshWidgets();
+            }
+        }
 
         confirmChanges = addButton(new Button(xTopLeft + 8, yTopLeft + texHeight + 8, 100, 20, "Confirm Changes", button -> {
             saveDataToTile();
@@ -112,7 +145,7 @@ public class AmbienceGUI extends Screen {
         help = false;
         bHelp = addButton(new Button(xTopLeft + texWidth - 16 - 8, yTopLeft + texHeight - 16 - 8, 16, 16, "", button -> { clickHelp(); }));
 
-        loadDataFromTile();
+        //loadDataFromTile();
     }
 
     private void clickHelp() {
@@ -181,6 +214,22 @@ public class AmbienceGUI extends Screen {
 
         highlightedTab = tab;
         highlightedTab.activate();
+    }
+
+    private List<AbstractTab> getAllTabs() {
+        List<AbstractTab> list = new ArrayList<>();
+
+        list.add(mainTab);
+
+        list.add(boundsTab);
+
+        list.add(priorityTab);
+
+        list.add(delayTab);
+
+        list.add(miscTab);
+
+        return list;
     }
 
     private List<AbstractTab> getActiveTabs() {

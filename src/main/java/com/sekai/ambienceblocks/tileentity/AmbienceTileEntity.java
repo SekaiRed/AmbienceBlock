@@ -17,21 +17,8 @@ public class AmbienceTileEntity extends TileEntity {
         super(RegistryHandler.AMBIENCE_TILE_ENTITY.get());
     }
 
-    /*public void setServerMusicName(String musicName, ServerPlayerEntity player) {
-        this.musicName = musicName;
-        this.priority = 1;
-        this.maxDistance = 32D;
-        //PacketHandler.NET.send(PacketDistributor.PLAYER.noArg(), new PacketDebug(4));
-        PacketHandler.NET.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new PacketUpdateGlobalAmbienceTE(musicName, priority, maxDistance, getPos()));
-        //PacketHandler.NET.send(PacketDistributor.TargetPoint(), new MyMessage());
-    }*/
-
     @Override
     public CompoundNBT write(CompoundNBT compound) {
-        /*compound.putString("musicName", this.musicName);
-        compound.putInt("priority",this.priority);
-        compound.putDouble("offDistance", this.offDistance);
-        compound.putBoolean("isGlobal", this.isGlobal);*/
         data.toNBT(compound);
         return super.write(compound);
     }
@@ -40,20 +27,12 @@ public class AmbienceTileEntity extends TileEntity {
     public void read(CompoundNBT compound) {
         super.read(compound);
         data.fromNBT(compound);
-        /*this.musicName = compound.getString("musicName");
-        this.priority = compound.getInt("priority");
-        this.offDistance = compound.getDouble("offDistance");
-        this.isGlobal = compound.getBoolean("isGlobal");*/
     }
 
     @Override
     public CompoundNBT getUpdateTag() {
         CompoundNBT tag = new CompoundNBT();
         data.toNBT(tag);
-        /*tag.putString("musicName", this.musicName);
-        tag.putInt("priority",this.priority);
-        tag.putDouble("offDistance", this.offDistance);
-        tag.putBoolean("isGlobal", this.isGlobal);*/
         super.write(tag);
         return tag;
     }
@@ -62,17 +41,10 @@ public class AmbienceTileEntity extends TileEntity {
     public void handleUpdateTag(CompoundNBT tag) {
         super.read(tag);
         data.fromNBT(tag);
-        /*this.musicName = tag.getString("musicName");
-        this.priority = tag.getInt("priority");
-        this.offDistance = tag.getDouble("offDistance");
-        this.isGlobal = tag.getBoolean("isGlobal");*/
     }
 
     //fancy
     public boolean isWithinBounds(PlayerEntity player) {
-        /*double dist = distanceTo(player);
-
-        return dist < this.getOffDistance();*/
         return data.isWithinBounds(player, pos);
     }
 
