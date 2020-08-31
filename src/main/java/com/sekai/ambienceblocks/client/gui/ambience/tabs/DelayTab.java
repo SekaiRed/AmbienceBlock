@@ -150,6 +150,32 @@ public class DelayTab extends AbstractTab {
             GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
         }
 
+        if(textMinVolume.isHovered()) {
+            list.add(TextFormatting.RED + "Minimum Volume");
+            list.add("If the volume is random between two bounds then the lower bound is <tile's volume> - <value>");
+            list.add(TextFormatting.GRAY + "0 on both min and max means that the sound won't have a random volume.");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+        if(textMaxVolume.isHovered()) {
+            list.add(TextFormatting.RED + "Maximum Volume");
+            list.add("If the volume is random between two bounds then the upper bound is <tile's volume> + <value>");
+            list.add(TextFormatting.GRAY + "0 on both min and max means that the sound won't have a random volume.");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+
+        if(textMinPitch.isHovered()) {
+            list.add(TextFormatting.RED + "Minimum Pitch");
+            list.add("If the pitch is random between two bounds then the lower bound is <tile's pitch> - <value>");
+            list.add(TextFormatting.GRAY + "0 on both min and max means that the sound won't have a random pitch.");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+        if(textMaxPitch.isHovered()) {
+            list.add(TextFormatting.RED + "Maximum Pitch");
+            list.add("If the pitch is random between two bounds then the upper bound is <tile's pitch> + <value>");
+            list.add(TextFormatting.GRAY + "0 on both min and max means that the sound won't have a random pitch.");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+
         if(canPlayOverSelf.isHovered()) {
             list.add("If this block's delay reaches the end before a previous sound finishes playing, it won't care and play anyway when this is checked.");
             GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);

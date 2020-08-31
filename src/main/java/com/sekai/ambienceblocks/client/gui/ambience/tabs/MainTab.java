@@ -156,6 +156,16 @@ public class MainTab extends AbstractTab {
             list.add(TextFormatting.DARK_GRAY + "0.5 to 2");
             GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
         }
+        if(textFadeIn.isHovered()) {
+            list.add(TextFormatting.RED + "Fade In Time");
+            list.add(TextFormatting.GRAY + "How long should it take for this sound to reach max volume when it begins?");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+        if(textFadeOut.isHovered()) {
+            list.add(TextFormatting.RED + "Fade Out Time");
+            list.add(TextFormatting.GRAY + "How long should it take for this sound to reach min volume when it stops?");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
 
         if(shouldFuse.isHovered()) {
             list.add(TextFormatting.RED + "Should Fuse");

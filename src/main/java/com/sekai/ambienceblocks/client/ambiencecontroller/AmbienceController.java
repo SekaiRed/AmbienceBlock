@@ -20,7 +20,7 @@ public class AmbienceController {
     public static AmbienceController instance;
     public static Minecraft mc;
     public static SoundHandler handler;
-    private static final boolean debugMode = true;
+    private static final boolean debugMode = false;
 
     //System variables
     public int tick = 0;

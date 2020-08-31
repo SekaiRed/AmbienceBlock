@@ -20,9 +20,11 @@ public class MiscTab extends AbstractTab {
     Button paste = new Button(getNeighbourX(copy), getRowY(0) + getOffsetY(20), 60, 20, "Paste", button -> {
         guiRef.setData(AmbienceController.instance.getClipboard());
     });
+    /*
+     TODO: Add a preset folder that you can view trough this list
     StringListWidget musicList = new StringListWidget(getBaseX(), getRowY(1), getEndX() - getBaseX(), getEndY() - getRowY(1), 4, 16, font, null);
-
-    //TextInstance presets;
+    TextInstance presets;
+    */
 
     public MiscTab(AmbienceGUI guiRef) {
         super(guiRef);
@@ -33,38 +35,23 @@ public class MiscTab extends AbstractTab {
         return "Misc";
     }
 
-    /*@Override
-    public void initialInit() {
-        copy = guiRef.addButton(new Button(getBaseX(), getRowY(0) + getOffsetY(20), 60, 20, "Copy", button -> {
-            AmbienceController.instance.setClipboard(guiRef.getData());
-        }));
-
-        paste = guiRef.addButton(new Button(getNeighbourX(copy), getRowY(0) + getOffsetY(20), 60, 20, "Paste", button -> {
-            guiRef.setData(AmbienceController.instance.getClipboard());
-        }));
-
-        musicList = new StringListWidget(getBaseX(), getRowY(1), getEndX() - getBaseX(), getEndY() - getRowY(1), 4, 16, font, null);
-        for (ResourceLocation element : Minecraft.getInstance().getSoundHandler().getAvailableSounds()) {
-            if(element.getPath().contains("ambients")) musicList.addElement(element.getPath());
-        }
-    }*/
-
     @Override
     public void initialInit() {
-        for (ResourceLocation element : Minecraft.getInstance().getSoundHandler().getAvailableSounds()) {
+        /*for (ResourceLocation element : Minecraft.getInstance().getSoundHandler().getAvailableSounds()) {
             if(element.getPath().contains("ambients")) musicList.addElement(element.getPath());
-        }
+        }*/
 
         addButton(copy);
         addButton(paste);
-        addWidget(musicList);
+        //addWidget(musicList);
     }
 
     @Override
     public void updateWidgetPosition() {
         copy.x = getBaseX(); copy.y = getRowY(0);
         paste.x = getNeighbourX(copy); paste.y = getRowY(0);
-        musicList.x = getBaseX(); musicList.y = getRowY(1);// musicList.setWidth(getEndX() - getBaseX()); musicList.setHeight(getEndY() - getRowY(1));
+
+        //musicList.x = getBaseX(); musicList.y = getRowY(1);
     }
 
     public void doubleClicked() {
@@ -76,9 +63,7 @@ public class MiscTab extends AbstractTab {
         copy.render(mouseX, mouseY, partialTicks);
         paste.render(mouseX, mouseY, partialTicks);
 
-        musicList.render(mouseX, mouseY);
-
-        //presets.render();
+        //musicList.render(mouseX, mouseY);
     }
 
     @Override
