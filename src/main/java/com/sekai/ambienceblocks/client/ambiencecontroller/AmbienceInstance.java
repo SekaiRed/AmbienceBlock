@@ -91,7 +91,6 @@ public class AmbienceInstance extends TickableSound {
         }
 
         if(fadingOut) {
-            System.out.println("stopping " + fadingOutCounter + " out of " + fadeOut);
             if(fadingOutCounter <= 0) {
                 //fadingOut = false;
                 donePlaying = true;

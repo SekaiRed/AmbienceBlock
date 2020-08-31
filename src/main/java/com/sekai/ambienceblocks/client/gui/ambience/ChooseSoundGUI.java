@@ -48,8 +48,6 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
 
         String previousString = targetField.getText();
 
-        System.out.println(previousString);
-
         if(previousString.split(":").length <= 2) {
             if(previousString.split(":").length == 1) {
                 selectedDomain = "minecraft";
@@ -209,12 +207,9 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
     public void onDoubleClick(StringListWidget list, int index, String name) {
         targetField.setText(name);
         mc.displayGuiScreen(prevScreen);
-        System.out.println(name);
     }
 
     public void onConfirm() {
-        //targetField.setText(list.getElementString());
-        System.out.println(targetField.toString() + ", " + targetField.getText());
         mc.displayGuiScreen(prevScreen);
         //targetField.setText(list.getElementString());
         targetField.setText(selectedDomain + ":" + selected);
