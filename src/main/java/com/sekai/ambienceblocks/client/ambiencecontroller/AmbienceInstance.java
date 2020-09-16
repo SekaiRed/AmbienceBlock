@@ -36,11 +36,12 @@ public class AmbienceInstance extends TickableSound {
         internalPos = pos;
         //this.repeat = false;
         //this.repeatDelay = 0;
-        this.attenuationType = AttenuationType.LINEAR;
+        //this.attenuationType = AttenuationType.LINEAR;
         this.global = false;
         //experiment
         this.repeat = repeat;
         this.repeatDelay = 0;
+        this.attenuationType = AttenuationType.NONE;
 
         this.fadeIn = fadeIn;
 

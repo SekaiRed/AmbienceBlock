@@ -2,13 +2,16 @@ package com.sekai.ambienceblocks.client.gui.ambience;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sekai.ambienceblocks.Main;
+import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.ArrayList;
@@ -33,11 +36,16 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
     Minecraft mc = Minecraft.getInstance();
 
     StringListWidget list;
+    Button play;
+    Button stop;
 
     private String selectedDomain = "";
     private String selected = "";
     private List<String> activeList = new ArrayList<>();
     private String biasSelectionName = "";
+
+    SimpleSound previewSound;
+    //SimpleSound.master(new SoundEvent(new ResourceLocation(resultSound)), 1.0f, 0.75f)
 
     public ChooseSoundGUI(Screen prevScreen, TextFieldWidget targetField) {
         super(new TranslationTextComponent("narrator.screen.choosesound"));
@@ -104,6 +112,16 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
         xTopLeft = (this.width - texWidth) / 2;
         yTopLeft = (this.height - texHeight) / 2;
 
+        play = new Button(xTopLeft + separation/2, yTopLeft + texHeight + separation/2, 60, 20, "Play", button -> {
+            playSoundPreview();
+        });
+        addButton(play);
+
+        stop = new Button(xTopLeft + 60 + separation, yTopLeft + texHeight + separation/2, 60, 20, "Stop", button -> {
+            stopSoundPreview();
+        });
+        addButton(stop);
+
         this.children.add(list = new StringListWidget(xTopLeft + separation, yTopLeft + separation + yOffset, texWidth - separation * 2, texHeight - separation * 2 - yOffset, 4, 16, font, new StringListWidget.IPressable() {
             @Override
             public void onClick(StringListWidget list, int index, String name) {
@@ -142,6 +160,26 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
         }));
 
         updateList();
+    }
+
+    public void playSoundPreview() {
+        if(!selectedDomain.equals("") && !list.getSelectionContent().contains("<"))
+        {
+            System.out.println("playing sound");
+            String resultSound = selectedDomain + ":" + selected + list.getSelectionContent();
+            stopSoundPreview();
+            previewSound = SimpleSound.master(new SoundEvent(new ResourceLocation(resultSound)), 1.0f, 0.75f);
+            mc.getSoundHandler().play(previewSound);
+            System.out.println(mc.getSoundHandler().isPlaying(previewSound));
+        }
+        //.playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+    }
+
+    public void stopSoundPreview() {
+        if(previewSound != null) {
+            mc.getSoundHandler().stop(previewSound);
+            previewSound = null;
+        }
     }
 
     public void updateList() {
@@ -187,10 +225,14 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
         drawCenteredString(font, selectedDomain + ":" + selected, xTopLeft + texWidth/2, yTopLeft + separation / 2, 0xFFFFFF);
 
         list.render(p_render_1_, p_render_2_);
+
+        play.render(p_render_1_, p_render_2_, p_render_3_);
+        stop.render(p_render_1_, p_render_2_, p_render_3_);
     }
 
     @Override
     public void onClose() {
+        mc.getSoundHandler().stop(previewSound);
         mc.displayGuiScreen(prevScreen);
     }
 
@@ -206,11 +248,13 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
     @Override
     public void onDoubleClick(StringListWidget list, int index, String name) {
         targetField.setText(name);
+        mc.getSoundHandler().stop(previewSound);
         mc.displayGuiScreen(prevScreen);
     }
 
     public void onConfirm() {
         mc.displayGuiScreen(prevScreen);
+        mc.getSoundHandler().stop(previewSound);
         //targetField.setText(list.getElementString());
         targetField.setText(selectedDomain + ":" + selected);
     }

@@ -277,6 +277,10 @@ public class StringListWidget extends Widget {
         }
     }
 
+    public String getSelectionContent() {
+        return list.get(selectionIndex);
+    }
+
     public int getSelectionIndex() {
         return selectionIndex;
     }
