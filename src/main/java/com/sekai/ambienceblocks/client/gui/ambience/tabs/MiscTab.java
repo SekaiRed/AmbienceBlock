@@ -36,6 +36,11 @@ public class MiscTab extends AbstractTab {
     }
 
     @Override
+    public String getShortName() {
+        return "Misc";
+    }
+
+    @Override
     public void initialInit() {
         /*for (ResourceLocation element : Minecraft.getInstance().getSoundHandler().getAvailableSounds()) {
             if(element.getPath().contains("ambients")) musicList.addElement(element.getPath());

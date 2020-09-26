@@ -2,11 +2,14 @@ package com.sekai.ambienceblocks.client.ambiencecontroller;
 
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
+import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
@@ -86,6 +89,20 @@ public class AmbienceController {
             if(slot.getOwner().data.needsRedstone() && !mc.world.isBlockPowered(slot.getOwner().getPos())) {
                 stopMusic(slot, "needed redstone but wasn't powered");
                 continue;
+            }
+
+            if(slot.getOwner().data.isUsingCondition()) {
+                boolean condBool = false;
+                List<AbstractCond> conditions = slot.getOwner().data.getConditions();
+                for (AbstractCond condition : conditions) {
+                    if(!condition.isTrue(new Vec3d(mc.player.getPosX(), mc.player.getPosY(), mc.player.getPosZ()), slot.getOwner().getPos(), mc.world)) {
+                        condBool = true;//continue;
+                    }
+                }
+                if(condBool) {
+                    stopMusic(slot, "conditions returned false");
+                    continue;
+                }
             }
 
             //volume stuff
@@ -252,7 +269,7 @@ public class AmbienceController {
         }
         //System.out.println("playing " + tile.getMusicName() + " at " + tile.getPos());
         ResourceLocation playingResource = new ResourceLocation(tile.getMusicName());
-        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), getVolumeFromTileEntity(tile),tile.data.getPitch(), tile.data.getFadeIn(), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos().add(ParsingUtil.Vec3dToVec3i(tile.data.getOffset())), getVolumeFromTileEntity(tile),tile.data.getPitch(), tile.data.getFadeIn(), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
         handler.play(playingMusic);
         soundsList.add(new CustomSoundSlot(tile.getMusicName(), playingMusic, tile));
     }
@@ -269,13 +286,8 @@ public class AmbienceController {
         if(usingRandomVolume) volume = (float) (tile.data.getMinRandomVolume() + Math.random() * (tile.data.getMaxRandomVolume() - tile.data.getMinRandomVolume()));
         if(usingRandomPitch) pitch = (float) (tile.data.getMinRandomPitch() + Math.random() * (tile.data.getMaxRandomPitch() - tile.data.getMinRandomPitch()));
 
-        if(usingRandomPitch) {
-            System.out.println("for " + tile.getMusicName());
-            System.out.println(pitch);
-        }
-
         ResourceLocation playingResource = new ResourceLocation(tile.getMusicName());
-        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), volume, pitch, tile.data.getFadeIn(), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos().add(ParsingUtil.Vec3dToVec3i(tile.data.getOffset())), volume, pitch, tile.data.getFadeIn(), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
         handler.play(playingMusic);
         CustomSoundSlot custom = new CustomSoundSlot(tile.getMusicName(), playingMusic, tile);
         soundsList.add(custom);
@@ -312,7 +324,7 @@ public class AmbienceController {
             System.out.println("swapping " + tile.getMusicName() + " from " + soundSlot.getOwner().getPos() + " to " + tile.getPos());
         }
         soundSlot.setOwner(tile);
-        soundSlot.getMusicInstance().setBlockPos(tile.getPos());
+        soundSlot.getMusicInstance().setBlockPos(tile.getPos().add(ParsingUtil.Vec3dToVec3i(tile.data.getOffset())));
     }
 
     //Mostly used when the tile gets update from a request by the server
@@ -337,9 +349,17 @@ public class AmbienceController {
         if(!tile.isWithinBounds(mc.player))
             return false;
 
-        if(tile.data.needsRedstone())
-            if(!mc.world.isBlockPowered(tile.getPos()))
+        if(tile.data.needsRedstone()) {
+            if (!mc.world.isBlockPowered(tile.getPos())) {
                 return false;
+            }
+        }
+
+        List<AbstractCond> conditions = tile.data.getConditions();
+        for (AbstractCond condition : conditions) {
+            if(!condition.isTrue(new Vec3d(mc.player.getPosX(), mc.player.getPosY(), mc.player.getPosZ()), tile.getPos(), mc.world))
+                return false;
+        }
 
         return true;
     }

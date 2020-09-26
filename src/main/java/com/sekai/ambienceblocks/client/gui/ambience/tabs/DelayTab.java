@@ -42,8 +42,16 @@ public class DelayTab extends AbstractTab {
     public TextInstance textMaxPitch = new TextInstance(0, 0, 0xFFFFFF, MAX_PITCH + " :", font);
     public TextFieldWidget maxPitch = new TextFieldWidget(font, 0, 0, 50, 20, "name");
 
-    public CheckboxWidget canPlayOverSelf = new CheckboxWidget(getBaseX(), getRowY(1), 20 + font.getStringWidth("Can play over itself"), 20, "Can play over itself", false);
-    public CheckboxWidget shouldStopPrevious = new CheckboxWidget(getBaseX(), getRowY(2), 20 + font.getStringWidth("Should stop previous instance"), 20, "Should stop previous instance", false);
+    /*public TextInstance textRandPos = new TextInstance(0, 0, 0xFFFFFF, "Random Pos :", font);
+    public TextInstance textRandX = new TextInstance(0, 0, 0xFFFFFF, "X :", font);
+    public TextFieldWidget randX = new TextFieldWidget(font, 0, 0, 30, 20, "name");
+    public TextInstance textRandY = new TextInstance(0, 0, 0xFFFFFF, "Y :", font);
+    public TextFieldWidget randY = new TextFieldWidget(font, 0, 0, 30, 20, "name");
+    public TextInstance textRandZ = new TextInstance(0, 0, 0xFFFFFF, "Z :", font);
+    public TextFieldWidget randZ = new TextFieldWidget(font, 0, 0, 30, 20, "name");*/
+
+    public CheckboxWidget canPlayOverSelf = new CheckboxWidget(getBaseX(), getRowY(3), 20 + font.getStringWidth("Plays over itself"), 20, "Plays over itself", false);
+    public CheckboxWidget shouldStopPrevious = new CheckboxWidget(getBaseX(), getRowY(4), 20 + font.getStringWidth("Stop previous"), 20, "Stop previous", false);
 
     public DelayTab(AmbienceGUI guiRef) {
         super(guiRef);
@@ -52,6 +60,11 @@ public class DelayTab extends AbstractTab {
     @Override
     public String getName() {
         return "Delay";
+    }
+
+    @Override
+    public String getShortName() {
+        return "Dly";
     }
 
     @Override
@@ -110,8 +123,16 @@ public class DelayTab extends AbstractTab {
         textMaxPitch.x = getNeighbourX(minPitch); textMaxPitch.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
         maxPitch.x = getNeighbourX(textMaxPitch); maxPitch.y = getRowY(2);
 
+        /*textRandPos.x = getBaseX(); textRandPos.y = getRowY(3) + getOffsetY(font.FONT_HEIGHT);
+        textRandX.x = getNeighbourX(textRandPos); textRandX.y = getRowY(3) + getOffsetY(font.FONT_HEIGHT);
+        randX.x = getNeighbourX(textRandX); randX.y = getRowY(3);
+        textRandY.x = getNeighbourX(randX); textRandY.y = getRowY(3) + getOffsetY(font.FONT_HEIGHT);
+        randY.x = getNeighbourX(textRandX); randY.y = getRowY(3);
+        textRandZ.x = getNeighbourX(randX); textRandZ.y = getRowY(3) + getOffsetY(font.FONT_HEIGHT);
+        randZ.x = getNeighbourX(textRandX); randZ.y = getRowY(3);*/
+
         canPlayOverSelf.x = getBaseX(); canPlayOverSelf.y = getRowY(3);
-        shouldStopPrevious.x = getBaseX(); shouldStopPrevious.y = getRowY(4);
+        shouldStopPrevious.x = getNeighbourX(canPlayOverSelf); shouldStopPrevious.y = getRowY(3);
     }
 
     @Override
@@ -130,6 +151,14 @@ public class DelayTab extends AbstractTab {
         minPitch.render(mouseX, mouseY, partialTicks);
         textMaxPitch.render(mouseX, mouseY);
         maxPitch.render(mouseX, mouseY, partialTicks);
+
+        /*textRandPos.render(mouseX, mouseY);
+        textRandX.render(mouseX, mouseY);
+        randX.render(mouseX, mouseY, partialTicks);
+        textRandY.render(mouseX, mouseY);
+        randY.render(mouseX, mouseY, partialTicks);
+        textRandZ.render(mouseX, mouseY);
+        randZ.render(mouseX, mouseY, partialTicks);*/
 
         canPlayOverSelf.render(mouseX, mouseY, partialTicks);
         shouldStopPrevious.render(mouseX, mouseY, partialTicks);
@@ -196,6 +225,10 @@ public class DelayTab extends AbstractTab {
 
         minPitch.tick();
         maxPitch.tick();
+
+        /*randX.tick();
+        randY.tick();
+        randZ.tick();*/
 
         shouldStopPrevious.active = canPlayOverSelf.isChecked();
         shouldStopPrevious.visible = canPlayOverSelf.isChecked();

@@ -2,7 +2,9 @@ package com.sekai.ambienceblocks.tileentity;
 
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.AbstractBounds;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.SphereBounds;
+import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
 import com.sekai.ambienceblocks.util.BoundsUtil;
+import com.sekai.ambienceblocks.util.CondsUtil;
 import com.sekai.ambienceblocks.util.NBTHelper;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.gui.widget.button.CheckboxButton;
@@ -12,6 +14,11 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 //data holder class
 public class AmbienceTileEntityData
@@ -53,6 +60,10 @@ public class AmbienceTileEntityData
     private boolean canPlayOverSelf = false;
     private boolean shouldStopPrevious = false;
 
+    //condition
+    private boolean useCondition = false;
+    private List<AbstractCond> conditions = new ArrayList<>();
+
     //NBT util
     public CompoundNBT toNBT(CompoundNBT compound) {
         compound.putString("musicName", this.soundName);
@@ -86,6 +97,14 @@ public class AmbienceTileEntityData
 
             compound.putFloat("minRandPitch", this.minRandPitch);
             compound.putFloat("maxRandPitch", this.maxRandPitch);
+        }
+
+        compound.putBoolean("useCondition", this.useCondition);
+        if(useCondition) {
+            compound.putInt("condSize", this.conditions.size());
+            for(int i = 0; i < conditions.size(); i++) {
+                compound.put("cond" + i, CondsUtil.toNBT(conditions.get(i)));
+            }
         }
 
         return compound;
@@ -124,6 +143,15 @@ public class AmbienceTileEntityData
 
             this.minRandPitch = compound.getFloat("minRandPitch");
             this.maxRandPitch = compound.getFloat("maxRandPitch");
+        }
+
+        this.useCondition = compound.getBoolean("useCondition");
+        if(useCondition) {
+            conditions.clear();
+            int size = compound.getInt("condSize");
+            for(int i = 0; i < size; i++) {
+                conditions.add(CondsUtil.fromNBT((CompoundNBT) Objects.requireNonNull(compound.get("cond" + i))));
+            }
         }
 
     }
@@ -167,6 +195,14 @@ public class AmbienceTileEntityData
             buf.writeFloat(this.minRandPitch);
             buf.writeFloat(this.maxRandPitch);
         }
+
+        buf.writeBoolean(this.useCondition);
+        if(useCondition) {
+            buf.writeInt(this.conditions.size());
+            for (AbstractCond condition : conditions) {
+                CondsUtil.toBuff(condition, buf);
+            }
+        }
     }
 
     public void fromBuff(PacketBuffer buf) {
@@ -202,6 +238,15 @@ public class AmbienceTileEntityData
 
             this.minRandPitch = buf.readFloat();
             this.maxRandPitch = buf.readFloat();
+        }
+
+        this.useCondition = buf.readBoolean();
+        if(useCondition) {
+            conditions.clear();
+            int size = buf.readInt();
+            for (int i = 0; i < size; i++) {
+                conditions.add(CondsUtil.fromBuff(buf));
+            }
         }
     }
     ////
@@ -309,6 +354,22 @@ public class AmbienceTileEntityData
 
     public void setUsePriority(boolean usePriority) {
         this.usePriority = usePriority;
+    }
+
+    public boolean isUsingCondition() {
+        return useCondition;
+    }
+
+    public void setUseCondition(boolean useCondition) {
+        this.useCondition = useCondition;
+    }
+
+    public List<AbstractCond> getConditions() {
+        return conditions;
+    }
+
+    public void setConditions(List<AbstractCond> conditions) {
+        this.conditions = conditions;
     }
 
     public AbstractBounds getBounds() {

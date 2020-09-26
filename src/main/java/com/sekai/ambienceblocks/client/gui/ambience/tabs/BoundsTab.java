@@ -3,15 +3,14 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 import com.sekai.ambienceblocks.client.gui.widgets.CheckboxWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.*;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.ParsingUtil;
-import javafx.scene.control.CheckBox;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
@@ -40,7 +39,7 @@ public class BoundsTab extends AbstractTab {
     Button cylAxisButton = guiRef.addButton(new Button(getNeighbourX(textCylAxis), getRowY(1) + getOffsetY(20), 20, 20, "X", button -> {
         moveToNextAxisCylinder();
     }));
-    BoundsAxis cylAxis;
+    AmbienceAxis cylAxis;
 
     TextInstance textCapRadius = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.radius"), font);
     TextFieldWidget capRadius = new TextFieldWidget(font, getNeighbourX(textCapRadius), getRowY(1), 40, 20, "name");
@@ -50,7 +49,7 @@ public class BoundsTab extends AbstractTab {
     Button capAxisButton = guiRef.addButton(new Button(getNeighbourX(textCapAxis), getRowY(1) + getOffsetY(20), 20, 20, "X", button -> {
         moveToNextAxisCapsule();
     }));
-    BoundsAxis capAxis;
+    AmbienceAxis capAxis;
 
     TextInstance textCubicX = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "X", font);
     TextFieldWidget cubicX = new TextFieldWidget(font, getNeighbourX(textCubicX), getRowY(1), 40, 20, "name");
@@ -80,6 +79,11 @@ public class BoundsTab extends AbstractTab {
     @Override
     public String getName() {
         return "Bounds";
+    }
+
+    @Override
+    public String getShortName() {
+        return "Bnds";
     }
 
     /*@Override
@@ -556,12 +560,12 @@ public class BoundsTab extends AbstractTab {
 
         cylRadius.setText(String.valueOf(0));
         cylLength.setText(String.valueOf(0));
-        cylAxis = BoundsAxis.Y;
+        cylAxis = AmbienceAxis.Y;
         cylAxisButton.setMessage(cylAxis.toString());
 
         capRadius.setText(String.valueOf(0));
         capLength.setText(String.valueOf(0));
-        capAxis = BoundsAxis.Y;
+        capAxis = AmbienceAxis.Y;
         capAxisButton.setMessage(capAxis.toString());
 
         cubicX.setText(String.valueOf(0));

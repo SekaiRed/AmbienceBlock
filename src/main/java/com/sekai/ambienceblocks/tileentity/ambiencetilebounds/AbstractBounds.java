@@ -1,9 +1,9 @@
 package com.sekai.ambienceblocks.tileentity.ambiencetilebounds;
 
+import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public abstract class AbstractBounds {
@@ -35,7 +35,7 @@ public abstract class AbstractBounds {
         return new Vec3d(origin.getX(), origin.getY(), origin.getZ()).add(blockOffset);
     }
 
-    public double getPlayerPosByAxis(PlayerEntity player, BoundsAxis axis) {
+    public double getPlayerPosByAxis(PlayerEntity player, AmbienceAxis axis) {
         switch(axis) {
             case X:return player.getPosX();
             case Y:return player.getPosY();
@@ -44,7 +44,7 @@ public abstract class AbstractBounds {
         return 0;
     }
 
-    public double getVec3dPosByAxis(Vec3d vec, BoundsAxis axis) {
+    public double getVec3dPosByAxis(Vec3d vec, AmbienceAxis axis) {
         switch(axis) {
             case X:return vec.getX();
             case Y:return vec.getY();

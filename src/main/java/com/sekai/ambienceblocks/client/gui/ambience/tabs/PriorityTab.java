@@ -28,6 +28,11 @@ public class PriorityTab extends AbstractTab {
     }
 
     @Override
+    public String getShortName() {
+        return "Prio";
+    }
+
+    @Override
     public void initialInit() {
         addWidget(priority);
         priority.setValidator(ParsingUtil.numberFilter);

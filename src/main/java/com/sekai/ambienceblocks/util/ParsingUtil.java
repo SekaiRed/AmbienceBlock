@@ -3,6 +3,7 @@ package com.sekai.ambienceblocks.util;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 
 import java.util.function.Predicate;
 
@@ -152,4 +153,8 @@ public class ParsingUtil {
             return true;
         }
     };
+
+    public static Vec3i Vec3dToVec3i(Vec3d offset) {
+        return new Vec3i(Math.round(offset.x), Math.round(offset.y), Math.round(offset.z));
+    }
 }

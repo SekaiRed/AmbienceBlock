@@ -277,6 +277,10 @@ public class StringListWidget extends Widget {
         }
     }
 
+    public int getAmountOfElements() {
+        return list.size();
+    }
+
     public String getSelectionContent() {
         return list.get(selectionIndex);
     }
@@ -287,6 +291,10 @@ public class StringListWidget extends Widget {
 
     public void setSelectionIndex(int selectionIndex) {
         this.selectionIndex = selectionIndex;
+    }
+
+    public void setSelectionIndexToLast() {
+        this.selectionIndex = list.size() - 1;
     }
 
     public void setSelectionByString(String name) {

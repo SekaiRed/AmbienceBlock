@@ -20,11 +20,12 @@ public abstract class AbstractTab {
     protected int x, y, width, height;
 
     private boolean active;
-    private List<Widget> widgets = new ArrayList<>();
-    private List<Widget> buttons = new ArrayList<>();
+    private final List<Widget> widgets = new ArrayList<>();
+    private final List<Widget> buttons = new ArrayList<>();
 
     protected static final int separation = 8;
-    protected static final int rowHeight = 20;
+    protected static final int rowHeight = 18;
+    protected static final int checkboxOffset = 4;
 
     public AbstractTab(AmbienceGUI guiRef) {
         font = Minecraft.getInstance().fontRenderer;
@@ -63,6 +64,8 @@ public abstract class AbstractTab {
     }
 
     public abstract String getName();
+
+    public abstract String getShortName();
 
     public abstract void initialInit();
 

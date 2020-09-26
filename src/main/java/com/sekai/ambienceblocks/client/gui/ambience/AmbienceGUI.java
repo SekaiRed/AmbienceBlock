@@ -30,17 +30,12 @@ public class AmbienceGUI extends Screen {
 
     public static final int tabEdgeWidth = 16, tabHeight = 16;
 
-    private static final int intNull = Integer.MAX_VALUE;
-
-    /*private MainTab mainTab;
-    private BoundsTab boundsTab;
-    private PriorityTab priorityTab;
-    private DelayTab delayTab;
-    private MiscTab miscTab;*/
     private MainTab mainTab = new MainTab(this);
     private BoundsTab boundsTab = new BoundsTab(this);
+    private FuseTab fuseTab = new FuseTab(this);
     private PriorityTab priorityTab = new PriorityTab(this);
     private DelayTab delayTab = new DelayTab(this);
+    private CondTab condTab = new CondTab(this);
     private MiscTab miscTab = new MiscTab(this);
 
     private AbstractTab highlightedTab;
@@ -73,9 +68,6 @@ public class AmbienceGUI extends Screen {
             highlightedTab.renderToolTip(mouseX, mouseY);
 
         drawHelp();
-
-        /*if(highlightIndex == 0)
-            mainTab.render(mouseX, mouseY, partialTicks);*/
     }
 
     @Override
@@ -89,34 +81,6 @@ public class AmbienceGUI extends Screen {
 
         if(!initialized)
         {
-            /*mainTab = new MainTab(this);
-            mainTab.initialInit();
-            mainTab.guiOpenedInit();
-            setHighlightedTab(mainTab);
-
-            boundsTab = new BoundsTab(this);
-            boundsTab.initialInit();
-            boundsTab.guiOpenedInit();
-            boundsTab.deactivate();
-
-            priorityTab = new PriorityTab(this);
-            priorityTab.initialInit();
-            priorityTab.guiOpenedInit();
-            priorityTab.deactivate();
-
-            delayTab = new DelayTab(this);
-            delayTab.initialInit();
-            delayTab.guiOpenedInit();
-            delayTab.deactivate();
-
-            miscTab = new MiscTab(this);
-            miscTab.initialInit();
-            miscTab.guiOpenedInit();
-            miscTab.deactivate();*/
-
-            //set up in advance to get the correct amount of active tabs
-            //mainTab.setFieldFromData(target.data);
-
             for(AbstractTab tab : tabs) {
                 tab.updateMetaValues(this);
                 tab.initialInit();
@@ -223,9 +187,13 @@ public class AmbienceGUI extends Screen {
 
         list.add(boundsTab);
 
+        list.add(fuseTab);
+
         list.add(priorityTab);
 
         list.add(delayTab);
+
+        list.add(condTab);
 
         list.add(miscTab);
 
@@ -239,11 +207,17 @@ public class AmbienceGUI extends Screen {
 
         list.add(boundsTab);
 
+        if(mainTab.shouldFuse.isChecked())
+            list.add(fuseTab);
+
         if(mainTab.usePriority.isChecked())
             list.add(priorityTab);
 
         if(mainTab.useDelay.isChecked())
             list.add(delayTab);
+
+        if(mainTab.useCondition.isChecked())
+            list.add(condTab);
 
         list.add(miscTab);
 
@@ -310,8 +284,13 @@ public class AmbienceGUI extends Screen {
     private void drawTabs(int mouseX, int mouseY) {
         List<AbstractTab> options = getActiveTabs();
         int tabSize = getTabWidth();
+        String tabName;
         for(int i = 0; i < options.size(); i++) {
-            drawTab(tabSize * i, tabSize, options.get(i).getName(), getTabState(mouseX, mouseY, options.get(i)));
+            if(font.getStringWidth(options.get(i).getName()) < tabSize - 8)
+                tabName = options.get(i).getName();
+            else
+                tabName = options.get(i).getShortName();
+            drawTab(tabSize * i, tabSize, tabName, getTabState(mouseX, mouseY, options.get(i)));
         }
     }
 
@@ -327,6 +306,10 @@ public class AmbienceGUI extends Screen {
     }
 
     //meta
+    public void forceUpdateCondList() {
+        condTab.updateGuiCondList();
+    }
+
     public void addWidget(Widget widget) {
         this.children.add(widget);
     }

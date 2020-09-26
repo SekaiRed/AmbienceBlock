@@ -1,19 +1,19 @@
 package com.sekai.ambienceblocks.tileentity.ambiencetilebounds;
 
+import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.Vec3d;
-import org.omg.CORBA.Bounds;
 
 public class CapsuleBounds extends AbstractBounds {
     public static final int id = 2;
 
     private double radius;
     private double length;
-    private BoundsAxis axis;
+    private AmbienceAxis axis;
 
-    public CapsuleBounds(double radius, double length, BoundsAxis axis) {
+    public CapsuleBounds(double radius, double length, AmbienceAxis axis) {
         this.radius = radius;
         this.length = length;
         this.axis = axis;
@@ -22,7 +22,7 @@ public class CapsuleBounds extends AbstractBounds {
     public CapsuleBounds() {
         this.radius = 0;
         this.length = 0;
-        this.axis = BoundsAxis.Y;
+        this.axis = AmbienceAxis.Y;
     }
 
     public double getRadius() {
@@ -41,11 +41,11 @@ public class CapsuleBounds extends AbstractBounds {
         this.length = length;
     }
 
-    public BoundsAxis getAxis() {
+    public AmbienceAxis getAxis() {
         return axis;
     }
 
-    public void setAxis(BoundsAxis axis) {
+    public void setAxis(AmbienceAxis axis) {
         this.axis = axis;
     }
 
@@ -214,7 +214,7 @@ public class CapsuleBounds extends AbstractBounds {
     public void fromNBT(CompoundNBT compound) {
         this.radius = compound.getDouble("radius");
         this.length = compound.getDouble("length");
-        this.axis = BoundsAxis.getAxisFromInt(compound.getInt("axis"));
+        this.axis = AmbienceAxis.getAxisFromInt(compound.getInt("axis"));
     }
 
     @Override
@@ -228,7 +228,7 @@ public class CapsuleBounds extends AbstractBounds {
     public void fromBuff(PacketBuffer buf) {
         this.radius = buf.readDouble();
         this.length = buf.readDouble();
-        this.axis = BoundsAxis.getAxisFromInt(buf.readInt());
+        this.axis = AmbienceAxis.getAxisFromInt(buf.readInt());
     }
 
     @Override
