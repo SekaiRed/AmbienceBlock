@@ -29,7 +29,6 @@ public class AmbienceTileEntityData
     //main
     private String soundName = "";
     private boolean shouldFuse = false;
-    private boolean needRedstone = false;
 
     //sounds
     private float volume = 1.0f;
@@ -68,7 +67,6 @@ public class AmbienceTileEntityData
     public CompoundNBT toNBT(CompoundNBT compound) {
         compound.putString("musicName", this.soundName);
         compound.putBoolean("shouldFuse", this.shouldFuse);
-        compound.putBoolean("needRedstone", this.needRedstone);
 
         compound.putFloat("volume", this.volume);
         compound.putFloat("pitch", this.pitch);
@@ -113,7 +111,6 @@ public class AmbienceTileEntityData
     public void fromNBT(CompoundNBT compound) {
         this.soundName = compound.getString("musicName");
         this.shouldFuse = compound.getBoolean("shouldFuse");
-        this.needRedstone = compound.getBoolean("needRedstone");
 
         this.volume = compound.getFloat("volume");
         this.pitch = compound.getFloat("pitch");
@@ -162,7 +159,6 @@ public class AmbienceTileEntityData
         //Encode the data for the buffer
         buf.writeString(this.soundName, 50);
         buf.writeBoolean(this.shouldFuse);
-        buf.writeBoolean(this.needRedstone);
 
         buf.writeFloat(this.volume);
         buf.writeFloat(this.pitch);
@@ -209,7 +205,6 @@ public class AmbienceTileEntityData
         //Decode the data from the buffer
         this.soundName = buf.readString(50);
         this.shouldFuse = buf.readBoolean();
-        this.needRedstone = buf.readBoolean();
 
         this.volume = buf.readFloat();
         this.pitch = buf.readFloat();
@@ -275,14 +270,6 @@ public class AmbienceTileEntityData
 
     public void setShouldFuse(boolean shouldFuse) {
         this.shouldFuse = shouldFuse;
-    }
-
-    public boolean needsRedstone() {
-        return needRedstone;
-    }
-
-    public void setNeedRedstone(boolean needRedstone) {
-        this.needRedstone = needRedstone;
     }
 
     public float getVolume() {

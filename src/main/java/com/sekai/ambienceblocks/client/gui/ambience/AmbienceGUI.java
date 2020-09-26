@@ -32,7 +32,7 @@ public class AmbienceGUI extends Screen {
 
     private MainTab mainTab = new MainTab(this);
     private BoundsTab boundsTab = new BoundsTab(this);
-    private FuseTab fuseTab = new FuseTab(this);
+    //private FuseTab fuseTab = new FuseTab(this);
     private PriorityTab priorityTab = new PriorityTab(this);
     private DelayTab delayTab = new DelayTab(this);
     private CondTab condTab = new CondTab(this);
@@ -187,7 +187,7 @@ public class AmbienceGUI extends Screen {
 
         list.add(boundsTab);
 
-        list.add(fuseTab);
+        //list.add(fuseTab);
 
         list.add(priorityTab);
 
@@ -207,8 +207,8 @@ public class AmbienceGUI extends Screen {
 
         list.add(boundsTab);
 
-        if(mainTab.shouldFuse.isChecked())
-            list.add(fuseTab);
+        //if(mainTab.shouldFuse.isChecked())
+        //    list.add(fuseTab);
 
         if(mainTab.usePriority.isChecked())
             list.add(priorityTab);

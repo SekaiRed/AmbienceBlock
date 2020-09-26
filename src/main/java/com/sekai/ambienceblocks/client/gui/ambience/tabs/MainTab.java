@@ -39,7 +39,7 @@ public class MainTab extends AbstractTab {
     public TextInstance textFadeOut = new TextInstance(0, 0, 0xFFFFFF, "Fade Out :", font);
     public TextFieldWidget soundFadeOut = new TextFieldWidget(font, 0, 0, 40, 20, "name");
 
-    public CheckboxWidget needRedstone = new CheckboxWidget(getBaseX(), getRowY(3), 20 + font.getStringWidth("Needs redstone") + checkboxOffset, 20, "Needs redstone", false);
+    //public CheckboxWidget needRedstone = new CheckboxWidget(getBaseX(), getRowY(3), 20 + font.getStringWidth("Needs redstone") + checkboxOffset, 20, "Needs redstone", false);
     public CheckboxWidget shouldFuse = new CheckboxWidget(getBaseX(), getRowY(2), 20 + font.getStringWidth("Should fuse") + checkboxOffset, 20, "Should fuse", false);
     public CheckboxWidget useDelay = new CheckboxWidget(getBaseX(), getRowY(3), 20 + font.getStringWidth("Using delay") + checkboxOffset, 20, "Using delay", false);
     public CheckboxWidget usePriority = new CheckboxWidget(getNeighbourX(shouldFuse), getRowY(2), 20 + font.getStringWidth("Using priority") + checkboxOffset, 20, "Using priority", false);
@@ -82,7 +82,7 @@ public class MainTab extends AbstractTab {
         addWidget(soundPitch);
         addWidget(soundFadeIn);
         addWidget(soundFadeOut);
-        addWidget(needRedstone);
+        //addWidget(needRedstone);
         addWidget(shouldFuse);
         addWidget(usePriority);
         addWidget(useDelay);
@@ -107,11 +107,11 @@ public class MainTab extends AbstractTab {
         textFadeOut.x = getNeighbourX(soundFadeIn); textFadeOut.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
         soundFadeOut.x = getNeighbourX(textFadeOut); soundFadeOut.y = getRowY(2);
 
-        needRedstone.x = getBaseX(); needRedstone.y = getRowY(3);
-        shouldFuse.x = getNeighbourX(needRedstone); shouldFuse.y = getRowY(3);
-        usePriority.x = getBaseX(); usePriority.y = getRowY(4);
-        useDelay.x = getNeighbourX(usePriority); useDelay.y = getRowY(4);
-        useCondition.x = getBaseX(); useCondition.y = getRowY(5);
+        //needRedstone.x = getBaseX(); needRedstone.y = getRowY(3);
+        shouldFuse.x = getBaseX(); shouldFuse.y = getRowY(3);
+        usePriority.x = getNeighbourX(shouldFuse); usePriority.y = getRowY(3);
+        useDelay.x = getBaseX(); useDelay.y = getRowY(4);
+        useCondition.x = getNeighbourX(useDelay); useCondition.y = getRowY(4);
     }
 
     @Override
@@ -131,7 +131,7 @@ public class MainTab extends AbstractTab {
         textFadeOut.render(mouseX, mouseY);
         soundFadeOut.render(mouseX, mouseY, partialTicks);
 
-        needRedstone.render(mouseX, mouseY, partialTicks);
+        //needRedstone.render(mouseX, mouseY, partialTicks);
         shouldFuse.render(mouseX, mouseY, partialTicks);
         useDelay.render(mouseX, mouseY, partialTicks);
         usePriority.render(mouseX, mouseY, partialTicks);
@@ -176,11 +176,11 @@ public class MainTab extends AbstractTab {
             GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
         }
 
-        if(needRedstone.isHovered()) {
+        /*if(needRedstone.isHovered()) {
             list.add(TextFormatting.RED + "Needs Redstone");
             list.add("This block will not play without a redstone signal.");
             GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
-        }
+        }*/
         if(shouldFuse.isHovered()) {
             list.add(TextFormatting.RED + "Should Fuse");
             list.add("If another block is playing the same sound, the ownership will be transferred to whichever is closer.");
@@ -224,7 +224,7 @@ public class MainTab extends AbstractTab {
         soundFadeIn.setText(String.valueOf(data.getFadeIn()));
         soundFadeOut.setText(String.valueOf(data.getFadeOut()));
 
-        needRedstone.setChecked(data.needsRedstone());
+        //needRedstone.setChecked(data.needsRedstone());
         shouldFuse.setChecked(data.shouldFuse());
         useDelay.setChecked(data.isUsingDelay());
         usePriority.setChecked(data.isUsingPriority());
@@ -239,7 +239,7 @@ public class MainTab extends AbstractTab {
         data.setFadeIn(ParsingUtil.tryParseInt(soundFadeIn.getText()));
         data.setFadeOut(ParsingUtil.tryParseInt(soundFadeOut.getText()));
 
-        data.setNeedRedstone(needRedstone.isChecked());
+        //data.setNeedRedstone(needRedstone.isChecked());
         data.setShouldFuse(shouldFuse.isChecked());
         data.setUseDelay(useDelay.isChecked());
         data.setUsePriority(usePriority.isChecked());
@@ -254,9 +254,5 @@ public class MainTab extends AbstractTab {
     @Override
     public void onDeactivate() {
 
-    }
-
-    public int getChildren() {
-        return guiRef.children().size();
     }
 }

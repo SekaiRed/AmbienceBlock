@@ -86,10 +86,10 @@ public class AmbienceController {
                 }
             }
 
-            if(slot.getOwner().data.needsRedstone() && !mc.world.isBlockPowered(slot.getOwner().getPos())) {
+            /*if(slot.getOwner().data.needsRedstone() && !mc.world.isBlockPowered(slot.getOwner().getPos())) {
                 stopMusic(slot, "needed redstone but wasn't powered");
                 continue;
-            }
+            }*/
 
             if(slot.getOwner().data.isUsingCondition()) {
                 boolean condBool = false;
@@ -349,11 +349,11 @@ public class AmbienceController {
         if(!tile.isWithinBounds(mc.player))
             return false;
 
-        if(tile.data.needsRedstone()) {
+        /*if(tile.data.needsRedstone()) {
             if (!mc.world.isBlockPowered(tile.getPos())) {
                 return false;
             }
-        }
+        }*/
 
         List<AbstractCond> conditions = tile.data.getConditions();
         for (AbstractCond condition : conditions) {
