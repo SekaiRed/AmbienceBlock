@@ -5,15 +5,9 @@ import com.sekai.ambienceblocks.Main;
 import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AlwaysTrueCond;
-import com.sekai.ambienceblocks.tileentity.ambiencetilecond.PlayerPosToValueCond;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceTest;
 import com.sekai.ambienceblocks.util.CondsUtil;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class ChooseCondGUI extends Screen  {
@@ -44,7 +38,7 @@ public class ChooseCondGUI extends Screen  {
 
         drawMainBackground();
 
-        //drawCenteredString(font, selectedDomain + ":" + selected, xTopLeft + texWidth/2, yTopLeft + separation / 2, 0xFFFFFF);
+        drawCenteredString(font, "Choose a condition", xTopLeft + texWidth/2, yTopLeft + separation / 2, 0xFFFFFF);
 
         list.render(p_render_1_, p_render_2_);
 

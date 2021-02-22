@@ -12,9 +12,13 @@ import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.TranslationTextComponent;
+import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -68,6 +72,65 @@ public class AmbienceGUI extends Screen {
             highlightedTab.renderToolTip(mouseX, mouseY);
 
         drawHelp();
+
+        //drawDebug();
+    }
+
+    private void drawDebug() {
+        for(Widget widget : highlightedTab.buttons) {
+            float left = widget.x;
+            float top = widget.y;
+            float right = widget.x + widget.getWidth();
+            float bottom = widget.y + widget.getHeight();
+
+            RenderSystem.disableTexture();
+            RenderSystem.enableBlend();
+            RenderSystem.disableAlphaTest();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.shadeModel(GL11.GL_SMOOTH);
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+            GL11.glColor4f(0.0f, 1.0f, 1.0f, 0.2f);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+            buffer.pos(left, bottom, 0).endVertex();
+            buffer.pos(right, bottom, 0).endVertex();
+            buffer.pos(right, top, 0).endVertex();
+            buffer.pos(left, top, 0).endVertex();
+            tessellator.draw();
+
+            RenderSystem.shadeModel(GL11.GL_FLAT);
+            RenderSystem.disableBlend();
+            RenderSystem.enableAlphaTest();
+            RenderSystem.enableTexture();
+        }
+        for(Widget widget : highlightedTab.widgets) {
+            float left = widget.x;
+            float top = widget.y;
+            float right = widget.x + widget.getWidth();
+            float bottom = widget.y + widget.getHeight();
+
+            RenderSystem.disableTexture();
+            RenderSystem.enableBlend();
+            RenderSystem.disableAlphaTest();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.shadeModel(GL11.GL_SMOOTH);
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+            GL11.glColor4f(1.0f, 0.0f, 1.0f, 0.2f);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+            buffer.pos(left, bottom, 0).endVertex();
+            buffer.pos(right, bottom, 0).endVertex();
+            buffer.pos(right, top, 0).endVertex();
+            buffer.pos(left, top, 0).endVertex();
+            tessellator.draw();
+
+            RenderSystem.shadeModel(GL11.GL_FLAT);
+            RenderSystem.disableBlend();
+            RenderSystem.enableAlphaTest();
+            RenderSystem.enableTexture();
+        }
     }
 
     @Override
@@ -85,8 +148,10 @@ public class AmbienceGUI extends Screen {
                 tab.updateMetaValues(this);
                 tab.initialInit();
                 tab.updateWidgetPosition();
+                //if(tab instanceof MainTab) setHighlightedTab(tab);
+                //else tab.deactivate();
+                tab.deactivate();
                 if(tab instanceof MainTab) setHighlightedTab(tab);
-                else tab.deactivate();
             }
 
             loadDataFromTile();

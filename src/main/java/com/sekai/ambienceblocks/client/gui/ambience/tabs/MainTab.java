@@ -1,16 +1,19 @@
 package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
 import com.sekai.ambienceblocks.client.gui.widgets.CheckboxWidget;
+import com.sekai.ambienceblocks.client.gui.widgets.ScrollListWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.ambience.ChooseSoundGUI;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import com.sekai.ambienceblocks.util.ParsingUtil;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -26,6 +29,14 @@ public class MainTab extends AbstractTab {
     public Button soundButton = guiRef.addButton(new Button(getNeighbourX(soundName), getRowY(0) + getOffsetY(20), 20, 20, "...", button -> {
         Minecraft.getInstance().displayGuiScreen(new ChooseSoundGUI(this.guiRef, soundName));
     }));
+
+    public TextInstance textCategory = new TextInstance(0, 0, 0xFFFFFF, I18n.format("ui.ambienceblocks.category") + " :", font);
+    ScrollListWidget listCategory = new ScrollListWidget(0, 0, 60, 20, 4, 16, StaticUtil.getListOfSoundCategories(), font, new ScrollListWidget.IPressable() {
+        @Override
+        public void onChange(ScrollListWidget list, int index, String name) {
+
+        }
+    });
 
     public TextInstance textVolume = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.volume") + " :", font);
     public TextFieldWidget soundVolume = new TextFieldWidget(font, getNeighbourX(textVolume), getRowY(1), 40, 20, "name");
@@ -78,6 +89,7 @@ public class MainTab extends AbstractTab {
         //add widgets to the list
         addWidget(soundName);
         addButton(soundButton);
+        listCategory.addWidget(this);
         addWidget(soundVolume);
         addWidget(soundPitch);
         addWidget(soundFadeIn);
@@ -95,23 +107,27 @@ public class MainTab extends AbstractTab {
         soundName.x = getNeighbourX(textSoundName); soundName.y = getRowY(0); soundName.setWidth(getEndX() - getNeighbourX(textSoundName) - 20 - separation);
         soundButton.x = getNeighbourX(soundName); soundButton.y = getRowY(0) + getOffsetY(20);
 
-        textVolume.x = getBaseX(); textVolume.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
-        soundVolume.x = getNeighbourX(textVolume); soundVolume.y = getRowY(1);
+        textCategory.x = getBaseX(); textCategory.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        listCategory.x = getNeighbourX(textCategory); listCategory.y = getRowY(1) + getOffsetY(20);
+        listCategory.updateWidgetPosition();
 
-        textPitch.x = getNeighbourX(soundVolume); textPitch.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
-        soundPitch.x = getNeighbourX(textPitch); soundPitch.y = getRowY(1);
+        textVolume.x = getBaseX(); textVolume.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
+        soundVolume.x = getNeighbourX(textVolume); soundVolume.y = getRowY(2);
 
-        textFadeIn.x = getBaseX(); textFadeIn.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
-        soundFadeIn.x = getNeighbourX(textFadeIn); soundFadeIn.y = getRowY(2);
+        textPitch.x = getNeighbourX(soundVolume); textPitch.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
+        soundPitch.x = getNeighbourX(textPitch); soundPitch.y = getRowY(2);
 
-        textFadeOut.x = getNeighbourX(soundFadeIn); textFadeOut.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
-        soundFadeOut.x = getNeighbourX(textFadeOut); soundFadeOut.y = getRowY(2);
+        textFadeIn.x = getBaseX(); textFadeIn.y = getRowY(3) + getOffsetY(font.FONT_HEIGHT);
+        soundFadeIn.x = getNeighbourX(textFadeIn); soundFadeIn.y = getRowY(3);
+
+        textFadeOut.x = getNeighbourX(soundFadeIn); textFadeOut.y = getRowY(3) + getOffsetY(font.FONT_HEIGHT);
+        soundFadeOut.x = getNeighbourX(textFadeOut); soundFadeOut.y = getRowY(3);
 
         //needRedstone.x = getBaseX(); needRedstone.y = getRowY(3);
-        shouldFuse.x = getBaseX(); shouldFuse.y = getRowY(3);
-        usePriority.x = getNeighbourX(shouldFuse); usePriority.y = getRowY(3);
-        useDelay.x = getBaseX(); useDelay.y = getRowY(4);
-        useCondition.x = getNeighbourX(useDelay); useCondition.y = getRowY(4);
+        shouldFuse.x = getBaseX(); shouldFuse.y = getRowY(4);
+        usePriority.x = getNeighbourX(shouldFuse); usePriority.y = getRowY(4);
+        useDelay.x = getBaseX(); useDelay.y = getRowY(5);
+        useCondition.x = getNeighbourX(useDelay); useCondition.y = getRowY(5);
     }
 
     @Override
@@ -136,6 +152,9 @@ public class MainTab extends AbstractTab {
         useDelay.render(mouseX, mouseY, partialTicks);
         usePriority.render(mouseX, mouseY, partialTicks);
         useCondition.render(mouseX, mouseY, partialTicks);
+
+        textCategory.render(mouseX, mouseY);
+        listCategory.render(mouseX, mouseY);
     }
 
     @Override
@@ -153,6 +172,11 @@ public class MainTab extends AbstractTab {
             list.add(TextFormatting.GRAY + "You first choose the namespace of the sound.");
             list.add(TextFormatting.GRAY + "Sounds are separated into folders by '.' (dot), folders are annotated with <>.");
             list.add(TextFormatting.GRAY + "Anything that isn't a folder is an actual sound, double clicking it will select it.");
+            GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+        if(textCategory.isHovered()) {
+            list.add(TextFormatting.RED + "Category");
+            list.add(TextFormatting.GRAY + "Category the sound should play as.");
             GuiUtils.drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
         }
         if(textVolume.isHovered()) {
@@ -219,6 +243,7 @@ public class MainTab extends AbstractTab {
     @Override
     public void setFieldFromData(AmbienceTileEntityData data) {
         soundName.setText(data.getSoundName());
+        listCategory.setSelectionByString(data.getCategory());
         soundVolume.setText(String.valueOf(data.getVolume()));
         soundPitch.setText(String.valueOf(data.getPitch()));
         soundFadeIn.setText(String.valueOf(data.getFadeIn()));
@@ -234,6 +259,8 @@ public class MainTab extends AbstractTab {
     @Override
     public void setDataFromField(AmbienceTileEntityData data) {
         data.setSoundName(soundName.getText());
+        //data.setCategory(SoundCategory.valueOf(listCategory.getSelectedString()).getName());
+        data.setCategory(ParsingUtil.tryParseEnum(listCategory.getSelectedString().toUpperCase(), SoundCategory.MASTER).getName());
         data.setVolume(ParsingUtil.tryParseFloat(soundVolume.getText()));
         data.setPitch(ParsingUtil.tryParseFloat(soundPitch.getText()));
         data.setFadeIn(ParsingUtil.tryParseInt(soundFadeIn.getText()));

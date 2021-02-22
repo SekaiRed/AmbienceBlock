@@ -3,6 +3,7 @@ package com.sekai.ambienceblocks.client.gui.ambience;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sekai.ambienceblocks.Main;
 import com.sekai.ambienceblocks.client.gui.ambience.tabs.CondTab;
+import com.sekai.ambienceblocks.client.gui.widgets.ScrollListWidget;
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceWidgetHolder;
 import net.minecraft.client.gui.screen.Screen;
@@ -15,7 +16,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditCondGUI extends Screen {
+public class EditCondGUI extends AmbienceScreen {
     private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(Main.MODID, "textures/gui/ambience_gui.png");
 
     public static final int texWidth = 256;
@@ -80,10 +81,14 @@ public class EditCondGUI extends Screen {
         addWidgets(cond.getWidgets());
         int indexX = offset;
         for(AmbienceWidgetHolder element : condWidgets) {
+            System.out.println(element.getKey());
             Widget widget = element.get();
+            System.out.println(widget.x + "; " + widget.y);
             widget.x = xTopLeft + indexX;
             widget.y = yTopLeft + offset + rowHeight + separation;
+            System.out.println(widget.x + "; " + widget.y);
             indexX += widget.getWidth() + separation;
+            if(widget instanceof ScrollListWidget) ((ScrollListWidget)widget).updateWidgetPosition();
         }
 
         //initialized = true;
@@ -97,6 +102,8 @@ public class EditCondGUI extends Screen {
 
         for(AmbienceWidgetHolder widget : condWidgets) {
             widget.get().render(p_render_1_, p_render_2_, p_render_3_);
+
+            if(widget.get() instanceof ScrollListWidget) ((ScrollListWidget)widget.get()).render(p_render_1_, p_render_2_);
         }
 
         editCond.render(p_render_1_, p_render_2_, p_render_3_);
@@ -129,12 +136,12 @@ public class EditCondGUI extends Screen {
         this.cond = cond;
     }
 
-    private void addWidget(AmbienceWidgetHolder widget) {
+    /*private void addWidget(AmbienceWidgetHolder widget) {
         this.condWidgets.add(widget);
         this.children.add(widget.get());
         if(widget.get() instanceof Button)
             this.buttons.add(widget.get());
-    }
+    }*/
 
     private void addWidgets(List<AmbienceWidgetHolder> widgets) {
         for(AmbienceWidgetHolder widget : widgets) {
@@ -142,6 +149,8 @@ public class EditCondGUI extends Screen {
             this.children.add(widget.get());
             if(widget.get() instanceof Button)
                 this.buttons.add(widget.get());
+            if(widget.get() instanceof ScrollListWidget)
+                ((ScrollListWidget) widget.get()).addWidget(this);
         }
     }
 

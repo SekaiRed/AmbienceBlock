@@ -269,7 +269,7 @@ public class AmbienceController {
         }
         //System.out.println("playing " + tile.getMusicName() + " at " + tile.getPos());
         ResourceLocation playingResource = new ResourceLocation(tile.getMusicName());
-        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos().add(ParsingUtil.Vec3dToVec3i(tile.data.getOffset())), getVolumeFromTileEntity(tile),tile.data.getPitch(), tile.data.getFadeIn(), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(tile.data.getCategory().toUpperCase(), SoundCategory.MASTER), tile.getPos().add(ParsingUtil.Vec3dToVec3i(tile.data.getOffset())), getVolumeFromTileEntity(tile),tile.data.getPitch(), tile.data.getFadeIn(), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
         handler.play(playingMusic);
         soundsList.add(new CustomSoundSlot(tile.getMusicName(), playingMusic, tile));
     }
@@ -287,7 +287,7 @@ public class AmbienceController {
         if(usingRandomPitch) pitch = (float) (tile.data.getMinRandomPitch() + Math.random() * (tile.data.getMaxRandomPitch() - tile.data.getMinRandomPitch()));
 
         ResourceLocation playingResource = new ResourceLocation(tile.getMusicName());
-        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos().add(ParsingUtil.Vec3dToVec3i(tile.data.getOffset())), volume, pitch, tile.data.getFadeIn(), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(tile.data.getCategory().toUpperCase(), SoundCategory.MASTER), tile.getPos().add(ParsingUtil.Vec3dToVec3i(tile.data.getOffset())), volume, pitch, tile.data.getFadeIn(), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
         handler.play(playingMusic);
         CustomSoundSlot custom = new CustomSoundSlot(tile.getMusicName(), playingMusic, tile);
         soundsList.add(custom);

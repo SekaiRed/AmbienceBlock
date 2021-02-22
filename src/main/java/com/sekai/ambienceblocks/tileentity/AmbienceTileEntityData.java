@@ -7,16 +7,14 @@ import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.CondsUtil;
 import com.sekai.ambienceblocks.util.NBTHelper;
 import com.sekai.ambienceblocks.util.ParsingUtil;
-import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,6 +27,7 @@ public class AmbienceTileEntityData
     //main
     private String soundName = "";
     private boolean shouldFuse = false;
+    private String category = SoundCategory.MASTER.getName();
 
     //sounds
     private float volume = 1.0f;
@@ -67,6 +66,7 @@ public class AmbienceTileEntityData
     public CompoundNBT toNBT(CompoundNBT compound) {
         compound.putString("musicName", this.soundName);
         compound.putBoolean("shouldFuse", this.shouldFuse);
+        compound.putString("category", this.category);
 
         compound.putFloat("volume", this.volume);
         compound.putFloat("pitch", this.pitch);
@@ -111,6 +111,7 @@ public class AmbienceTileEntityData
     public void fromNBT(CompoundNBT compound) {
         this.soundName = compound.getString("musicName");
         this.shouldFuse = compound.getBoolean("shouldFuse");
+        this.category = compound.getString("category");
 
         this.volume = compound.getFloat("volume");
         this.pitch = compound.getFloat("pitch");
@@ -159,6 +160,7 @@ public class AmbienceTileEntityData
         //Encode the data for the buffer
         buf.writeString(this.soundName, 50);
         buf.writeBoolean(this.shouldFuse);
+        buf.writeString(this.category, 20);
 
         buf.writeFloat(this.volume);
         buf.writeFloat(this.pitch);
@@ -205,6 +207,7 @@ public class AmbienceTileEntityData
         //Decode the data from the buffer
         this.soundName = buf.readString(50);
         this.shouldFuse = buf.readBoolean();
+        this.category = buf.readString(20);
 
         this.volume = buf.readFloat();
         this.pitch = buf.readFloat();
@@ -260,9 +263,11 @@ public class AmbienceTileEntityData
     }
 
     //Getter and setter
-    public String getSoundName() {
-        return soundName;
-    }
+    public String getSoundName() { return soundName; }
+
+    public String getCategory() { return category; }
+
+    public void setCategory(String category) { this.category = category; }
 
     public boolean shouldFuse() {
         return shouldFuse;

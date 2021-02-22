@@ -3,12 +3,9 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.ambience.EditCondGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceTest;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AlwaysTrueCond;
-import com.sekai.ambienceblocks.tileentity.ambiencetilecond.PlayerPosToValueCond;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
 

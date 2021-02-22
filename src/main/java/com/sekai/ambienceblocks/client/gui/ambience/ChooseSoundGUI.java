@@ -165,12 +165,10 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
     public void playSoundPreview() {
         if(!selectedDomain.equals("") && !list.getSelectionContent().contains("<"))
         {
-            System.out.println("playing sound");
             String resultSound = selectedDomain + ":" + selected + list.getSelectionContent();
             stopSoundPreview();
             previewSound = SimpleSound.master(new SoundEvent(new ResourceLocation(resultSound)), 1.0f, 0.75f);
             mc.getSoundHandler().play(previewSound);
-            System.out.println(mc.getSoundHandler().isPlaying(previewSound));
         }
         //.playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
     }

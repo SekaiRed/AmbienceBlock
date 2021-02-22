@@ -1,6 +1,5 @@
 package com.sekai.ambienceblocks.util;
 
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.AbstractBounds;
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.*;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceEquality;
@@ -39,7 +38,9 @@ public class CondsUtil {
 
     public enum CondList {
         ALWAYS_TRUE(0, new AlwaysTrueCond()),
-        PLAYER_POS_TO_VALUE(10, new PlayerPosToValueCond(AmbienceTest.EQUAL_TO, AmbienceAxis.X, 0)),
+        PLAYER_POS_AXIS(10, new PlayerPosAxisCond(AmbienceTest.EQUAL_TO, AmbienceAxis.X, 0)),
+        PLAYER_HEALTH(11, new PlayerHealthCond(AmbienceTest.GREATER_THAN, 10)),
+        PLAYER_HUNGER(12, new PlayerHungerCond(AmbienceTest.GREATER_THAN, 10)),
         WORLD_WEATHER(20, new WorldWeatherCond(AmbienceEquality.EQUAL_TO, AmbienceWeather.CLEAR)),
         WORLD_DAYTIME(21, new WorldDaytimeCond(AmbienceTest.GREATER_THAN, 0)),
         WORLD_REDSTONE(22, new WorldNeedRedstoneCond(AmbienceEquality.EQUAL_TO));

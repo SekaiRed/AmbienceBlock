@@ -2,15 +2,22 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
 import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
+import com.sekai.ambienceblocks.client.gui.widgets.ScrollListWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
+import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AlwaysTrueCond;
+import com.sekai.ambienceblocks.util.CondsUtil;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MiscTab extends AbstractTab {
@@ -20,6 +27,19 @@ public class MiscTab extends AbstractTab {
     Button paste = new Button(getNeighbourX(copy), getRowY(0) + getOffsetY(20), 60, 20, "Paste", button -> {
         guiRef.setData(AmbienceController.instance.getClipboard());
     });
+
+    //ScrollListWidget scroll;
+
+    /*Button test = new Button(getBaseX(), getRowY(2) + getOffsetY(20), 60, 20, "yes", button -> {
+        System.out.println("gotcha");
+    });
+
+    ScrollListWidget scroll = new ScrollListWidget(getBaseX(), getRowY(1) + getOffsetY(20), 200, 20, 4, 16, StaticUtil.getListOfSoundCategories(), font, new ScrollListWidget.IPressable() {
+        @Override
+        public void onChange(ScrollListWidget list, int index, String name) {
+
+        }
+    });*/
     /*
      TODO: Add a preset folder that you can view trough this list
     StringListWidget musicList = new StringListWidget(getBaseX(), getRowY(1), getEndX() - getBaseX(), getEndY() - getRowY(1), 4, 16, font, null);
@@ -42,21 +62,19 @@ public class MiscTab extends AbstractTab {
 
     @Override
     public void initialInit() {
-        /*for (ResourceLocation element : Minecraft.getInstance().getSoundHandler().getAvailableSounds()) {
-            if(element.getPath().contains("ambients")) musicList.addElement(element.getPath());
-        }*/
-
         addButton(copy);
         addButton(paste);
-        //addWidget(musicList);
+        //scroll.addWidget(this);
+        //addButton(test);
     }
 
     @Override
     public void updateWidgetPosition() {
         copy.x = getBaseX(); copy.y = getRowY(0);
         paste.x = getNeighbourX(copy); paste.y = getRowY(0);
-
-        //musicList.x = getBaseX(); musicList.y = getRowY(1);
+        //scroll.x = getBaseX(); scroll.y = getRowY(1);
+        //scroll.updateWidgetPosition();
+        //test.x = getBaseX(); test.y = getRowY(2);
     }
 
     public void doubleClicked() {
@@ -67,8 +85,8 @@ public class MiscTab extends AbstractTab {
     public void render(int mouseX, int mouseY, float partialTicks) {
         copy.render(mouseX, mouseY, partialTicks);
         paste.render(mouseX, mouseY, partialTicks);
-
-        //musicList.render(mouseX, mouseY);
+        //test.render(mouseX, mouseY, partialTicks);
+        //scroll.render(mouseX, mouseY);
     }
 
     @Override

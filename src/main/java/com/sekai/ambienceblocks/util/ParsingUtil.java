@@ -1,13 +1,23 @@
 package com.sekai.ambienceblocks.util;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 
+import java.util.ArrayList;
 import java.util.function.Predicate;
 
 public class ParsingUtil {
+    public static <E extends Enum<E>> E tryParseEnum(String value, E defaultVal) {
+        try {
+            return E.valueOf(defaultVal.getDeclaringClass(), value);
+        } catch (IllegalArgumentException e) {
+            return defaultVal;
+        }
+    }
+
     public static int tryParseInt(String value, int defaultVal) {
         try {
             return Integer.parseInt(value);

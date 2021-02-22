@@ -1,5 +1,8 @@
 package com.sekai.ambienceblocks.tileentity.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum AmbienceTest {
     GREATER_THAN(0, ">"),
     LESSER_THAN(1, "<"),
@@ -41,6 +44,20 @@ public enum AmbienceTest {
         if(this == EQUAL_TO)
             return from == comparedTo;
         return false;
+    }
+
+    public static ArrayList<String> getStringValues() {
+        ArrayList<String> list = new ArrayList<>();
+        for(AmbienceTest test : values())
+            list.add(test.name);
+        return list;
+    }
+
+    public static AmbienceTest getValueFromString(String value) {
+        for(AmbienceTest test : values())
+            if(test.getName().equals(value))
+                return test;
+        return AmbienceTest.GREATER_THAN;
     }
 
     private static final AmbienceTest[] vals = values();

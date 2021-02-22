@@ -20,8 +20,8 @@ public abstract class AbstractTab {
     protected int x, y, width, height;
 
     private boolean active;
-    private final List<Widget> widgets = new ArrayList<>();
-    private final List<Widget> buttons = new ArrayList<>();
+    public final List<Widget> widgets = new ArrayList<>();
+    public final List<Widget> buttons = new ArrayList<>();
 
     protected static final int separation = 8;
     protected static final int rowHeight = 18;
@@ -94,12 +94,16 @@ public abstract class AbstractTab {
     public void activate() {
         active = true;
         for(Widget widget : widgets) {
-            widget.visible = true;
-            widget.active = true;
+            if(widget != null) {
+                widget.visible = true;
+                widget.active = true;
+            }
         }
         for(Widget widget : buttons) {
-            widget.visible = true;
-            widget.active = true;
+            if(widget != null) {
+                widget.visible = true;
+                widget.active = true;
+            }
         }
         onActivate();
     }
@@ -109,12 +113,16 @@ public abstract class AbstractTab {
     public void deactivate() {
         active = false;
         for(Widget widget : widgets) {
-            widget.visible = false;
-            widget.active = false;
+            if(widget != null) {
+                widget.visible = false;
+                widget.active = false;
+            }
         }
         for(Widget widget : buttons) {
-            widget.visible = false;
-            widget.active = false;
+            if(widget != null) {
+                widget.visible = false;
+                widget.active = false;
+            }
         }
         onDeactivate();
     }

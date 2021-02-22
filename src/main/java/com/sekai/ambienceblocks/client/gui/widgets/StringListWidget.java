@@ -38,6 +38,12 @@ public class StringListWidget extends Widget {
         this.onPress = onPress;
     }
 
+    @Override
+    public void render(int p_render_1_, int p_render_2_, float p_render_3_) {
+        super.render(p_render_1_, p_render_2_, p_render_3_);
+        render(p_render_1_, p_render_2_);
+    }
+
     public void render(int mouseX, int mouseY) {
         this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 
@@ -302,6 +308,7 @@ public class StringListWidget extends Widget {
             if (list.get(i).equals(name)) {
                 setSelectionIndex(i);
                 //scrollIndex = (float) ((getElementY(i) - y - separation) / ((double) getTotalListHeight() - height));
+                setScroll(0f);
                 setScroll((float) ((getElementY(i) - y - separation) / ((double) getTotalListHeight() - height)));
             }
         }
