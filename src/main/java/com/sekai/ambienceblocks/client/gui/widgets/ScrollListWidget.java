@@ -33,7 +33,7 @@ public class ScrollListWidget extends Widget {
 
     public StringListWidget scrollList;
 
-    public ScrollListWidget(int xIn, int yIn, int widthIn, int heightIn, int separation, int optionHeight, ArrayList<String> list, FontRenderer font, IPressable onChange) {
+    public ScrollListWidget(int xIn, int yIn, int widthIn, int heightIn, int separation, int optionHeight, int listLength, ArrayList<String> list, FontRenderer font, IPressable onChange) {
         super(xIn, yIn, widthIn, heightIn, new StringTextComponent(""));
         internalWidth = widthIn;
         internalHeight = heightIn;
@@ -57,7 +57,10 @@ public class ScrollListWidget extends Widget {
         main.setWidth(internalWidth);
         main.setHeight(internalHeight);
 
-        scrollList = new StringListWidget(x + 1, y + internalHeight, internalWidth - 2, internalHeight * 4, separation, optionHeight, font, new StringListWidget.IPressable() {
+        this.width = widthIn;
+        this.height = heightIn;
+
+        scrollList = new StringListWidget(x + 1, y + internalHeight, internalWidth - 2, internalHeight * listLength/*4*/, separation, optionHeight, font, new StringListWidget.IPressable() {
             @Override
             public void onClick(StringListWidget list, int index, String name) {
 

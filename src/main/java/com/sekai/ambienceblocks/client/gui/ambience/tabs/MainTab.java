@@ -7,8 +7,10 @@ import com.sekai.ambienceblocks.client.gui.widgets.CheckboxWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.ScrollListWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.StaticUtil;
+import net.minecraft.block.SoundType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
@@ -32,7 +34,15 @@ public class MainTab extends AbstractTab {
     }));
 
     public TextInstance textCategory = new TextInstance(0, 0, 0xFFFFFF, I18n.format("ui.ambienceblocks.category") + " :", font);
-    ScrollListWidget listCategory = new ScrollListWidget(0, 0, 60, 20, 4, 16, StaticUtil.getListOfSoundCategories(), font, new ScrollListWidget.IPressable() {
+    public ScrollListWidget listCategory = new ScrollListWidget(0, 0, 60, 20, 4, 16, 4, StaticUtil.getListOfSoundCategories(), font, new ScrollListWidget.IPressable() {
+        @Override
+        public void onChange(ScrollListWidget list, int index, String name) {
+
+        }
+    });
+
+    public TextInstance textType = new TextInstance(0, 0, 0xFFFFFF, I18n.format("ui.ambienceblocks.type") + " :", font);
+    public ScrollListWidget listType = new ScrollListWidget(0, 0, 60, 20, 4, 16, 2, StaticUtil.getListOfAmbienceType(), font, new ScrollListWidget.IPressable() {
         @Override
         public void onChange(ScrollListWidget list, int index, String name) {
 
@@ -52,10 +62,11 @@ public class MainTab extends AbstractTab {
     public TextFieldWidget soundFadeOut = new TextFieldWidget(font, 0, 0, 40, 20, new StringTextComponent(""));
 
     //public CheckboxWidget needRedstone = new CheckboxWidget(getBaseX(), getRowY(3), 20 + font.getStringWidth("Needs redstone") + checkboxOffset, 20, "Needs redstone", false);
+    public CheckboxWidget usePriority = new CheckboxWidget(0, getRowY(2), 20 + font.getStringWidth("Using priority") + checkboxOffset, 20, "Using priority", false);
+    public CheckboxWidget useCondition = new CheckboxWidget(getNeighbourX(usePriority), getRowY(2), 20 + font.getStringWidth("Using condition") + checkboxOffset, 20, "Using condition", false);
+    //public CheckboxWidget alwaysPlay = new CheckboxWidget(getNeighbourX(useCondition), getRowY(2), 20 + font.getStringWidth("Always play") + checkboxOffset, 20, "Always play", false);
     public CheckboxWidget shouldFuse = new CheckboxWidget(getBaseX(), getRowY(2), 20 + font.getStringWidth("Should fuse") + checkboxOffset, 20, "Should fuse", false);
     public CheckboxWidget useDelay = new CheckboxWidget(getBaseX(), getRowY(3), 20 + font.getStringWidth("Using delay") + checkboxOffset, 20, "Using delay", false);
-    public CheckboxWidget usePriority = new CheckboxWidget(getNeighbourX(shouldFuse), getRowY(2), 20 + font.getStringWidth("Using priority") + checkboxOffset, 20, "Using priority", false);
-    public CheckboxWidget useCondition = new CheckboxWidget(getNeighbourX(shouldFuse), getRowY(2), 20 + font.getStringWidth("Using condition") + checkboxOffset, 20, "Using condition", false);
 
     public MainTab(AmbienceGUI guiRef) {
         super(guiRef);
@@ -92,6 +103,8 @@ public class MainTab extends AbstractTab {
         addButton(soundButton);
         listCategory.addWidget(this);
         listCategory.addWidget(this.guiRef);
+        listType.addWidget(this);
+        listType.addWidget(this.guiRef);
         addWidget(soundVolume);
         addWidget(soundPitch);
         addWidget(soundFadeIn);
@@ -101,6 +114,7 @@ public class MainTab extends AbstractTab {
         addWidget(usePriority);
         addWidget(useDelay);
         addWidget(useCondition);
+        //addWidget(alwaysPlay);
     }
 
     @Override
@@ -112,6 +126,10 @@ public class MainTab extends AbstractTab {
         textCategory.x = getBaseX(); textCategory.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
         listCategory.x = getNeighbourX(textCategory); listCategory.y = getRowY(1) + getOffsetY(20);
         listCategory.updateWidgetPosition();
+
+        textType.x = getNeighbourX(listCategory); textType.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        listType.x = getNeighbourX(textType); listType.y = getRowY(1) + getOffsetY(20);
+        listType.updateWidgetPosition();
 
         textVolume.x = getBaseX(); textVolume.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
         soundVolume.x = getNeighbourX(textVolume); soundVolume.y = getRowY(2);
@@ -126,14 +144,23 @@ public class MainTab extends AbstractTab {
         soundFadeOut.x = getNeighbourX(textFadeOut); soundFadeOut.y = getRowY(3);
 
         //needRedstone.x = getBaseX(); needRedstone.y = getRowY(3);
-        shouldFuse.x = getBaseX(); shouldFuse.y = getRowY(4);
-        usePriority.x = getNeighbourX(shouldFuse); usePriority.y = getRowY(4);
+
+        usePriority.x = getBaseX(); usePriority.y = getRowY(4);
+        useCondition.x = getNeighbourX(usePriority); useCondition.y = getRowY(4);
+        //alwaysPlay.x = getBaseX(); alwaysPlay.y = getRowY(5);
+        shouldFuse.x = getBaseX(); shouldFuse.y = getRowY(5);
         useDelay.x = getBaseX(); useDelay.y = getRowY(5);
-        useCondition.x = getNeighbourX(useDelay); useCondition.y = getRowY(5);
+
     }
 
     @Override
     public void render(MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+        boolean isMusic = AmbienceType.MUSIC.equals(getType());
+        shouldFuse.active = isMusic;
+        shouldFuse.visible = isMusic;
+        useDelay.active = !isMusic;
+        useDelay.visible = !isMusic;
+
         textSoundName.render(matrix, mouseX, mouseY);
         soundName.render(matrix, mouseX, mouseY, partialTicks);
         soundButton.render(matrix, mouseX, mouseY, partialTicks);
@@ -154,9 +181,12 @@ public class MainTab extends AbstractTab {
         useDelay.render(matrix, mouseX, mouseY, partialTicks);
         usePriority.render(matrix, mouseX, mouseY, partialTicks);
         useCondition.render(matrix, mouseX, mouseY, partialTicks);
+        //alwaysPlay.render(matrix, mouseX, mouseY, partialTicks);
 
         textCategory.render(matrix, mouseX, mouseY);
         listCategory.render(matrix, mouseX, mouseY);
+        textType.render(matrix, mouseX, mouseY);
+        listType.render(matrix, mouseX, mouseY);
     }
 
     @Override
@@ -179,6 +209,11 @@ public class MainTab extends AbstractTab {
         if(textCategory.isHovered()) {
             list.add(TextFormatting.RED + "Category");
             list.add(TextFormatting.GRAY + "Category the sound should play as.");
+            drawHoveringText(matrix, list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+        if(textType.isHovered()) {
+            list.add(TextFormatting.RED + "Type");
+            list.add(TextFormatting.GRAY + "What kind of sound is it?");
             drawHoveringText(matrix, list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
         }
         if(textVolume.isHovered()) {
@@ -228,6 +263,11 @@ public class MainTab extends AbstractTab {
             list.add("This block will only play when a condition is met.");
             drawHoveringText(matrix, list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
         }
+        /*if(alwaysPlay.isHovered()) {
+            list.add(TextFormatting.RED + "Always play");
+            list.add("This block starts playing muted as soon as it loads in to make it sound more seamless.");
+            drawHoveringText(matrix, list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }*/
     }
 
     @Override
@@ -246,16 +286,20 @@ public class MainTab extends AbstractTab {
     public void setFieldFromData(AmbienceTileEntityData data) {
         soundName.setText(data.getSoundName());
         listCategory.setSelectionByString(data.getCategory());
+        listType.setSelectionByString(data.getType());
         soundVolume.setText(String.valueOf(data.getVolume()));
         soundPitch.setText(String.valueOf(data.getPitch()));
         soundFadeIn.setText(String.valueOf(data.getFadeIn()));
         soundFadeOut.setText(String.valueOf(data.getFadeOut()));
 
         //needRedstone.setChecked(data.needsRedstone());
-        shouldFuse.setChecked(data.shouldFuse());
-        useDelay.setChecked(data.isUsingDelay());
+        if(AmbienceType.MUSIC.equals(getType()))
+            shouldFuse.setChecked(data.shouldFuse());
+        if(AmbienceType.AMBIENT.equals(getType()))
+            useDelay.setChecked(data.isUsingDelay());
         usePriority.setChecked(data.isUsingPriority());
         useCondition.setChecked(data.isUsingCondition());
+        //alwaysPlay.setChecked(data.shouldAlwaysPlay());
     }
 
     @Override
@@ -263,16 +307,20 @@ public class MainTab extends AbstractTab {
         data.setSoundName(soundName.getText());
         //data.setCategory(SoundCategory.valueOf(listCategory.getSelectedString()).getName());
         data.setCategory(ParsingUtil.tryParseEnum(listCategory.getSelectedString().toUpperCase(), SoundCategory.MASTER).getName());
+        data.setType(ParsingUtil.tryParseEnum(listType.getSelectedString().toUpperCase(), AmbienceType.AMBIENT).getName());
         data.setVolume(ParsingUtil.tryParseFloat(soundVolume.getText()));
         data.setPitch(ParsingUtil.tryParseFloat(soundPitch.getText()));
         data.setFadeIn(ParsingUtil.tryParseInt(soundFadeIn.getText()));
         data.setFadeOut(ParsingUtil.tryParseInt(soundFadeOut.getText()));
 
         //data.setNeedRedstone(needRedstone.isChecked());
-        data.setShouldFuse(shouldFuse.isChecked());
-        data.setUseDelay(useDelay.isChecked());
+        if(AmbienceType.MUSIC.equals(getType()))
+            data.setShouldFuse(shouldFuse.isChecked());
+        if(AmbienceType.AMBIENT.equals(getType()))
+            data.setUseDelay(useDelay.isChecked());
         data.setUsePriority(usePriority.isChecked());
         data.setUseCondition(useCondition.isChecked());
+        //data.setAlwaysPlay(alwaysPlay.isChecked());
     }
 
     @Override
@@ -283,5 +331,9 @@ public class MainTab extends AbstractTab {
     @Override
     public void onDeactivate() {
 
+    }
+
+    public AmbienceType getType() {
+        return AmbienceType.valueOf(listType.getSelectedString().toUpperCase());
     }
 }

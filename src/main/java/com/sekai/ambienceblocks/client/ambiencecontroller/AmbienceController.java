@@ -90,7 +90,6 @@ public class AmbienceController {
         //BlockPos pos = mc.player.getPosition().add(0, 0, 2);
         MatrixStack matrixStack = event.getMatrixStack();
 
-        matrixStack.push();
         //Matrix4f matrix4f = matrixStack.getLast().getMatrix();
         //RenderSystem.multMatrix(matrix4f);
 
@@ -109,32 +108,6 @@ public class AmbienceController {
         Tessellator.getInstance().draw();
         RenderSystem.depthFunc(515);
         RenderSystem.popMatrix();
-
-
-        /*for(TileEntity tile : mc.world.loadedTileEntityList) {
-            if(!(tile instanceof AmbienceTileEntity))
-                continue;
-
-            BlockPos pos = tile.getPos();
-
-            matrixStack.push(); // push
-            matrixStack.translate(-renderInfo.getProjectedView().getX(), -renderInfo.getProjectedView().getY(), -renderInfo.getProjectedView().getZ()); // translate back to camera
-            Matrix4f matrix4f = matrixStack.getLast().getMatrix();
-            RenderSystem.multMatrix(matrix4f);
-            RenderSystem.depthFunc(519);
-            //Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation("textures/block/stone.png"));
-            Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-            drawBlock(Tessellator.getInstance().getBuffer(), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 1, 0, 1, 0.5, 0.5, 0.5);
-            matrixStack.translate(renderInfo.getProjectedView().getX(), renderInfo.getProjectedView().getY(), renderInfo.getProjectedView().getZ());
-            Tessellator.getInstance().draw();
-            //RenderSystem.multMatrix(matrix4f);
-            //matrixStack.translate(0, 0, 0); // reset translation
-            //matrixStack.translate(renderInfo.getProjectedView().getX(), renderInfo.getProjectedView().getY(), renderInfo.getProjectedView().getZ()); // reset
-            RenderSystem.depthFunc(515);
-            matrixStack.pop(); // pop
-        }*/
-
-        matrixStack.pop();
 
         /*IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         IVertexBuilder builder = buffer.getBuffer(RenderType.getLines());

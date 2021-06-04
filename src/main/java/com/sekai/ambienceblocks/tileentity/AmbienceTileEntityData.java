@@ -3,6 +3,7 @@ package com.sekai.ambienceblocks.tileentity;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.AbstractBounds;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.SphereBounds;
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.CondsUtil;
 import com.sekai.ambienceblocks.util.NBTHelper;
@@ -26,8 +27,10 @@ public class AmbienceTileEntityData
 
     //main
     private String soundName = "";
-    private boolean shouldFuse = false;
     private String category = SoundCategory.MASTER.getName();
+    private String type = AmbienceType.AMBIENT.getName();
+    private boolean shouldFuse = false;
+    //private boolean alwaysPlay = false;
 
     //sounds
     private float volume = 1.0f;
@@ -65,8 +68,10 @@ public class AmbienceTileEntityData
     //NBT util
     public CompoundNBT toNBT(CompoundNBT compound) {
         compound.putString("musicName", this.soundName);
-        compound.putBoolean("shouldFuse", this.shouldFuse);
         compound.putString("category", this.category);
+        compound.putString("type", this.type);
+        compound.putBoolean("shouldFuse", this.shouldFuse);
+        //compound.putBoolean("alwaysPlay", this.alwaysPlay);
 
         compound.putFloat("volume", this.volume);
         compound.putFloat("pitch", this.pitch);
@@ -110,8 +115,10 @@ public class AmbienceTileEntityData
 
     public void fromNBT(CompoundNBT compound) {
         this.soundName = compound.getString("musicName");
-        this.shouldFuse = compound.getBoolean("shouldFuse");
         this.category = compound.getString("category");
+        this.type = compound.getString("type");
+        this.shouldFuse = compound.getBoolean("shouldFuse");
+        //this.alwaysPlay = compound.getBoolean("alwaysPlay");
 
         this.volume = compound.getFloat("volume");
         this.pitch = compound.getFloat("pitch");
@@ -159,8 +166,12 @@ public class AmbienceTileEntityData
     public void toBuff(PacketBuffer buf) {
         //Encode the data for the buffer
         buf.writeString(this.soundName, 50);
-        buf.writeBoolean(this.shouldFuse);
         buf.writeString(this.category, 20);
+        buf.writeString(this.type, 10);
+        //buf.writeBoolean(this.alwaysPlay);
+
+        if(AmbienceType.MUSIC.getName().equals(type))
+            buf.writeBoolean(this.shouldFuse);
 
         buf.writeFloat(this.volume);
         buf.writeFloat(this.pitch);
@@ -180,18 +191,20 @@ public class AmbienceTileEntityData
         buf.writeDouble(this.offset.z);
         buf.writeBoolean(this.isGlobal);
 
-        buf.writeBoolean(this.useDelay);
-        if(useDelay) {
-            buf.writeInt(this.minDelay);
-            buf.writeInt(this.maxDelay);
-            buf.writeBoolean(this.canPlayOverSelf);
-            buf.writeBoolean(this.shouldStopPrevious);
+        if(AmbienceType.AMBIENT.getName().equals(type)) {
+            buf.writeBoolean(this.useDelay);
+            if (useDelay) {
+                buf.writeInt(this.minDelay);
+                buf.writeInt(this.maxDelay);
+                buf.writeBoolean(this.canPlayOverSelf);
+                buf.writeBoolean(this.shouldStopPrevious);
 
-            buf.writeFloat(this.minRandVolume);
-            buf.writeFloat(this.maxRandVolume);
+                buf.writeFloat(this.minRandVolume);
+                buf.writeFloat(this.maxRandVolume);
 
-            buf.writeFloat(this.minRandPitch);
-            buf.writeFloat(this.maxRandPitch);
+                buf.writeFloat(this.minRandPitch);
+                buf.writeFloat(this.maxRandPitch);
+            }
         }
 
         buf.writeBoolean(this.useCondition);
@@ -206,8 +219,12 @@ public class AmbienceTileEntityData
     public void fromBuff(PacketBuffer buf) {
         //Decode the data from the buffer
         this.soundName = buf.readString(50);
-        this.shouldFuse = buf.readBoolean();
         this.category = buf.readString(20);
+        this.type = buf.readString(10);
+        //this.alwaysPlay = buf.readBoolean();
+
+        if(AmbienceType.MUSIC.getName().equals(type))
+            this.shouldFuse = buf.readBoolean();
 
         this.volume = buf.readFloat();
         this.pitch = buf.readFloat();
@@ -224,18 +241,20 @@ public class AmbienceTileEntityData
         this.offset = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
         this.isGlobal = buf.readBoolean();
 
-        this.useDelay = buf.readBoolean();
-        if(useDelay) {
-            this.minDelay = buf.readInt();
-            this.maxDelay = buf.readInt();
-            this.canPlayOverSelf = buf.readBoolean();
-            this.shouldStopPrevious = buf.readBoolean();
+        if(AmbienceType.AMBIENT.getName().equals(type)) {
+            this.useDelay = buf.readBoolean();
+            if (useDelay) {
+                this.minDelay = buf.readInt();
+                this.maxDelay = buf.readInt();
+                this.canPlayOverSelf = buf.readBoolean();
+                this.shouldStopPrevious = buf.readBoolean();
 
-            this.minRandVolume = buf.readFloat();
-            this.maxRandVolume = buf.readFloat();
+                this.minRandVolume = buf.readFloat();
+                this.maxRandVolume = buf.readFloat();
 
-            this.minRandPitch = buf.readFloat();
-            this.maxRandPitch = buf.readFloat();
+                this.minRandPitch = buf.readFloat();
+                this.maxRandPitch = buf.readFloat();
+            }
         }
 
         this.useCondition = buf.readBoolean();
@@ -268,6 +287,10 @@ public class AmbienceTileEntityData
     public String getCategory() { return category; }
 
     public void setCategory(String category) { this.category = category; }
+
+    public String getType() { return type; }
+
+    public void setType(String type) { this.type = type; }
 
     public boolean shouldFuse() {
         return shouldFuse;
@@ -363,6 +386,14 @@ public class AmbienceTileEntityData
     public void setConditions(List<AbstractCond> conditions) {
         this.conditions = conditions;
     }
+
+    /*public boolean shouldAlwaysPlay() {
+        return alwaysPlay;
+    }
+
+    public void setAlwaysPlay(boolean alwaysPlay) {
+        this.alwaysPlay = alwaysPlay;
+    }*/
 
     public AbstractBounds getBounds() {
         return bounds;
@@ -496,7 +527,8 @@ public class AmbienceTileEntityData
             if(getSoundName().charAt(i) != ':')
                 hue += getSoundName().charAt(i) - 97;
         }
-        //hue = hue%360;
+        hue *= 2;
+
         float U = (float) Math.cos(hue*Math.PI/180);
         float W = (float) Math.sin(hue*Math.PI/180);
 

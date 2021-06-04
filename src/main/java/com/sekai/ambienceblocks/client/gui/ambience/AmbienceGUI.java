@@ -7,6 +7,7 @@ import com.sekai.ambienceblocks.client.gui.ambience.tabs.*;
 import com.sekai.ambienceblocks.packets.PacketUpdateAmbienceTE;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
 import com.sekai.ambienceblocks.util.PacketHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
@@ -38,6 +39,7 @@ public class AmbienceGUI extends AmbienceScreen {
     public static final int tabEdgeWidth = 16, tabHeight = 16;
 
     private MainTab mainTab = new MainTab(this);
+    private MusicTab musicTab = new MusicTab(this);
     private BoundsTab boundsTab = new BoundsTab(this);
     //private FuseTab fuseTab = new FuseTab(this);
     private PriorityTab priorityTab = new PriorityTab(this);
@@ -253,6 +255,8 @@ public class AmbienceGUI extends AmbienceScreen {
 
         list.add(mainTab);
 
+        list.add(musicTab);
+
         list.add(boundsTab);
 
         //list.add(fuseTab);
@@ -273,6 +277,14 @@ public class AmbienceGUI extends AmbienceScreen {
 
         list.add(mainTab);
 
+        try {
+            if(AmbienceType.MUSIC.equals(mainTab.getType()))
+                list.add(musicTab);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+
+
         list.add(boundsTab);
 
         //if(mainTab.shouldFuse.isChecked())
@@ -281,7 +293,7 @@ public class AmbienceGUI extends AmbienceScreen {
         if(mainTab.usePriority.isChecked())
             list.add(priorityTab);
 
-        if(mainTab.useDelay.isChecked())
+        if(mainTab.useDelay.isChecked() && AmbienceType.AMBIENT.equals(mainTab.getType()))
             list.add(delayTab);
 
         if(mainTab.useCondition.isChecked())
