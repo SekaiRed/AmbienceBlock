@@ -1,0 +1,30 @@
+{
+  "itemGroup.ambiencetab": "Ambience Blocks",
+
+  "block.ambienceblocks.ambience_block": "Ambience Block",
+  "block.ambienceblocks.invisible_ambience_block": "Invisible Ambience Block",
+  "item.ambienceblocks.ambience_block_finder": "Ambience Block Finder",
+
+  "ui.ambienceblocks.music_id": "Sound ID",
+  "ui.ambienceblocks.music_par": "Sound Parameters",
+  "ui.ambienceblocks.bounds": "Bounds Detection",
+  "ui.ambienceblocks.delay": "Delay",
+  "ui.ambienceblocks.bounds.sphere": "Sphere",
+  "ui.ambienceblocks.bounds.cylinder": "Cylinder",
+  "ui.ambienceblocks.bounds.cubic": "Cubic",
+  "ui.ambienceblocks.radius": "Radius",
+  "ui.ambienceblocks.length": "Length",
+  "ui.ambienceblocks.priority": "Priority",
+  "ui.ambienceblocks.channel": "Channel",
+  "ui.ambienceblocks.category": "Category",
+  "ui.ambienceblocks.volume": "Volume",
+  "ui.ambienceblocks.pitch": "Pitch",
+  "ui.ambienceblocks.copy": "Copy",
+  "ui.ambienceblocks.paste": "Paste",
+  "ui.ambienceblocks.offset": "Offset",
+  "ui.ambienceblocks.min": "Min",
+  "ui.ambienceblocks.max": "Max",
+  "ui.ambienceblocks.type": "Type",
+  "ui.ambienceblocks.axis": "Axis",
+  "ui.ambienceblocks.random": "Random"
+}
