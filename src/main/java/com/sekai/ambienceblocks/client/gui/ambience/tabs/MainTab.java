@@ -22,6 +22,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -287,8 +290,17 @@ public class MainTab extends AbstractTab {
         soundName.setText(data.getSoundName());
         listCategory.setSelectionByString(data.getCategory());
         listType.setSelectionByString(data.getType());
-        soundVolume.setText(String.valueOf(data.getVolume()));
-        soundPitch.setText(String.valueOf(data.getPitch()));
+        //System.out.println(data.getVolume());
+        //todo what the fuck is going on
+        //soundVolume.setText(String.format("%.7f", data.getVolume()));
+        //soundPitch.setText(String.format("%.7f", data.getPitch()));
+        NumberFormat df = DecimalFormat.getInstance();
+        df.setMinimumFractionDigits(1);
+        df.setMaximumFractionDigits(4);
+        df.setRoundingMode(RoundingMode.HALF_EVEN);
+        soundVolume.setText(df.format(data.getVolume()));
+        soundPitch.setText(df.format(data.getPitch()));
+
         soundFadeIn.setText(String.valueOf(data.getFadeIn()));
         soundFadeOut.setText(String.valueOf(data.getFadeOut()));
 
@@ -308,6 +320,7 @@ public class MainTab extends AbstractTab {
         //data.setCategory(SoundCategory.valueOf(listCategory.getSelectedString()).getName());
         data.setCategory(ParsingUtil.tryParseEnum(listCategory.getSelectedString().toUpperCase(), SoundCategory.MASTER).getName());
         data.setType(ParsingUtil.tryParseEnum(listType.getSelectedString().toUpperCase(), AmbienceType.AMBIENT).getName());
+        //System.out.println(ParsingUtil.tryParseFloat(soundVolume.getText()));
         data.setVolume(ParsingUtil.tryParseFloat(soundVolume.getText()));
         data.setPitch(ParsingUtil.tryParseFloat(soundPitch.getText()));
         data.setFadeIn(ParsingUtil.tryParseInt(soundFadeIn.getText()));
