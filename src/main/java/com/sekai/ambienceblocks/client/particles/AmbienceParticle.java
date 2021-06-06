@@ -14,6 +14,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+@OnlyIn(Dist.CLIENT)
 public class AmbienceParticle extends SpriteTexturedParticle {
     /*protected AmbienceParticle(ClientWorld world, double x, double y, double z) {
         super(world, x, y, z);

@@ -1,5 +1,7 @@
 package com.sekai.ambienceblocks.util;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
@@ -164,5 +166,13 @@ public class ParsingUtil {
 
     public static Vector3i Vec3dToVec3i(Vector3d offset) {
         return new Vector3i(Math.round(offset.x), Math.round(offset.y), Math.round(offset.z));
+    }
+
+    public static boolean isValidSound(String name) {
+        for(ResourceLocation resource : Minecraft.getInstance().getSoundHandler().getAvailableSounds()) {
+            if(resource.toString().equals(name))
+                return true;
+        }
+        return false;
     }
 }

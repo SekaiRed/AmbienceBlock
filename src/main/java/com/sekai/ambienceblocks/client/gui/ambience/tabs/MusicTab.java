@@ -26,7 +26,7 @@ public class MusicTab extends AbstractTab {
     public TextInstance textOutroName = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.outro") + " :", font);
     public TextFieldWidget outroName = new TextFieldWidget(font, getNeighbourX(textOutroName), getRowY(1), getEndX() - getNeighbourX(textOutroName) - 20 - separation, 20, new StringTextComponent(""));
     public Button outroButton = guiRef.addButton(new Button(getNeighbourX(outroName), getRowY(1) + getOffsetY(20), 20, 20, new StringTextComponent("..."), button -> {
-        Minecraft.getInstance().displayGuiScreen(new ChooseSoundGUI(this.guiRef, introName));
+        Minecraft.getInstance().displayGuiScreen(new ChooseSoundGUI(this.guiRef, outroName));
     }));
 
     //public CheckboxWidget shouldFuse = new CheckboxWidget(getBaseX(), getRowY(2), 20 + font.getStringWidth("Should fuse") + checkboxOffset, 20, "Should fuse", false);
@@ -140,12 +140,14 @@ public class MusicTab extends AbstractTab {
 
     @Override
     public void setFieldFromData(AmbienceTileEntityData data) {
-
+        introName.setText(data.getIntroName());
+        outroName.setText(data.getOutroName());
     }
 
     @Override
     public void setDataFromField(AmbienceTileEntityData data) {
-
+        data.setIntroName(introName.getText());
+        data.setOutroName(outroName.getText());
     }
 
     @Override

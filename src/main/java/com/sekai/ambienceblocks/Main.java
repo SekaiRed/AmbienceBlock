@@ -1,15 +1,11 @@
 package com.sekai.ambienceblocks;
 
-import com.sekai.ambienceblocks.client.particles.AmbienceParticleFactory;
-import com.sekai.ambienceblocks.util.EventHandler;
-import com.sekai.ambienceblocks.util.PacketHandler;
-import com.sekai.ambienceblocks.util.RegistryHandler;
 import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.DebugOverlay;
-import net.minecraft.client.Minecraft;
+import com.sekai.ambienceblocks.util.PacketHandler;
+import com.sekai.ambienceblocks.util.RegistryHandler;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

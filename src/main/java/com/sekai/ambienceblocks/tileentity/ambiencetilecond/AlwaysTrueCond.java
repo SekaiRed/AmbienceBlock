@@ -36,7 +36,7 @@ public class AlwaysTrueCond extends AbstractCond  {
 
     //gui
 
-    @Override
+    /*@Override
     public List<AmbienceWidgetHolder> getWidgets() {
         return new ArrayList<>();
     }
@@ -44,7 +44,7 @@ public class AlwaysTrueCond extends AbstractCond  {
     @Override
     public void getDataFromWidgets(List<AmbienceWidgetHolder> allWidgets) {
 
-    }
+    }*/
 
     @Override
     public CompoundNBT toNBT() {

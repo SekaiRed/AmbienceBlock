@@ -30,6 +30,8 @@ public class AmbienceTileEntityData
     private String category = SoundCategory.MASTER.getName();
     private String type = AmbienceType.AMBIENT.getName();
     private boolean shouldFuse = false;
+    private String introName = "";
+    private String outroName = "";
     //private boolean alwaysPlay = false;
 
     //sounds
@@ -70,8 +72,12 @@ public class AmbienceTileEntityData
         compound.putString("musicName", this.soundName);
         compound.putString("category", this.category);
         compound.putString("type", this.type);
-        compound.putBoolean("shouldFuse", this.shouldFuse);
-        //compound.putBoolean("alwaysPlay", this.alwaysPlay);
+
+        if(AmbienceType.MUSIC.getName().equals(type)) {
+            compound.putBoolean("shouldFuse", this.shouldFuse);
+            compound.putString("introName", this.introName);
+            compound.putString("outroName", this.outroName);
+        }
 
         compound.putFloat("volume", this.volume);
         compound.putFloat("pitch", this.pitch);
@@ -88,18 +94,20 @@ public class AmbienceTileEntityData
         compound.put("offset", NBTHelper.writeVec3d(this.offset));
         compound.putBoolean("isGlobal", this.isGlobal);
 
-        compound.putBoolean("useDelay", this.useDelay);
-        if(useDelay) {
-            compound.putInt("minDelay", this.minDelay);
-            compound.putInt("maxDelay", this.maxDelay);
-            compound.putBoolean("canPlayOverSelf", this.canPlayOverSelf);
-            compound.putBoolean("shouldStopPrevious", this.shouldStopPrevious);
+        if(AmbienceType.AMBIENT.getName().equals(type)) {
+            compound.putBoolean("useDelay", this.useDelay);
+            if (useDelay) {
+                compound.putInt("minDelay", this.minDelay);
+                compound.putInt("maxDelay", this.maxDelay);
+                compound.putBoolean("canPlayOverSelf", this.canPlayOverSelf);
+                compound.putBoolean("shouldStopPrevious", this.shouldStopPrevious);
 
-            compound.putFloat("minRandVolume", this.minRandVolume);
-            compound.putFloat("maxRandVolume", this.maxRandVolume);
+                compound.putFloat("minRandVolume", this.minRandVolume);
+                compound.putFloat("maxRandVolume", this.maxRandVolume);
 
-            compound.putFloat("minRandPitch", this.minRandPitch);
-            compound.putFloat("maxRandPitch", this.maxRandPitch);
+                compound.putFloat("minRandPitch", this.minRandPitch);
+                compound.putFloat("maxRandPitch", this.maxRandPitch);
+            }
         }
 
         compound.putBoolean("useCondition", this.useCondition);
@@ -117,8 +125,12 @@ public class AmbienceTileEntityData
         this.soundName = compound.getString("musicName");
         this.category = compound.getString("category");
         this.type = compound.getString("type");
-        this.shouldFuse = compound.getBoolean("shouldFuse");
-        //this.alwaysPlay = compound.getBoolean("alwaysPlay");
+
+        if(AmbienceType.MUSIC.getName().equals(type)) {
+            this.shouldFuse = compound.getBoolean("shouldFuse");
+            this.introName = compound.getString("introName");
+            this.outroName = compound.getString("outroName");
+        }
 
         this.volume = compound.getFloat("volume");
         this.pitch = compound.getFloat("pitch");
@@ -136,18 +148,20 @@ public class AmbienceTileEntityData
         this.offset = NBTHelper.readVec3d(compound.getCompound("offset"));
         this.isGlobal = compound.getBoolean("isGlobal");
 
-        this.useDelay = compound.getBoolean("useDelay");
-        if(useDelay) {
-            this.minDelay = compound.getInt("minDelay");
-            this.maxDelay = compound.getInt("maxDelay");
-            this.canPlayOverSelf = compound.getBoolean("canPlayOverSelf");
-            this.shouldStopPrevious = compound.getBoolean("shouldStopPrevious");
+        if(AmbienceType.AMBIENT.getName().equals(type)) {
+            this.useDelay = compound.getBoolean("useDelay");
+            if (useDelay) {
+                this.minDelay = compound.getInt("minDelay");
+                this.maxDelay = compound.getInt("maxDelay");
+                this.canPlayOverSelf = compound.getBoolean("canPlayOverSelf");
+                this.shouldStopPrevious = compound.getBoolean("shouldStopPrevious");
 
-            this.minRandVolume = compound.getFloat("minRandVolume");
-            this.maxRandVolume = compound.getFloat("maxRandVolume");
+                this.minRandVolume = compound.getFloat("minRandVolume");
+                this.maxRandVolume = compound.getFloat("maxRandVolume");
 
-            this.minRandPitch = compound.getFloat("minRandPitch");
-            this.maxRandPitch = compound.getFloat("maxRandPitch");
+                this.minRandPitch = compound.getFloat("minRandPitch");
+                this.maxRandPitch = compound.getFloat("maxRandPitch");
+            }
         }
 
         this.useCondition = compound.getBoolean("useCondition");
@@ -170,8 +184,11 @@ public class AmbienceTileEntityData
         buf.writeString(this.type, 10);
         //buf.writeBoolean(this.alwaysPlay);
 
-        if(AmbienceType.MUSIC.getName().equals(type))
+        if(AmbienceType.MUSIC.getName().equals(type)) {
             buf.writeBoolean(this.shouldFuse);
+            buf.writeString(this.introName);
+            buf.writeString(this.outroName);
+        }
 
         buf.writeFloat(this.volume);
         buf.writeFloat(this.pitch);
@@ -223,8 +240,14 @@ public class AmbienceTileEntityData
         this.type = buf.readString(10);
         //this.alwaysPlay = buf.readBoolean();
 
-        if(AmbienceType.MUSIC.getName().equals(type))
+        if(AmbienceType.MUSIC.getName().equals(type)) {
             this.shouldFuse = buf.readBoolean();
+            this.introName = buf.readString(50);
+            this.outroName = buf.readString(50);
+        }
+
+        //if(AmbienceType.MUSIC.getName().equals(type))
+        //    this.shouldFuse = buf.readBoolean();
 
         this.volume = buf.readFloat();
         this.pitch = buf.readFloat();
@@ -284,6 +307,26 @@ public class AmbienceTileEntityData
     //Getter and setter
     public String getSoundName() { return soundName; }
 
+    public void setSoundName(String soundName) {
+        this.soundName = soundName;
+    }
+
+    public String getIntroName() {
+        return introName;
+    }
+
+    public void setIntroName(String introName) {
+        this.introName = introName;
+    }
+
+    public String getOutroName() {
+        return outroName;
+    }
+
+    public void setOutroName(String introName) {
+        this.outroName = introName;
+    }
+
     public String getCategory() { return category; }
 
     public void setCategory(String category) { this.category = category; }
@@ -314,10 +357,6 @@ public class AmbienceTileEntityData
 
     public void setPitch(float pitch) {
         this.pitch = pitch;
-    }
-
-    public void setSoundName(String soundName) {
-        this.soundName = soundName;
     }
 
     public int getFadeIn() {

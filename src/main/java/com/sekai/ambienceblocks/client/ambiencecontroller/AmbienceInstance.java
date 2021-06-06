@@ -14,17 +14,18 @@ public class AmbienceInstance extends TickableSound {
     private float internalPitch = 1f;
     private BlockPos internalPos;
 
+    /*
     //fade in
     private int fadingInCounter;
     private boolean fadingIn;
-    private final int fadeIn;
+    private int fadeIn;
 
     //fade out
     private int fadingOutCounter;
     private boolean fadingOut;
-    private int fadeOut;
+    private int fadeOut;*/
 
-    public AmbienceInstance(ResourceLocation soundId, SoundCategory categoryIn, BlockPos pos, float volume, float pitch, int fadeIn, boolean repeat) {
+    public AmbienceInstance(ResourceLocation soundId, SoundCategory categoryIn, BlockPos pos, float volume, float pitch/*int fadeIn*/, boolean repeat) {
         super(new SoundEvent(soundId), categoryIn);
         this.volume = volume;
         internalVolume = volume;
@@ -43,7 +44,7 @@ public class AmbienceInstance extends TickableSound {
         this.repeatDelay = 0;
         this.attenuationType = AttenuationType.NONE;
 
-        this.fadeIn = fadeIn;
+        /*this.fadeIn = fadeIn;
 
         if(fadeIn != 0) {
             this.volume = 0.00001f;
@@ -52,7 +53,7 @@ public class AmbienceInstance extends TickableSound {
         } else {
             fadingInCounter = 0;
             fadingIn = false;
-        }
+        }*/
     }
 
     public void setVolume(float volume) {
@@ -80,9 +81,7 @@ public class AmbienceInstance extends TickableSound {
 
     @Override
     public void tick() {
-        float audioMult = 1f;
-
-        if(fadingIn) {
+        /*if(fadingIn) {
             if(fadingInCounter >= fadeIn) {
                 fadingIn = false;
             } else {
@@ -99,11 +98,11 @@ public class AmbienceInstance extends TickableSound {
                 audioMult *= fadingOutCounter / (float)fadeOut;
                 fadingOutCounter--;
             }
-        }
+        }*/
 
         //update volume if it changed
-        if(internalVolume != volume || audioMult != 1f) {
-            this.volume = internalVolume * audioMult;
+        if(internalVolume != volume) {
+            this.volume = internalVolume;
         }
 
         if(internalPitch != pitch)
@@ -117,8 +116,8 @@ public class AmbienceInstance extends TickableSound {
     }
 
     public void stop(int fadeOut) {
-        this.fadeOut = fadeOut;
+        /*this.fadeOut = fadeOut;
         fadingOutCounter = fadeOut;
-        fadingOut = true;
+        fadingOut = true;*/
     }
 }
