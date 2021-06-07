@@ -3,6 +3,9 @@ package com.sekai.ambienceblocks.tileentity.ambiencetilecond;
 import com.sekai.ambienceblocks.client.gui.widgets.presets.textfield.CustomTextField;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceTest;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceWidgetHolder;
+import com.sekai.ambienceblocks.tileentity.util.messenger.AbstractAmbienceWidgetMessenger;
+import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetEnum;
+import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
@@ -58,6 +61,24 @@ public class PlayerHungerCond extends AbstractCond {
     //gui
 
     @Override
+    public List<AbstractAmbienceWidgetMessenger> getWidgets() {
+        List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
+        list.add(new AmbienceWidgetEnum<>(TEST, 20, test));
+        list.add(new AmbienceWidgetString(VALUE, 50, Double.toString(value)));
+        return list;
+    }
+
+    @Override
+    public void getDataFromWidgets(List<AbstractAmbienceWidgetMessenger> allWidgets) {
+        for(AbstractAmbienceWidgetMessenger widget : allWidgets) {
+            if(TEST.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
+                test = (AmbienceTest) ((AmbienceWidgetEnum) widget).getValue();
+            if(VALUE.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
+                value = ParsingUtil.tryParseDouble(((AmbienceWidgetString) widget).getValue());
+        }
+    }
+
+    /*@Override
     public List<AmbienceWidgetHolder> getWidgets() {
         List<AmbienceWidgetHolder> list = new ArrayList<>();
         list.add(new AmbienceWidgetHolder(getName() + "." + TEST, new Button(0, 0, 20, 20, new StringTextComponent(test.getName()), button -> {
@@ -76,7 +97,7 @@ public class PlayerHungerCond extends AbstractCond {
                 value = ParsingUtil.tryParseDouble(((CustomTextField) widgetHolder.get()).getText());
             }
         }
-    }
+    }*/
 
     @Override
     public CompoundNBT toNBT() {

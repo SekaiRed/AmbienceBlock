@@ -1,7 +1,12 @@
 package com.sekai.ambienceblocks.tileentity.ambiencetilecond;
 
 import com.sekai.ambienceblocks.tileentity.util.AmbienceEquality;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceTest;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceWidgetHolder;
+import com.sekai.ambienceblocks.tileentity.util.messenger.AbstractAmbienceWidgetMessenger;
+import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetEnum;
+import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetString;
+import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -44,7 +49,7 @@ public class WorldNeedRedstoneCond extends AbstractCond {
 
     //gui
 
-    @Override
+    /*@Override
     public List<AmbienceWidgetHolder> getWidgets() {
         List<AmbienceWidgetHolder> list = new ArrayList<>();
         list.add(new AmbienceWidgetHolder(getName() + "." + EQUAL, new Button(0, 0, 20, 20, new StringTextComponent(equal.getName()), button -> {
@@ -57,6 +62,21 @@ public class WorldNeedRedstoneCond extends AbstractCond {
     @Override
     public void getDataFromWidgets(List<AmbienceWidgetHolder> allWidgets) {
 
+    }*/
+
+    @Override
+    public List<AbstractAmbienceWidgetMessenger> getWidgets() {
+        List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
+        list.add(new AmbienceWidgetEnum<>(EQUAL, 20, equal));
+        return list;
+    }
+
+    @Override
+    public void getDataFromWidgets(List<AbstractAmbienceWidgetMessenger> allWidgets) {
+        for(AbstractAmbienceWidgetMessenger widget : allWidgets) {
+            if(EQUAL.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
+                equal = (AmbienceEquality) ((AmbienceWidgetEnum) widget).getValue();
+        }
     }
 
     @Override

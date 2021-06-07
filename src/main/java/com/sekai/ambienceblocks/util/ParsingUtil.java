@@ -1,5 +1,9 @@
 package com.sekai.ambienceblocks.util;
 
+import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceEquality;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceTest;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceWeather;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -10,6 +14,17 @@ import net.minecraft.util.text.StringTextComponent;
 import java.util.function.Predicate;
 
 public class ParsingUtil {
+    //this is disgusting, someone needs to stop me
+    public static <E extends Enum<E>> String getCachedEnumName(E value) {
+        if(value instanceof AmbienceTest)
+            return ((AmbienceTest) value).getName();
+        if(value instanceof AmbienceEquality)
+            return ((AmbienceEquality) value).getName();
+        if(value instanceof AmbienceWeather)
+            return ((AmbienceWeather) value).getName();
+        return value.name();
+    }
+
     public static <E extends Enum<E>> E tryParseEnum(String value, E defaultVal) {
         try {
             return E.valueOf(defaultVal.getDeclaringClass(), value);

@@ -1,6 +1,7 @@
 package com.sekai.ambienceblocks.tileentity.ambiencetilecond;
 
 import com.sekai.ambienceblocks.tileentity.util.AmbienceWidgetHolder;
+import com.sekai.ambienceblocks.tileentity.util.messenger.AbstractAmbienceWidgetMessenger;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
@@ -36,15 +37,15 @@ public class AlwaysTrueCond extends AbstractCond  {
 
     //gui
 
-    /*@Override
-    public List<AmbienceWidgetHolder> getWidgets() {
+    @Override
+    public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         return new ArrayList<>();
     }
 
     @Override
-    public void getDataFromWidgets(List<AmbienceWidgetHolder> allWidgets) {
+    public void getDataFromWidgets(List<AbstractAmbienceWidgetMessenger> allWidgets) {
 
-    }*/
+    }
 
     @Override
     public CompoundNBT toNBT() {

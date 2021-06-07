@@ -240,6 +240,7 @@ public class AmbienceController {
             }
 
             //fusing volume and pitch shenanigans
+            //todo priority is broken with this system, maybe i could cache a priority value based on the collective one of all fuse blocks?
             if(slot.getOwner().data.shouldFuse()) {
                 float volume = 0;
                 float pitch = 0;

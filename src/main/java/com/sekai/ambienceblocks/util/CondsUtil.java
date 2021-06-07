@@ -43,7 +43,8 @@ public class CondsUtil {
         PLAYER_HUNGER(12, new PlayerHungerCond(AmbienceTest.GREATER_THAN, 10)),
         WORLD_WEATHER(20, new WorldWeatherCond(AmbienceEquality.EQUAL_TO, AmbienceWeather.CLEAR)),
         WORLD_DAYTIME(21, new WorldDaytimeCond(AmbienceTest.GREATER_THAN, 0)),
-        WORLD_REDSTONE(22, new WorldNeedRedstoneCond(AmbienceEquality.EQUAL_TO));
+        WORLD_REDSTONE(22, new WorldNeedRedstoneCond(AmbienceEquality.EQUAL_TO)),
+        AMBIENCE_PRIORITY(30, new AmbiencePriorityCond(AmbienceTest.EQUAL_TO, 0, 0));
 
         int metaValue;
         AbstractCond defaultCond;
