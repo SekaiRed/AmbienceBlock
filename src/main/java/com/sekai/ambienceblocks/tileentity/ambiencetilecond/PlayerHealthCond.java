@@ -84,8 +84,8 @@ public class PlayerHealthCond extends AbstractCond {
     @Override
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
-        list.add(new AmbienceWidgetEnum<>(TEST, 20, test));
-        list.add(new AmbienceWidgetString(VALUE, 50, Double.toString(value)));
+        list.add(new AmbienceWidgetEnum<>(TEST, "", 20, test));
+        list.add(new AmbienceWidgetString(VALUE, "Health :", 50, Double.toString(value), 8, ParsingUtil.decimalNumberFilter));
         return list;
         /*List<AmbienceWidgetHolder> list = new ArrayList<>();
         list.add(new AmbienceWidgetHolder(getName() + "." + TEST, new Button(0, 0, 20, 20, new StringTextComponent(test.getName()), button -> {

@@ -35,7 +35,7 @@ public class CondTab extends AbstractTab {
         buttonDown();
     });
 
-    StringListWidget condGuiList = new StringListWidget(getBaseX(), getRowY(0), getEndX() - getBaseX(), getRowY(5) - getRowY(0) - separation, 4, 16, font, null);
+    StringListWidget condGuiList = new StringListWidget(getBaseX(), getRowY(0), getEndX() - getBaseX(), getRowY(5) - getRowY(0) - verticalSeparation, 4, 16, font, null);
 
     public CondTab(AmbienceGUI guiRef) {
         super(guiRef);
@@ -168,8 +168,8 @@ public class CondTab extends AbstractTab {
     }
 
     public void replaceCond(int index, AbstractCond cond) {
-        System.out.println(cond.getListDescription());
-        System.out.println(condList.get(index).getListDescription());
+        //System.out.println(cond.getListDescription());
+        //System.out.println(condList.get(index).getListDescription());
 
         removeCond(index);
         condList.add(index, cond);

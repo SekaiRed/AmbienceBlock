@@ -3,7 +3,6 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.ambience.ChooseSoundGUI;
-import com.sekai.ambienceblocks.client.gui.widgets.CheckboxWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import net.minecraft.client.Minecraft;
@@ -11,20 +10,19 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MusicTab extends AbstractTab {
     public TextInstance textIntroName = new TextInstance(getBaseX(), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.intro") + " :", font);
-    public TextFieldWidget introName = new TextFieldWidget(font, getNeighbourX(textIntroName), getRowY(0), getEndX() - getNeighbourX(textIntroName) - 20 - separation, 20, new StringTextComponent(""));
+    public TextFieldWidget introName = new TextFieldWidget(font, getNeighbourX(textIntroName), getRowY(0), getEndX() - getNeighbourX(textIntroName) - 20 - horizontalSeparation, 20, new StringTextComponent(""));
     public Button introButton = guiRef.addButton(new Button(getNeighbourX(introName), getRowY(0) + getOffsetY(20), 20, 20, new StringTextComponent("..."), button -> {
         Minecraft.getInstance().displayGuiScreen(new ChooseSoundGUI(this.guiRef, introName));
     }));
 
     public TextInstance textOutroName = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.outro") + " :", font);
-    public TextFieldWidget outroName = new TextFieldWidget(font, getNeighbourX(textOutroName), getRowY(1), getEndX() - getNeighbourX(textOutroName) - 20 - separation, 20, new StringTextComponent(""));
+    public TextFieldWidget outroName = new TextFieldWidget(font, getNeighbourX(textOutroName), getRowY(1), getEndX() - getNeighbourX(textOutroName) - 20 - horizontalSeparation, 20, new StringTextComponent(""));
     public Button outroButton = guiRef.addButton(new Button(getNeighbourX(outroName), getRowY(1) + getOffsetY(20), 20, 20, new StringTextComponent("..."), button -> {
         Minecraft.getInstance().displayGuiScreen(new ChooseSoundGUI(this.guiRef, outroName));
     }));
@@ -88,11 +86,11 @@ public class MusicTab extends AbstractTab {
     @Override
     public void updateWidgetPosition() {
         textIntroName.x = getBaseX(); textIntroName.y = getRowY(0) + getOffsetY(font.FONT_HEIGHT);
-        introName.x = getNeighbourX(textIntroName); introName.y = getRowY(0); introName.setWidth(getEndX() - getNeighbourX(textIntroName) - 20 - separation);
+        introName.x = getNeighbourX(textIntroName); introName.y = getRowY(0); introName.setWidth(getEndX() - getNeighbourX(textIntroName) - 20 - horizontalSeparation);
         introButton.x = getNeighbourX(introName); introButton.y = getRowY(0) + getOffsetY(20);
 
         textOutroName.x = getBaseX(); textOutroName.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
-        outroName.x = getNeighbourX(textOutroName); outroName.y = getRowY(1); outroName.setWidth(getEndX() - getNeighbourX(textOutroName) - 20 - separation);
+        outroName.x = getNeighbourX(textOutroName); outroName.y = getRowY(1); outroName.setWidth(getEndX() - getNeighbourX(textOutroName) - 20 - horizontalSeparation);
         outroButton.x = getNeighbourX(outroName); outroButton.y = getRowY(1) + getOffsetY(20);
 
         //copy.x = getBaseX(); copy.y = getRowY(0);

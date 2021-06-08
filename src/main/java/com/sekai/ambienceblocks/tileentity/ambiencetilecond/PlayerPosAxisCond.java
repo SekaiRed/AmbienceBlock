@@ -94,10 +94,10 @@ public class PlayerPosAxisCond extends AbstractCond {
     @Override
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
-        list.add(new AmbienceWidgetEnum<>(TEST, 20, test));
-        list.add(new AmbienceWidgetEnum<>(AXIS, 20, axis));
+        list.add(new AmbienceWidgetEnum<>(TEST, "", 20, test));
+        list.add(new AmbienceWidgetEnum<>(AXIS, "Axis :",20, axis));
         //list.add(new AmbienceWidgetString(AXIS, 50, Double.toString(value)));
-        list.add(new AmbienceWidgetString(VALUE, 50, Double.toString(value)));
+        list.add(new AmbienceWidgetString(VALUE, "Position :", 50, Double.toString(value), 12, ParsingUtil.decimalNumberFilter));
         return list;
     }
 

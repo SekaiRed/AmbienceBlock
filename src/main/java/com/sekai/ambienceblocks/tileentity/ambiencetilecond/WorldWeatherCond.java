@@ -2,6 +2,7 @@ package com.sekai.ambienceblocks.tileentity.ambiencetilecond;
 
 import com.sekai.ambienceblocks.tileentity.util.*;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AbstractAmbienceWidgetMessenger;
+import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetEnum;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -78,12 +79,20 @@ public class WorldWeatherCond extends AbstractCond {
 
     @Override
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
-        return new ArrayList<>();
+        List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
+        list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
+        list.add(new AmbienceWidgetEnum<>(WEATHER, "Weather :",50, weather));
+        return list;
     }
 
     @Override
     public void getDataFromWidgets(List<AbstractAmbienceWidgetMessenger> allWidgets) {
-
+        for(AbstractAmbienceWidgetMessenger widget : allWidgets) {
+            if(EQUAL.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
+                equal = (AmbienceEquality) ((AmbienceWidgetEnum) widget).getValue();
+            if(WEATHER.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
+                weather = (AmbienceWeather) ((AmbienceWidgetEnum) widget).getValue();
+        }
     }
 
     @Override

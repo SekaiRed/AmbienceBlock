@@ -662,6 +662,14 @@ public class AmbienceController {
         }
     }*/
 
+    public boolean isSoundPlaying(String sound) {
+        for(AmbienceSlot slot : soundsList) {
+            if(slot.getMusicString().contains(sound))
+                return true;
+        }
+        return false;
+    }
+
     private boolean hasSameMusics(AmbienceTileEntityData oData, AmbienceTileEntityData nData) {
         //if(oData.equals(nData))
         //    return false;

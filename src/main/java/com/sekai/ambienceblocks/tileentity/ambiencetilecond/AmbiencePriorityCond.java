@@ -80,9 +80,9 @@ public class AmbiencePriorityCond extends AbstractCond {
     @Override
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
-        list.add(new AmbienceWidgetEnum<>(TEST, 20, test));
-        list.add(new AmbienceWidgetString(PRIORITY, 50, Integer.toString(priority)));
-        list.add(new AmbienceWidgetString(CHANNEL, 50, Integer.toString(channel)));
+        list.add(new AmbienceWidgetEnum<>(TEST, "", 20, test));
+        list.add(new AmbienceWidgetString(PRIORITY, "Priority :", 50, Integer.toString(priority), 2, ParsingUtil.numberFilter));
+        list.add(new AmbienceWidgetString(CHANNEL, "Channel :", 20, Integer.toString(channel), 1, ParsingUtil.numberFilter));
         return list;
     }
 

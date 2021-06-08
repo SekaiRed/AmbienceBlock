@@ -1,6 +1,6 @@
 package com.sekai.ambienceblocks.tileentity.util;
 
-public enum AmbienceType {
+public enum AmbienceType implements AmbienceEnumName {
     AMBIENT("ambient"),
     MUSIC("music");
 

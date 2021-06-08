@@ -7,6 +7,7 @@ import com.sekai.ambienceblocks.tileentity.util.AmbienceTest;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceWeather;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.GameType;
 
 public class CondsUtil {
     //nbt stuff
@@ -41,10 +42,12 @@ public class CondsUtil {
         PLAYER_POS_AXIS(10, new PlayerPosAxisCond(AmbienceTest.EQUAL_TO, AmbienceAxis.X, 0)),
         PLAYER_HEALTH(11, new PlayerHealthCond(AmbienceTest.GREATER_THAN, 10)),
         PLAYER_HUNGER(12, new PlayerHungerCond(AmbienceTest.GREATER_THAN, 10)),
+        PLAYER_GAMEMODE(13, new PlayerGamemodeCond(AmbienceEquality.EQUAL_TO, GameType.SURVIVAL)),
         WORLD_WEATHER(20, new WorldWeatherCond(AmbienceEquality.EQUAL_TO, AmbienceWeather.CLEAR)),
         WORLD_DAYTIME(21, new WorldDaytimeCond(AmbienceTest.GREATER_THAN, 0)),
         WORLD_REDSTONE(22, new WorldNeedRedstoneCond(AmbienceEquality.EQUAL_TO)),
-        AMBIENCE_PRIORITY(30, new AmbiencePriorityCond(AmbienceTest.EQUAL_TO, 0, 0));
+        AMBIENCE_PRIORITY(30, new AmbiencePriorityCond(AmbienceTest.EQUAL_TO, 0, 0)),
+        AMBIENCE_ISPLAYING(31, new AmbienceIsPlayingCond(AmbienceEquality.EQUAL_TO, ""));
 
         int metaValue;
         AbstractCond defaultCond;

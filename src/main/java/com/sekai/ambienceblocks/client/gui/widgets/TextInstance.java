@@ -44,6 +44,12 @@ public class TextInstance extends Widget {
         this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
     }
 
+    @Override
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        render(matrixStack, mouseX, mouseY);
+        //super.render(matrixStack, mouseX, mouseY, partialTicks);
+    }
+
     public int getWidth() {
         return font.getStringWidth(text);
     }

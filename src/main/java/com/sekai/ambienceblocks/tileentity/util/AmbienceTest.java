@@ -2,7 +2,7 @@ package com.sekai.ambienceblocks.tileentity.util;
 
 import java.util.ArrayList;
 
-public enum AmbienceTest {
+public enum AmbienceTest implements AmbienceEnumName {
     GREATER_THAN(0, ">"),
     LESSER_THAN(1, "<"),
     EQUAL_TO(2, "=");

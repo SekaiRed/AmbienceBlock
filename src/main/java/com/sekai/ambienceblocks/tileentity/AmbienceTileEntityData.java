@@ -3,6 +3,8 @@ package com.sekai.ambienceblocks.tileentity;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.AbstractBounds;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.SphereBounds;
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceEquality;
+import com.sekai.ambienceblocks.tileentity.util.AmbiencePosition;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.CondsUtil;
@@ -50,6 +52,7 @@ public class AmbienceTileEntityData
     private boolean isGlobal = false;
 
     //offset
+    private AmbiencePosition space = AmbiencePosition.RELATIVE;
     private Vector3d offset = new Vector3d(0, 0, 0);
 
     //delay
@@ -90,6 +93,7 @@ public class AmbienceTileEntityData
             compound.putInt("channel", this.channel);
         }
 
+        compound.putInt("space", space.ordinal());
         compound.put("bounds", BoundsUtil.toNBT(this.bounds));
         compound.put("offset", NBTHelper.writeVec3d(this.offset));
         compound.putBoolean("isGlobal", this.isGlobal);
@@ -143,7 +147,8 @@ public class AmbienceTileEntityData
             this.channel = compound.getInt("channel");
         }
 
-
+        this.space = AmbiencePosition.values()[compound.getInt("space") < AmbienceEquality.values().length ? compound.getInt("space") : 0];
+        //this.space = AmbiencePosition.values()
         this.bounds = BoundsUtil.fromNBT(compound.getCompound("bounds"));
         this.offset = NBTHelper.readVec3d(compound.getCompound("offset"));
         this.isGlobal = compound.getBoolean("isGlobal");
@@ -202,6 +207,7 @@ public class AmbienceTileEntityData
         }
 
         //buf.writeDouble(this.offDistance);
+        buf.writeInt(space.ordinal());
         BoundsUtil.toBuff(this.bounds, buf);
         buf.writeDouble(this.offset.x);
         buf.writeDouble(this.offset.y);
@@ -260,6 +266,9 @@ public class AmbienceTileEntityData
             this.channel = buf.readInt();
         }
 
+        //yeowch
+        int spaceID = buf.readInt();
+        this.space =  AmbiencePosition.values()[spaceID<AmbiencePosition.values().length?spaceID:0];
         this.bounds = BoundsUtil.fromBuff(buf);
         this.offset = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
         this.isGlobal = buf.readBoolean();
@@ -293,15 +302,24 @@ public class AmbienceTileEntityData
 
     //Bounds
     public boolean isWithinBounds(PlayerEntity player, BlockPos origin) {
-        return bounds.isWithinBounds(player, ParsingUtil.blockPosToVec3d(origin).add(getOffset()));
+        if(AmbiencePosition.RELATIVE.equals(getSpace()))
+            return bounds.isWithinBounds(player, ParsingUtil.blockPosToVec3d(origin).add(getOffset()));
+        else
+            return bounds.isWithinBounds(player, getOffset());
     }
 
     public double distanceFromCenter(PlayerEntity player, BlockPos origin) {
-        return bounds.distanceFromCenter(player, ParsingUtil.blockPosToVec3d(origin).add(getOffset()));
+        if(AmbiencePosition.RELATIVE.equals(getSpace()))
+            return bounds.distanceFromCenter(player, ParsingUtil.blockPosToVec3d(origin).add(getOffset()));
+        else
+            return bounds.distanceFromCenter(player, getOffset());
     }
 
     public double getPercentageHowCloseIsPlayer(PlayerEntity player, BlockPos origin) {
-        return bounds.getPercentageHowCloseIsPlayer(player, ParsingUtil.blockPosToVec3d(origin).add(getOffset()));
+        if(AmbiencePosition.RELATIVE.equals(getSpace()))
+            return bounds.getPercentageHowCloseIsPlayer(player, ParsingUtil.blockPosToVec3d(origin).add(getOffset()));
+        else
+            return bounds.getPercentageHowCloseIsPlayer(player, getOffset());
     }
 
     //Getter and setter
@@ -439,6 +457,14 @@ public class AmbienceTileEntityData
     }
 
     public void setBounds(AbstractBounds bounds) { this.bounds = bounds; }
+
+    public AmbiencePosition getSpace() {
+        return space;
+    }
+
+    public void setSpace(AmbiencePosition space) {
+        this.space = space;
+    }
 
     public Vector3d getOffset() {
         return offset;

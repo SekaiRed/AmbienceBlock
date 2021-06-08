@@ -4,6 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sekai.ambienceblocks.Main;
 import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
+import com.sekai.ambienceblocks.client.gui.widgets.presets.textfield.CustomTextField;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.FontRenderer;
@@ -255,9 +256,11 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
     }
 
     public void onConfirm() {
+        targetField.setText(selectedDomain + ":" + selected);
         mc.displayGuiScreen(prevScreen);
         mc.getSoundHandler().stop(previewSound);
         //targetField.setText(list.getElementString());
+        System.out.println(targetField);
         targetField.setText(selectedDomain + ":" + selected);
     }
 

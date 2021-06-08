@@ -7,6 +7,7 @@ import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.*;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
+import com.sekai.ambienceblocks.tileentity.util.AmbiencePosition;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -55,9 +56,6 @@ public class BoundsTab extends AbstractTab {
         moveToNextAxisCapsule();
     }));*/
     Button capAxisButton = new Button(getNeighbourX(textCapAxis), getRowY(1) + getOffsetY(20), 20, 20, new StringTextComponent("X"), button -> {
-        System.out.println(button.visible);
-        System.out.println(button.active);
-        System.out.println(this.isActive());
         moveToNextAxisCapsule();
     });
     AmbienceAxis capAxis;
@@ -69,8 +67,13 @@ public class BoundsTab extends AbstractTab {
     TextInstance textCubicZ = new TextInstance(getNeighbourX(cubicY), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "Z", font);
     TextFieldWidget cubicZ = new TextFieldWidget(font, getNeighbourX(textCubicZ), getRowY(1), 40, 20, new StringTextComponent(""));
 
-    TextInstance textOffset = new TextInstance(getBaseX(), getRowY(2) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.offset") + " :", font);
-    TextInstance textOffsetX = new TextInstance(getNeighbourX(textOffset), getRowY(2) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "X", font);
+    TextInstance textOffset = new TextInstance(getBaseX(), getRowY(2) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.offset"), font);
+    AmbiencePosition offsetPos;
+    Button offsetPosButton = new Button(getNeighbourX(textOffset), getRowY(2) + getOffsetY(20), 20, 20, new StringTextComponent("X"), button -> {
+        offsetPos = offsetPos.next();
+        button.setMessage(new StringTextComponent(offsetPos.getName()));
+    });
+    TextInstance textOffsetX = new TextInstance(getNeighbourX(offsetPosButton), getRowY(2) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "X", font);
     TextFieldWidget offsetX = new TextFieldWidget(font, getNeighbourX(textOffsetX), getRowY(2), 40, 20, new StringTextComponent(""));
     TextInstance textOffsetY = new TextInstance(getNeighbourX(offsetX), getRowY(2) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, "Y", font);
     TextFieldWidget offsetY = new TextFieldWidget(font, getNeighbourX(textOffsetY), getRowY(2), 40, 20, new StringTextComponent(""));
@@ -158,14 +161,15 @@ public class BoundsTab extends AbstractTab {
         cubicZ.setMaxStringLength(6);
         addWidget(cubicZ);
 
+        addButton(offsetPosButton);
         offsetX.setValidator(ParsingUtil.negativeDecimalNumberFilter);
-        offsetX.setMaxStringLength(8);
+        offsetX.setMaxStringLength(10);
         addWidget(offsetX);
         offsetY.setValidator(ParsingUtil.negativeDecimalNumberFilter);
-        offsetY.setMaxStringLength(8);
+        offsetY.setMaxStringLength(10);
         addWidget(offsetY);
         offsetZ.setValidator(ParsingUtil.negativeDecimalNumberFilter);
-        offsetZ.setMaxStringLength(8);
+        offsetZ.setMaxStringLength(10);
         addWidget(offsetZ);
 
         resetBoundFields();
@@ -206,7 +210,8 @@ public class BoundsTab extends AbstractTab {
         cubicZ.x = getNeighbourX(textCubicZ); cubicZ.y = getRowY(1);
 
         textOffset.x = getBaseX(); textOffset.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
-        textOffsetX.x = getNeighbourX(textOffset); textOffsetX.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
+        offsetPosButton.x = getNeighbourX(textOffset); offsetPosButton.y = getRowY(2) + getOffsetY(20);
+        textOffsetX.x = getNeighbourX(offsetPosButton); textOffsetX.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
         offsetX.x = getNeighbourX(textOffsetX); offsetX.y = getRowY(2);
         textOffsetY.x = getNeighbourX(offsetX); textOffsetY.y = getRowY(2) + getOffsetY(font.FONT_HEIGHT);
         offsetY.x = getNeighbourX(textOffsetY); offsetY.y = getRowY(2);
@@ -255,6 +260,7 @@ public class BoundsTab extends AbstractTab {
         cubicZ.render(matrix, mouseX, mouseY, partialTicks);
 
         textOffset.render(matrix, mouseX, mouseY);
+        offsetPosButton.render(matrix, mouseX, mouseY, partialTicks);
         textOffsetX.render(matrix, mouseX, mouseY);
         offsetX.render(matrix, mouseX, mouseY, partialTicks);
         textOffsetY.render(matrix, mouseX, mouseY);
@@ -336,6 +342,9 @@ public class BoundsTab extends AbstractTab {
         //setCheckBoxChecked(isGlobal, data.isGlobal());
         isGlobal.setChecked(data.isGlobal());
 
+        offsetPos = data.getSpace();
+        offsetPosButton.setMessage(new StringTextComponent(offsetPos.getName()));
+
         loadBoundType(data);
 
         Vector3d pos = data.getOffset();
@@ -347,6 +356,8 @@ public class BoundsTab extends AbstractTab {
     @Override
     public void setDataFromField(AmbienceTileEntityData data) {
         data.setGlobal(isGlobal.isChecked());
+
+        data.setSpace(offsetPos);
 
         if(boundType == SphereBounds.id) {
             SphereBounds bounds = new SphereBounds();

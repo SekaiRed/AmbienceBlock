@@ -6,7 +6,6 @@ import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.util.text.ITextProperties;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -25,7 +24,8 @@ public abstract class AbstractTab {
     public final List<Widget> widgets = new ArrayList<>();
     public final List<Widget> buttons = new ArrayList<>();
 
-    protected static final int separation = 8;
+    protected static final int horizontalSeparation = 6;
+    protected static final int verticalSeparation = 8;
     protected static final int rowHeight = 18;
     protected static final int checkboxOffset = 4;
 
@@ -137,23 +137,23 @@ public abstract class AbstractTab {
 
     //util stuff
     protected int getBaseX() {
-        return x + separation;
+        return x + horizontalSeparation;
     }
 
     protected int getEndX() {
-        return x + width - separation;
+        return x + width - horizontalSeparation;
     }
 
     protected int getEndY() {
-        return y + height - separation;
+        return y + height - verticalSeparation;
     }
 
     protected int getNeighbourX(Widget widget) {
-        return widget.x + widget.getWidth() + separation;
+        return widget.x + widget.getWidth() + horizontalSeparation;
     }
 
     protected int getRowY(int row) {
-        return y + rowHeight * row + separation * (row + 1) + AmbienceGUI.tabHeight;
+        return y + rowHeight * row + verticalSeparation * (row + 1) + AmbienceGUI.tabHeight;
     }
 
     protected int getOffsetY(int height) {

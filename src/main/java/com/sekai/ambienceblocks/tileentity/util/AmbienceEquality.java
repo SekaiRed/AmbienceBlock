@@ -1,6 +1,6 @@
 package com.sekai.ambienceblocks.tileentity.util;
 
-public enum AmbienceEquality {
+public enum AmbienceEquality implements AmbienceEnumName {
     EQUAL_TO(0, "=="),
     NOT_EQUAL_TO(1, "!=");
 
