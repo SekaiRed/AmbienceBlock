@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks.tileentity.ambiencetilecond;
 
+import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AbstractAmbienceWidgetMessenger;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -16,7 +17,7 @@ public abstract class AbstractCond {
 
     public abstract String getName();
     public abstract String getListDescription();
-    public abstract boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn);
+    public abstract boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn);
 
     //gui
     public abstract List<AbstractAmbienceWidgetMessenger> getWidgets();

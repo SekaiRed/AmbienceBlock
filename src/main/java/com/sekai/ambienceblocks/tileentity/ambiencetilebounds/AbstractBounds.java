@@ -31,9 +31,9 @@ public abstract class AbstractBounds {
     public abstract void fromBuff(PacketBuffer buf);
 
     //util
-    public Vector3d getFixedOrigin(Vector3d origin) {
+    /*public Vector3d getFixedOrigin(Vector3d origin) {
         return new Vector3d(origin.getX(), origin.getY(), origin.getZ()).add(blockOffset);
-    }
+    }*/
 
     public double getPlayerPosByAxis(PlayerEntity player, AmbienceAxis axis) {
         switch(axis) {

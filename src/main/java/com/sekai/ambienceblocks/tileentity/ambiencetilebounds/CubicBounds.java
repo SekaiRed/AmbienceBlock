@@ -40,7 +40,7 @@ public class CubicBounds extends AbstractBounds {
 
     @Override
     public boolean isWithinBounds(PlayerEntity player, Vector3d origin) {
-        origin.add(blockOffset);
+        //origin.add(blockOffset);
         return player.getPosX() >= origin.getX() - xSize / 2 && player.getPosY() >= origin.getY() - ySize / 2 && player.getPosZ() >= origin.getZ() - zSize / 2
                 && player.getPosX() <= origin.getX() + xSize / 2 && player.getPosY() <= origin.getY() + ySize / 2 && player.getPosZ() <= origin.getZ() + zSize / 2;
     }
@@ -61,7 +61,7 @@ public class CubicBounds extends AbstractBounds {
 
     @Override
     public double getPercentageHowCloseIsPlayer(PlayerEntity player, Vector3d origin) {
-        double x = Math.abs(player.getPosX() - getFixedOrigin(origin).getX()), y = Math.abs(player.getPosY() - getFixedOrigin(origin).getY()), z = Math.abs(player.getPosZ() - getFixedOrigin(origin).getZ());
+        double x = Math.abs(player.getPosX() - origin.getX()), y = Math.abs(player.getPosY() - origin.getY()), z = Math.abs(player.getPosZ() - origin.getZ());
         return ((1 - (x / (xSize / 2))) * (1 - (y / (ySize / 2))) * (1 - (z / (zSize / 2))));
     }
 

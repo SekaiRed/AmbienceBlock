@@ -1,13 +1,11 @@
 package com.sekai.ambienceblocks.tileentity.ambiencetilecond;
 
 import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
+import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceEquality;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceTest;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetSound;
-import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetString;
-import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
@@ -46,7 +44,7 @@ public class AmbienceIsPlayingCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn) {
+    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
         return equal.testFor(AmbienceController.instance.isSoundPlaying(sound));
     }
 

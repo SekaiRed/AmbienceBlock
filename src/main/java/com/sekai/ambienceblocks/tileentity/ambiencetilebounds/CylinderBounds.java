@@ -65,7 +65,7 @@ public class CylinderBounds extends AbstractBounds {
 
         //return dist < radius && player.getPosY() < origin.getY() - 1 + length && player.getPosY() > origin.getY() - 1;
         double playerPos = getPlayerPosByAxis(player, axis);
-        double originPos = getVec3dPosByAxis(getFixedOrigin(origin), axis);
+        double originPos = getVec3dPosByAxis(origin, axis);
         return dist < radius && playerPos < originPos + length / 2D && playerPos > originPos - length / 2D;
     }
 
@@ -77,7 +77,8 @@ public class CylinderBounds extends AbstractBounds {
         Vector3d axisMask = axis.getIgnoreAxisMask();
 
         Vector3d vecPlayer = new Vector3d(player.getPosX() * axisMask.x, player.getPosY() * axisMask.y, player.getPosZ() * axisMask.z);
-        Vector3d vecTile = getFixedOrigin(new Vector3d(origin.getX() * axisMask.x, origin.getY() * axisMask.y - blockOffset.y, origin.getZ() * axisMask.z));
+        //Vector3d vecTile = getFixedOrigin(new Vector3d(origin.getX() * axisMask.x, origin.getY() * axisMask.y - blockOffset.y, origin.getZ() * axisMask.z));
+        Vector3d vecTile = new Vector3d(origin.getX() * axisMask.x, origin.getY() * axisMask.y - blockOffset.y, origin.getZ() * axisMask.z);
 
         return vecPlayer.distanceTo(vecTile);
     }

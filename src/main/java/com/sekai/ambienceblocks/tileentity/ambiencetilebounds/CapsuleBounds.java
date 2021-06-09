@@ -66,7 +66,7 @@ public class CapsuleBounds extends AbstractBounds {
         boolean upperFlag = false, bottomFlag = false;
 
         double playerPos = getPlayerPosByAxis(player, axis);
-        double originPos = getVec3dPosByAxis(getFixedOrigin(origin), axis);
+        double originPos = getVec3dPosByAxis(origin, axis);
 
         if(playerPos > originPos + length / 2D)
             upperFlag = true;
@@ -131,7 +131,7 @@ public class CapsuleBounds extends AbstractBounds {
         boolean upperFlag = false, bottomFlag = false;
 
         double playerPos = getPlayerPosByAxis(player, axis);
-        double originPos = getVec3dPosByAxis(getFixedOrigin(origin), axis);
+        double originPos = getVec3dPosByAxis(origin, axis);
 
         if(playerPos > originPos + length / 2D)
             upperFlag = true;
@@ -188,7 +188,7 @@ public class CapsuleBounds extends AbstractBounds {
 
         Vector3d axisMask = axis.getIgnoreAxisMask();
         //Vector3d vecTile = new Vector3d(origin.getX() * axisMask.x, origin.getY() * axisMask.y, origin.getZ() * axisMask.z).add(new Vector3d(blockOffset.x, blockOffset.y, blockOffset.z));
-        Vector3d vecMaskedTile = getFixedOrigin(origin).mul(axisMask);
+        Vector3d vecMaskedTile = origin.mul(axisMask);
         Vector3d vecMaskedPlayer = vecPlayer.mul(axisMask);
 
         return vecMaskedPlayer.distanceTo(vecMaskedTile);

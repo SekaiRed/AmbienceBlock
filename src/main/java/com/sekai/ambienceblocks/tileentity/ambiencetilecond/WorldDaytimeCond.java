@@ -1,18 +1,15 @@
 package com.sekai.ambienceblocks.tileentity.ambiencetilecond;
 
-import com.sekai.ambienceblocks.client.gui.widgets.presets.textfield.CustomTextField;
+import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceTest;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceWidgetHolder;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.ParsingUtil;
-import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.IWorldInfo;
 
@@ -48,7 +45,7 @@ public class WorldDaytimeCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn) {
+    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
         IWorldInfo info = worldIn.getWorldInfo();
         return test.testForLong(info.getDayTime()%24000, (long) value);
     }

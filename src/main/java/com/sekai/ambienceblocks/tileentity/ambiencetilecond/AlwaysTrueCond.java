@@ -1,6 +1,6 @@
 package com.sekai.ambienceblocks.tileentity.ambiencetilecond;
 
-import com.sekai.ambienceblocks.tileentity.util.AmbienceWidgetHolder;
+import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AbstractAmbienceWidgetMessenger;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -31,7 +31,7 @@ public class AlwaysTrueCond extends AbstractCond  {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn) {
+    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
         return true;
     }
 

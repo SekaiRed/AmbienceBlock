@@ -1,10 +1,7 @@
 package com.sekai.ambienceblocks.util;
 
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.*;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceEquality;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceTest;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceWeather;
+import com.sekai.ambienceblocks.tileentity.util.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.GameType;
@@ -39,7 +36,7 @@ public class CondsUtil {
 
     public enum CondList {
         ALWAYS_TRUE(0, new AlwaysTrueCond()),
-        PLAYER_POS_AXIS(10, new PlayerPosAxisCond(AmbienceTest.EQUAL_TO, AmbienceAxis.X, 0)),
+        PLAYER_POS_AXIS(10, new PlayerPosAxisCond(AmbienceTest.EQUAL_TO, AmbiencePosition.ABSOLUTE, AmbienceAxis.X, 0)),
         PLAYER_HEALTH(11, new PlayerHealthCond(AmbienceTest.GREATER_THAN, 10)),
         PLAYER_HUNGER(12, new PlayerHungerCond(AmbienceTest.GREATER_THAN, 10)),
         PLAYER_GAMEMODE(13, new PlayerGamemodeCond(AmbienceEquality.EQUAL_TO, GameType.SURVIVAL)),

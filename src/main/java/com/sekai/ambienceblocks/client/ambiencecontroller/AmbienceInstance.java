@@ -5,6 +5,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -12,7 +13,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class AmbienceInstance extends TickableSound {
     private float internalVolume = 1f;
     private float internalPitch = 1f;
-    private BlockPos internalPos;
+    private Vector3d internalPos;
 
     /*
     //fade in
@@ -25,7 +26,7 @@ public class AmbienceInstance extends TickableSound {
     private boolean fadingOut;
     private int fadeOut;*/
 
-    public AmbienceInstance(ResourceLocation soundId, SoundCategory categoryIn, BlockPos pos, float volume, float pitch/*int fadeIn*/, boolean repeat) {
+    public AmbienceInstance(ResourceLocation soundId, SoundCategory categoryIn, Vector3d pos/*BlockPos pos*/, float volume, float pitch, boolean repeat) {
         super(new SoundEvent(soundId), categoryIn);
         this.volume = volume;
         internalVolume = volume;
@@ -74,7 +75,7 @@ public class AmbienceInstance extends TickableSound {
         internalPitch = pitch;
     }
 
-    public void setBlockPos(BlockPos pos) {
+    public void setBlockPos(Vector3d pos) {
         if(pos != null)
             internalPos = pos;
     }

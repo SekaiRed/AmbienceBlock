@@ -5,6 +5,7 @@ import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -69,9 +70,9 @@ public class AmbienceSlot {
             stateSnd = AmbienceSoundState.SINGLE;
 
         if(AmbienceSoundState.LOOP.equals(stateSnd) && !d.isUsingDelay())
-            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getPos().add(ParsingUtil.Vec3dToVec3i(d.getOffset())), getVolumeInternal(d), getPitchInternal(d), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), getPitchInternal(d), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
         else
-            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getPos().add(ParsingUtil.Vec3dToVec3i(d.getOffset())), getVolumeInternal(d), getPitchInternal(d), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), getPitchInternal(d), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
 
         handler.play(instance);
     }
@@ -89,7 +90,7 @@ public class AmbienceSlot {
             if(ParsingUtil.isValidSound(d.getOutroName())) {
                 ResourceLocation playingResource = new ResourceLocation(d.getOutroName());
                 handler.stop(instance);
-                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getPos().add(ParsingUtil.Vec3dToVec3i(d.getOffset())), getVolumeInternal(d), d.getPitch(), false);
+                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), d.getPitch(), false);
                 handler.play(instance);
                 stateSnd = AmbienceSoundState.OUTRO;
             }
@@ -127,11 +128,16 @@ public class AmbienceSlot {
         markForDeletion();
     }
 
+    private boolean isPlaying(ISound sound) {
+        //return AmbienceController.instance.isPlaying(sound);
+        return handler.isPlaying(instance);
+    }
+
     public void tick() {
         AmbienceTileEntityData d = owner.data;
 
         if(AmbienceSoundState.SINGLE.equals(stateSnd)) {
-            if(!handler.isPlaying(instance)) {
+            if(!isPlaying(instance)) /*if(!handler.isPlaying(instance))*/ {
                 //it's done playing the sound, let's just stop here
                 forceStop();
                 return;
@@ -140,16 +146,16 @@ public class AmbienceSlot {
 
         //intro/outro logic
         if(AmbienceSoundState.INTRO.equals(stateSnd)) {
-            if(!handler.isPlaying(instance)) {
+            if(!isPlaying(instance)) /*if(!handler.isPlaying(instance))*/ {
                 //System.out.println("end reached lol " + instance.canRepeat());
                 ResourceLocation playingResource = new ResourceLocation(d.getSoundName());
                 handler.stop(instance);
-                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getPos().add(ParsingUtil.Vec3dToVec3i(d.getOffset())), getVolumeInternal(d), d.getPitch(), true);
+                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), d.getPitch(), true);
                 handler.play(instance);
                 stateSnd = AmbienceSoundState.LOOP;
             }
         } else if(AmbienceSoundState.OUTRO.equals(stateSnd)) {
-            if(!handler.isPlaying(instance)) {
+            if(!isPlaying(instance)) /*if(!handler.isPlaying(instance))*/ {
                 //it's done playing the outro :(
                 forceStop();
             }
@@ -176,14 +182,14 @@ public class AmbienceSlot {
         }
 
         //volume pitch and other misc
-        instance.setVolume(getVolumeInternal(d));
-        instance.setPitch(getPitchInternal(d));//? shouldn't once be enough
+        setVolume(getVolumeInternal(d));
+        setPitch(getPitchInternal(d));//? shouldn't once be enough
     }
 
     public void forceVolumeAndPitchUpdate() {
         AmbienceTileEntityData d = owner.data;
-        instance.setVolume(getVolumeInternal(d));
-        instance.setPitch(getPitchInternal(d));
+        setVolume(getVolumeInternal(d));
+        setPitch(getPitchInternal(d));
     }
 
     private float getVolumeInternal(AmbienceTileEntityData d) {
@@ -199,7 +205,7 @@ public class AmbienceSlot {
             if (d.isGlobal())
                 return multVolume * volume;
             else
-                return (float) (multVolume * volume * d.getPercentageHowCloseIsPlayer(Minecraft.getInstance().player, owner.getPos()));
+                return (float) (multVolume * volume * d.getPercentageHowCloseIsPlayer(Minecraft.getInstance().player, owner.getOrigin()));
         }
     }
 
@@ -224,7 +230,7 @@ public class AmbienceSlot {
 
     public void setOwner(AmbienceTileEntity owner) {
         this.owner = owner;
-        getMusicInstance().setBlockPos(owner.getPos());
+        getMusicInstance().setBlockPos(owner.getOrigin());
     }
 
     public boolean isMarkedForDeletion() {

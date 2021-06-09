@@ -60,7 +60,7 @@ public class ScrollListWidget extends Widget {
         this.width = widthIn;
         this.height = heightIn;
 
-        scrollList = new StringListWidget(x + 1, y + internalHeight, internalWidth - 2, internalHeight * listLength/*4*/, separation, optionHeight, font, new StringListWidget.IPressable() {
+        scrollList = new StringListWidget(x + 1, y + internalHeight, internalWidth - 2, internalHeight * listLength + separation - 1, separation, optionHeight, font, new StringListWidget.IPressable() {
             @Override
             public void onClick(StringListWidget list, int index, String name) {
 

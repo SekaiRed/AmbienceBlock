@@ -301,25 +301,28 @@ public class AmbienceTileEntityData
     ////
 
     //Bounds
-    public boolean isWithinBounds(PlayerEntity player, BlockPos origin) {
-        if(AmbiencePosition.RELATIVE.equals(getSpace()))
+    public boolean isWithinBounds(PlayerEntity player, Vector3d origin) {
+        /*if(AmbiencePosition.RELATIVE.equals(getSpace()))
             return bounds.isWithinBounds(player, ParsingUtil.blockPosToVec3d(origin).add(getOffset()));
         else
-            return bounds.isWithinBounds(player, getOffset());
+            return bounds.isWithinBounds(player, getOffset());*/
+        return bounds.isWithinBounds(player, origin);
     }
 
-    public double distanceFromCenter(PlayerEntity player, BlockPos origin) {
-        if(AmbiencePosition.RELATIVE.equals(getSpace()))
+    public double distanceFromCenter(PlayerEntity player, Vector3d origin) {
+        /*if(AmbiencePosition.RELATIVE.equals(getSpace()))
             return bounds.distanceFromCenter(player, ParsingUtil.blockPosToVec3d(origin).add(getOffset()));
         else
-            return bounds.distanceFromCenter(player, getOffset());
+            return bounds.distanceFromCenter(player, getOffset());*/
+        return bounds.distanceFromCenter(player, origin);
     }
 
-    public double getPercentageHowCloseIsPlayer(PlayerEntity player, BlockPos origin) {
-        if(AmbiencePosition.RELATIVE.equals(getSpace()))
+    public double getPercentageHowCloseIsPlayer(PlayerEntity player, Vector3d origin) {
+        /*if(AmbiencePosition.RELATIVE.equals(getSpace()))
             return bounds.getPercentageHowCloseIsPlayer(player, ParsingUtil.blockPosToVec3d(origin).add(getOffset()));
         else
-            return bounds.getPercentageHowCloseIsPlayer(player, getOffset());
+            return bounds.getPercentageHowCloseIsPlayer(player, getOffset());*/
+        return bounds.getPercentageHowCloseIsPlayer(player, origin);
     }
 
     //Getter and setter

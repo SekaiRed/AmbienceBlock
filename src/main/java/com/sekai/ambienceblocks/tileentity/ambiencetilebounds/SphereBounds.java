@@ -46,9 +46,8 @@ public class SphereBounds extends AbstractBounds {
     @Override
     public double distanceFromCenter(PlayerEntity player, Vector3d origin) {
         Vector3d vecPlayer = new Vector3d(player.getPosX(), player.getPosY(), player.getPosZ());
-        Vector3d vecTile = new Vector3d(origin.getX(), origin.getY(), origin.getZ()).add(blockOffset);
 
-        return vecPlayer.distanceTo(vecTile);
+        return vecPlayer.distanceTo(origin);
     }
 
     @Override
