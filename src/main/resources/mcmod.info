@@ -1,0 +1,16 @@
+[
+{
+  "modid": "ambienceblocks",
+  "name": "Ambience Blocks",
+  "description": "A mod that adds blocks that can play any sounds in the game on loop or not. Works with custom sounds aswell.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["SekaiRed"],
+  "credits": "The Forge and FML guys, for making forge, thanks",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
