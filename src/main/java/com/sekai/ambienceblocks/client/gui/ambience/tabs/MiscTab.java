@@ -3,8 +3,11 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
+import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
+import com.sekai.ambienceblocks.client.rendering.RenderingEventHandler;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.gui.GuiUtils;
@@ -18,6 +21,17 @@ public class MiscTab extends AbstractTab {
     });
     Button paste = new Button(getNeighbourX(copy), getRowY(0) + getOffsetY(20), 60, 20, new StringTextComponent("Paste"), button -> {
         guiRef.setData(AmbienceController.instance.getClipboard());
+    });
+
+    //TextInstance tDebug = new
+    TextInstance tDebug = new TextInstance(getBaseX(), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("Debug :"), font);
+    Button bDebug = new Button(getNeighbourX(copy), getRowY(0) + getOffsetY(20), 40, 20, new StringTextComponent("OFF"), button -> {
+        if(AmbienceController.debugMode)
+            button.setMessage(new StringTextComponent("OFF"));
+        else
+            button.setMessage(new StringTextComponent("ON"));
+        RenderingEventHandler.clearEvent();
+        AmbienceController.debugMode = !AmbienceController.debugMode;
     });
 
     //ScrollListWidget scroll;
@@ -56,6 +70,8 @@ public class MiscTab extends AbstractTab {
     public void initialInit() {
         addButton(copy);
         addButton(paste);
+
+        addButton(bDebug);
         //scroll.addWidget(this);
         //addButton(test);
     }
@@ -64,19 +80,21 @@ public class MiscTab extends AbstractTab {
     public void updateWidgetPosition() {
         copy.x = getBaseX(); copy.y = getRowY(0);
         paste.x = getNeighbourX(copy); paste.y = getRowY(0);
+
+        tDebug.x = getBaseX(); tDebug.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
+        bDebug.x = getNeighbourX(tDebug); bDebug.y = getRowY(1) + getOffsetY(20);
         //scroll.x = getBaseX(); scroll.y = getRowY(1);
         //scroll.updateWidgetPosition();
         //test.x = getBaseX(); test.y = getRowY(2);
-    }
-
-    public void doubleClicked() {
-        System.out.println("double clicked");
     }
 
     @Override
     public void render(MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
         copy.render(matrix, mouseX, mouseY, partialTicks);
         paste.render(matrix, mouseX, mouseY, partialTicks);
+
+        tDebug.render(matrix, mouseX, mouseY, partialTicks);
+        bDebug.render(matrix, mouseX, mouseY, partialTicks);
         //test.render(mouseX, mouseY, partialTicks);
         //scroll.render(mouseX, mouseY);
     }
@@ -95,6 +113,13 @@ public class MiscTab extends AbstractTab {
             list.add("Paste the copied parameters onto this block.");
             drawHoveringText(matrix, list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
         }
+
+        if(bDebug.isHovered()) {
+            list.add(TextFormatting.RED + "Debug");
+            list.add("Turns on or off debug mode.");
+            list.add("It highlights some GUI elements and will show you details on the main component of the mod.");
+            drawHoveringText(matrix, list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
     }
 
     @Override
@@ -107,7 +132,10 @@ public class MiscTab extends AbstractTab {
 
     @Override
     public void setFieldFromData(AmbienceTileEntityData data) {
-
+        if(AmbienceController.debugMode)
+            bDebug.setMessage(new StringTextComponent("ON"));
+        else
+            bDebug.setMessage(new StringTextComponent("OFF"));
     }
 
     @Override

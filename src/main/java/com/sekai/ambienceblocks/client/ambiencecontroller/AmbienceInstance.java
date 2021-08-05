@@ -26,7 +26,7 @@ public class AmbienceInstance extends TickableSound {
     private boolean fadingOut;
     private int fadeOut;*/
 
-    public AmbienceInstance(ResourceLocation soundId, SoundCategory categoryIn, Vector3d pos/*BlockPos pos*/, float volume, float pitch, boolean repeat) {
+    public AmbienceInstance(ResourceLocation soundId, SoundCategory categoryIn, Vector3d pos, float volume, float pitch, boolean repeat) {
         super(new SoundEvent(soundId), categoryIn);
         this.volume = volume;
         internalVolume = volume;

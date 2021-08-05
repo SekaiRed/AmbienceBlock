@@ -36,12 +36,13 @@ public class CondsUtil {
 
     public enum CondList {
         ALWAYS_TRUE(0, new AlwaysTrueCond()),
-        PLAYER_POS_AXIS(10, new PlayerPosAxisCond(AmbienceTest.EQUAL_TO, AmbiencePosition.ABSOLUTE, AmbienceAxis.X, 0)),
+        PLAYER_POS_AXIS(10, new PlayerPosAxisCond(AmbienceTest.EQUAL_TO, AmbienceWorldSpace.ABSOLUTE, AmbienceAxis.X, 0)),
         PLAYER_HEALTH(11, new PlayerHealthCond(AmbienceTest.GREATER_THAN, 10)),
         PLAYER_HUNGER(12, new PlayerHungerCond(AmbienceTest.GREATER_THAN, 10)),
         PLAYER_GAMEMODE(13, new PlayerGamemodeCond(AmbienceEquality.EQUAL_TO, GameType.SURVIVAL)),
         WORLD_WEATHER(20, new WorldWeatherCond(AmbienceEquality.EQUAL_TO, AmbienceWeather.CLEAR)),
         WORLD_DAYTIME(21, new WorldDaytimeCond(AmbienceTest.GREATER_THAN, 0)),
+        WORLD_ISDAY(23, new WorldNeedDayCond(AmbienceEquality.EQUAL_TO)),
         WORLD_REDSTONE(22, new WorldNeedRedstoneCond(AmbienceEquality.EQUAL_TO)),
         AMBIENCE_PRIORITY(30, new AmbiencePriorityCond(AmbienceTest.EQUAL_TO, 0, 0)),
         AMBIENCE_ISPLAYING(31, new AmbienceIsPlayingCond(AmbienceEquality.EQUAL_TO, ""));

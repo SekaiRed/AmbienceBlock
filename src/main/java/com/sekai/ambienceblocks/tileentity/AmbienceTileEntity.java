@@ -1,8 +1,7 @@
 package com.sekai.ambienceblocks.tileentity;
 
-import com.sekai.ambienceblocks.tileentity.util.AmbiencePosition;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.util.RegistryHandler;
-import com.sun.javafx.geom.Vec3d;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -50,7 +49,7 @@ public class AmbienceTileEntity extends TileEntity {
     //fancy
     public Vector3d getOrigin() {
         Vector3d oPos = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-        if(AmbiencePosition.RELATIVE.equals(data.getSpace()))
+        if(AmbienceWorldSpace.RELATIVE.equals(data.getSpace()))
             return oPos.add(data.getOffset()).add(new Vector3d(0.5, 0.5, 0.5));
         else
             return data.getOffset().add(new Vector3d(0.5, 0.5, 0.5));

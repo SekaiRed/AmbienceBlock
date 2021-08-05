@@ -105,6 +105,10 @@ public class ParsingUtil {
         return new Vector3d(pos.getX(), pos.getY(), pos.getZ());
     }
 
+    public static String customBlockPosToString(BlockPos pos) {
+        return "(" + pos.getX() + "," + pos.getY() + "," + pos.getZ() + ")";
+    }
+
     //Predicate
     public static final Predicate<String> numberFilter = (stringIn) -> {
         if (!net.minecraft.util.StringUtils.isNullOrEmpty(stringIn)) {

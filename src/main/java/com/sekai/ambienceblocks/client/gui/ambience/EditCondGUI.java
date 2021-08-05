@@ -94,14 +94,14 @@ public class EditCondGUI extends AmbienceScreen {
             minecraft.displayGuiScreen(new ChooseCondGUI(this));
         }));
 
-        confirm = addButton(new Button(xTopLeft + 8, yTopLeft + texHeight + 8, 100, 20, new StringTextComponent("Confirm"), button -> {
+        confirm = addButton(new Button(xTopLeft + 4, yTopLeft + texHeight + 4, 100, 20, new StringTextComponent("Confirm"), button -> {
             //todo cond.getDataFromWidgets(condWidgets);
             collectData();
             tab.replaceCond(index, cond);
             minecraft.displayGuiScreen(prevScreen);
         }));
 
-        back = addButton(new Button(xTopLeft + texWidth - 8 - 100, yTopLeft + texHeight + 8, 100, 20, new StringTextComponent("Back"), button -> {
+        back = addButton(new Button(xTopLeft + texWidth - 4 - 100, yTopLeft + texHeight + 4, 100, 20, new StringTextComponent("Back"), button -> {
             prevScreen.forceUpdateCondList();
             minecraft.displayGuiScreen(prevScreen);
         }));
@@ -121,11 +121,6 @@ public class EditCondGUI extends AmbienceScreen {
                     addButton(widget);
             }
         }*/
-
-        System.out.println("widgetLink : " + widgetLink.size());
-        System.out.println("condWidgets : " + condWidgets.size());
-        System.out.println("children : " + children.size());
-        System.out.println("button : " + buttons.size());
 
         //initialized = true;
     }

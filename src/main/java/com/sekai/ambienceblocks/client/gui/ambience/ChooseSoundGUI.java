@@ -114,12 +114,12 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
         xTopLeft = (this.width - texWidth) / 2;
         yTopLeft = (this.height - texHeight) / 2;
 
-        play = new Button(xTopLeft + separation/2, yTopLeft + texHeight + separation/2, 60, 20, new StringTextComponent("Play"), button -> {
+        play = new Button(xTopLeft + separation/4, yTopLeft + texHeight + separation/4, 60, 20, new StringTextComponent("Play"), button -> {
             playSoundPreview();
         });
         addButton(play);
 
-        stop = new Button(xTopLeft + 60 + separation, yTopLeft + texHeight + separation/2, 60, 20, new StringTextComponent("Stop"), button -> {
+        stop = new Button(xTopLeft + 60 + separation/2, yTopLeft + texHeight + separation/4, 60, 20, new StringTextComponent("Stop"), button -> {
             stopSoundPreview();
         });
         addButton(stop);
@@ -260,7 +260,6 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
         mc.displayGuiScreen(prevScreen);
         mc.getSoundHandler().stop(previewSound);
         //targetField.setText(list.getElementString());
-        System.out.println(targetField);
         targetField.setText(selectedDomain + ":" + selected);
     }
 

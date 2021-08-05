@@ -2,7 +2,7 @@ package com.sekai.ambienceblocks.tileentity.ambiencetilecond;
 
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
-import com.sekai.ambienceblocks.tileentity.util.AmbiencePosition;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceTest;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetEnum;
@@ -19,7 +19,7 @@ import java.util.List;
 
 public class PlayerPosAxisCond extends AbstractCond {
     private AmbienceTest test;
-    private AmbiencePosition space;
+    private AmbienceWorldSpace space;
     private AmbienceAxis axis;
     private double value;
 
@@ -33,7 +33,7 @@ public class PlayerPosAxisCond extends AbstractCond {
     private static Button bAxis;
     private static TextFieldWidget textValue;*/
 
-    public PlayerPosAxisCond(AmbienceTest test, AmbiencePosition space, AmbienceAxis axis, double value) {
+    public PlayerPosAxisCond(AmbienceTest test, AmbienceWorldSpace space, AmbienceAxis axis, double value) {
         this.test = test;
         this.space = space;
         this.axis = axis;
@@ -59,7 +59,7 @@ public class PlayerPosAxisCond extends AbstractCond {
     @Override
     public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
         double playerValue = 0.0D;
-        if(AmbiencePosition.ABSOLUTE.equals(space)) {
+        if(AmbienceWorldSpace.ABSOLUTE.equals(space)) {
             if (axis == AmbienceAxis.X) playerValue = playerPos.x;
             if (axis == AmbienceAxis.Y) playerValue = playerPos.y;
             if (axis == AmbienceAxis.Z) playerValue = playerPos.z;
@@ -89,7 +89,7 @@ public class PlayerPosAxisCond extends AbstractCond {
             if(TEST.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
                 test = (AmbienceTest) ((AmbienceWidgetEnum) widget).getValue();
             if(SPACE.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
-                space = (AmbiencePosition) ((AmbienceWidgetEnum) widget).getValue();
+                space = (AmbienceWorldSpace) ((AmbienceWidgetEnum) widget).getValue();
             if(AXIS.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
                 axis = (AmbienceAxis) ((AmbienceWidgetEnum) widget).getValue();
             if(VALUE.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
@@ -110,7 +110,7 @@ public class PlayerPosAxisCond extends AbstractCond {
     @Override
     public void fromNBT(CompoundNBT nbt) {
         test = AmbienceTest.values()[nbt.getInt(TEST) < AmbienceTest.values().length ? nbt.getInt(TEST) : 0];
-        space = AmbiencePosition.values()[nbt.getInt(SPACE) < AmbiencePosition.values().length ? nbt.getInt(SPACE) : 0];
+        space = AmbienceWorldSpace.values()[nbt.getInt(SPACE) < AmbienceWorldSpace.values().length ? nbt.getInt(SPACE) : 0];
         axis = AmbienceAxis.values()[nbt.getInt(AXIS) < AmbienceAxis.values().length ? nbt.getInt(AXIS) : 0];
         value = nbt.getDouble(VALUE);
     }
@@ -126,7 +126,7 @@ public class PlayerPosAxisCond extends AbstractCond {
     @Override
     public void fromBuff(PacketBuffer buf) {
         this.test = AmbienceTest.values()[buf.readInt()];
-        this.space = AmbiencePosition.values()[buf.readInt()];
+        this.space = AmbienceWorldSpace.values()[buf.readInt()];
         this.axis = AmbienceAxis.values()[buf.readInt()];
         this.value = buf.readDouble();
     }

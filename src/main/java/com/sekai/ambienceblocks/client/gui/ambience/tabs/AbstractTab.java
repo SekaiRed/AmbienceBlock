@@ -2,6 +2,7 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
+import com.sekai.ambienceblocks.client.gui.widgets.ScrollListWidget;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -38,8 +39,13 @@ public abstract class AbstractTab {
 
     public void refreshWidgets() {
         for(Widget widget : widgets) {
-            if(!guiRef.getChildrens().contains(widget))
+            if(!guiRef.getChildrens().contains(widget)) {
                 guiRef.addWidget(widget);
+
+                if(widget instanceof ScrollListWidget) {
+                    ((ScrollListWidget) widget).addWidget(guiRef);
+                }
+            }
         }
 
         for(Widget widget : buttons) {

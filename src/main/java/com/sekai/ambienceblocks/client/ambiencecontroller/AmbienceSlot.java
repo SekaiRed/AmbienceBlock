@@ -77,11 +77,15 @@ public class AmbienceSlot {
         handler.play(instance);
     }
 
+    public boolean isStopping() {
+        return AmbienceSoundState.OUTRO.equals(stateSnd) || AmbienceFadeState.FADE_OUT.equals(stateFade);
+    }
+
     public void stop() {
         AmbienceTileEntityData d = owner.data;
 
         //don't apply stop logic if we're already in the outro or fade out state
-        if(AmbienceSoundState.OUTRO.equals(stateSnd) || AmbienceFadeState.FADE_OUT.equals(stateFade))
+        if(isStopping())
             return;
 
         //is it a music type?
@@ -329,8 +333,8 @@ public class AmbienceSlot {
     @Override
     public String toString() {
         return instance.getSoundLocation().toString() + ", " +
-                getOwner().getPos() + ", volume " + getVolume() + ", pitch " + getPitch() + ", priority " + getOwner().data.getPriority()
-                + ", channel " + getOwner().data.getChannel() + " with Sound : " + stateSnd.toString() + " and Fade : " + stateFade.toString() + " (" + isMarkedForDeletion() + ")";
+                ParsingUtil.customBlockPosToString(getOwner().getPos()) + ", volume " + getVolume() + ", pitch " + getPitch() + ", priority " + getOwner().data.getPriority()
+                + ", channel " + getOwner().data.getChannel() + " with Sound : " + stateSnd.toString() + " and Fade : " + stateFade.toString();
     }
 
     public void setIsSingle() {

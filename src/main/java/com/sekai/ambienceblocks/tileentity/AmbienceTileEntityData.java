@@ -4,19 +4,18 @@ import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.AbstractBounds;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.SphereBounds;
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceEquality;
-import com.sekai.ambienceblocks.tileentity.util.AmbiencePosition;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.CondsUtil;
 import com.sekai.ambienceblocks.util.NBTHelper;
-import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +28,7 @@ public class AmbienceTileEntityData
 
     //main
     private String soundName = "";
+    //TODO using names is fine but with the buffer atleast use ordinals, it would decrease packet size and will always be compatible
     private String category = SoundCategory.MASTER.getName();
     private String type = AmbienceType.AMBIENT.getName();
     private boolean shouldFuse = false;
@@ -52,7 +52,7 @@ public class AmbienceTileEntityData
     private boolean isGlobal = false;
 
     //offset
-    private AmbiencePosition space = AmbiencePosition.RELATIVE;
+    private AmbienceWorldSpace space = AmbienceWorldSpace.RELATIVE;
     private Vector3d offset = new Vector3d(0, 0, 0);
 
     //delay
@@ -147,8 +147,7 @@ public class AmbienceTileEntityData
             this.channel = compound.getInt("channel");
         }
 
-        this.space = AmbiencePosition.values()[compound.getInt("space") < AmbienceEquality.values().length ? compound.getInt("space") : 0];
-        //this.space = AmbiencePosition.values()
+        this.space = AmbienceWorldSpace.values()[compound.getInt("space") < AmbienceEquality.values().length ? compound.getInt("space") : 0];
         this.bounds = BoundsUtil.fromNBT(compound.getCompound("bounds"));
         this.offset = NBTHelper.readVec3d(compound.getCompound("offset"));
         this.isGlobal = compound.getBoolean("isGlobal");
@@ -252,9 +251,6 @@ public class AmbienceTileEntityData
             this.outroName = buf.readString(50);
         }
 
-        //if(AmbienceType.MUSIC.getName().equals(type))
-        //    this.shouldFuse = buf.readBoolean();
-
         this.volume = buf.readFloat();
         this.pitch = buf.readFloat();
         this.fadeIn = buf.readInt();
@@ -268,7 +264,7 @@ public class AmbienceTileEntityData
 
         //yeowch
         int spaceID = buf.readInt();
-        this.space =  AmbiencePosition.values()[spaceID<AmbiencePosition.values().length?spaceID:0];
+        this.space =  AmbienceWorldSpace.values()[spaceID< AmbienceWorldSpace.values().length?spaceID:0];
         this.bounds = BoundsUtil.fromBuff(buf);
         this.offset = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
         this.isGlobal = buf.readBoolean();
@@ -461,11 +457,11 @@ public class AmbienceTileEntityData
 
     public void setBounds(AbstractBounds bounds) { this.bounds = bounds; }
 
-    public AmbiencePosition getSpace() {
+    public AmbienceWorldSpace getSpace() {
         return space;
     }
 
-    public void setSpace(AmbiencePosition space) {
+    public void setSpace(AmbienceWorldSpace space) {
         this.space = space;
     }
 
@@ -592,6 +588,24 @@ public class AmbienceTileEntityData
         float[] c = new float[4];
         int hue = 0;
         for(int i = 0; i < getSoundName().length(); i++) {
+            if(getSoundName().charAt(i) != ':' && getSoundName().charAt(i) != '.')
+                hue += getSoundName().charAt(i) - 97;
+        }
+        hue *= 2;
+
+        hue%=255;
+
+        Color color = Color.getHSBColor(hue/255f, 1f, 1f);
+
+        c[0] = color.getRed()/255f;
+        c[1] = color.getGreen()/255f;
+        c[2] = color.getBlue()/255f;
+        c[3] = 1f;
+
+        return c;
+        /*float[] c = new float[4];
+        int hue = 0;
+        for(int i = 0; i < getSoundName().length(); i++) {
             if(getSoundName().charAt(i) != ':')
                 hue += getSoundName().charAt(i) - 97;
         }
@@ -615,6 +629,6 @@ public class AmbienceTileEntityData
                         + (.114+.886*U-.203*W)*ob);
         c[3] = 1f;
 
-        return c;
+        return c;*/
     }
 }

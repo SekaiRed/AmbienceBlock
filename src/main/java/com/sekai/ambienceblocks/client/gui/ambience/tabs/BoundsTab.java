@@ -7,7 +7,7 @@ import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.*;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
-import com.sekai.ambienceblocks.tileentity.util.AmbiencePosition;
+import com.sekai.ambienceblocks.tileentity.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -17,7 +17,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.client.gui.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +67,7 @@ public class BoundsTab extends AbstractTab {
     TextFieldWidget cubicZ = new TextFieldWidget(font, getNeighbourX(textCubicZ), getRowY(1), 40, 20, new StringTextComponent(""));
 
     TextInstance textOffset = new TextInstance(getBaseX(), getRowY(2) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.offset"), font);
-    AmbiencePosition offsetPos;
+    AmbienceWorldSpace offsetPos;
     Button offsetPosButton = new Button(getNeighbourX(textOffset), getRowY(2) + getOffsetY(20), 20, 20, new StringTextComponent("X"), button -> {
         offsetPos = offsetPos.next();
         button.setMessage(new StringTextComponent(offsetPos.getName()));

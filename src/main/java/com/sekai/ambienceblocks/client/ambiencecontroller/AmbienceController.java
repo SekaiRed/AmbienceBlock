@@ -2,37 +2,35 @@ package com.sekai.ambienceblocks.client.ambiencecontroller;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.sekai.ambienceblocks.client.rendering.RenderTypeHelper;
+import com.sekai.ambienceblocks.client.rendering.RenderingEventHandler;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
+import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.RegistryHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.ChannelManager;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.SoundEngine;
 import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.sound.SoundLoadEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import org.lwjgl.opengl.GL11;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public class AmbienceController {
@@ -40,48 +38,20 @@ public class AmbienceController {
     public static AmbienceController instance;
     public static Minecraft mc;
     public static SoundHandler handler;
-    private static final boolean debugMode = false;
+    public static boolean debugMode = false;
 
     //System variables
     public int tick = 0;
     public AmbienceTileEntityData clipboard;
 
     //System lists
-    private ArrayList<AmbienceSlot> soundsList = new ArrayList<>();
-    private ArrayList<AmbienceDelayRestriction> delayList = new ArrayList<>();
-
-    //Reflection
-    public static final Field sndManager = ObfuscationReflectionHelper.findField(SoundHandler.class, "field_147694_f");
-    public static final Field playingSoundsStopTime = ObfuscationReflectionHelper.findField(SoundEngine.class, "field_148624_n");
-    public static final Field playingSoundsChannel = ObfuscationReflectionHelper.findField(SoundEngine.class, "field_217942_m");
-    public static final Field soundTicks = ObfuscationReflectionHelper.findField(SoundEngine.class, "field_148618_g");
-    public static final Field soundInit = ObfuscationReflectionHelper.findField(SoundEngine.class, "field_148617_f");
-
-    //Complex
-    private SoundEngine sndEngine;
-    private Map<ISound, Integer> engineSoundStopTime;
-    private Map<ISound, ChannelManager.Entry> engineSoundChannel;
-    private int engineTick;
-    private boolean engineInit;
+    public ArrayList<AmbienceSlot> soundsList = new ArrayList<>();
+    public ArrayList<AmbienceDelayRestriction> delayList = new ArrayList<>();
 
     public AmbienceController() {
         instance = this;
         mc = Minecraft.getInstance();
         handler = Minecraft.getInstance().getSoundHandler();
-
-        sndManager.setAccessible(true);
-        playingSoundsStopTime.setAccessible(true);
-        soundTicks.setAccessible(true);
-        soundInit.setAccessible(true);
-        try {
-            sndEngine = (SoundEngine) sndManager.get(handler);
-            engineSoundStopTime = (Map<ISound, Integer>) playingSoundsStopTime.get(sndEngine);
-            engineSoundChannel = (Map<ISound, ChannelManager.Entry>) playingSoundsChannel.get(sndEngine);
-            engineTick = soundTicks.getInt(sndEngine);
-            engineInit = soundInit.getBoolean(sndEngine);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
     }
 
     @SubscribeEvent
@@ -102,76 +72,98 @@ public class AmbienceController {
         if(!holdingFinder)
             return;
 
-        ActiveRenderInfo renderInfo = Minecraft.getInstance().gameRenderer.getActiveRenderInfo();
-        MatrixStack matrixStack = event.getMatrixStack();
+        MatrixStack ms = event.getMatrixStack();
+        ms.push();
 
-        RenderSystem.pushMatrix();
-        matrixStack.translate(-renderInfo.getProjectedView().getX(), -renderInfo.getProjectedView().getY(), -renderInfo.getProjectedView().getZ()); // translate back to camera
-        RenderSystem.multMatrix(matrixStack.getLast().getMatrix());
-        RenderSystem.depthFunc(519);
-        Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         for(TileEntity tile : mc.world.loadedTileEntityList) {
             if(!(tile instanceof AmbienceTileEntity))
                 continue;
 
-            BlockPos pos = tile.getPos();
-            drawBlock(Tessellator.getInstance().getBuffer(), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, ((AmbienceTileEntity) tile).data.getColor());
+            AmbienceTileEntity aTile = (AmbienceTileEntity) tile;
+
+            float[] c = aTile.data.getColor();
+            //TODO change render type with thicker lines when the block is playing! Do that by adding a new thicker RenderType of lines and put it in LINE_BUFFERS
+            float brightness = isTileEntityAlreadyPlaying(aTile) != null ? 1f : 0.75f;
+            c[0] *= brightness;
+            c[1] *= brightness;
+            c[2] *= brightness;
+
+            renderBlockOutlineAt(ms, RenderTypeHelper.LINE_BUFFERS, tile.getPos(), c);
         }
-        Tessellator.getInstance().draw();
-        RenderSystem.depthFunc(515);
-        RenderSystem.popMatrix();
+
+        ms.pop();
+        RenderSystem.disableDepthTest();
+        RenderTypeHelper.LINE_BUFFERS.finish();
     }
 
-    private static void drawBlock(final BufferBuilder bufferbuilder, final double x, final double y, final double z, final float[] c) {
-        double size = 0.5;
-        if(c.length != 4)
-            return;
+    private void renderBlockOutlineAt(MatrixStack ms, IRenderTypeBuffer.Impl lineBuffers, BlockPos pos, float[] c) {
+        double renderPosX = Minecraft.getInstance().getRenderManager().info.getProjectedView().getX();
+        double renderPosY = Minecraft.getInstance().getRenderManager().info.getProjectedView().getY();
+        double renderPosZ = Minecraft.getInstance().getRenderManager().info.getProjectedView().getZ();
 
+        ms.push();
+        ms.translate(-renderPosX, -renderPosY, -renderPosZ);
+        //ms.translate(pos.getX() - renderPosX, pos.getY() - renderPosY, pos.getZ() - renderPosZ + 1);
+
+        ms.scale(1F, 1F, 1F);
+
+        renderBlockOutline(ms.getLast().getMatrix(), lineBuffers.getBuffer(RenderTypeHelper.LINE_NO_DEPTH_TEST), pos, c);
+
+        ms.pop();
+    }
+
+    private static void renderBlockOutline(Matrix4f mat, IVertexBuilder buffer, BlockPos pos, float[] c) {
+        float ix = (float) pos.getX();
+        float iy = (float) pos.getY();
+        float iz = (float) pos.getZ();
+        float ax = (float) pos.getX() + 1;
+        float ay = (float) pos.getY() + 1;
+        float az = (float) pos.getZ() + 1;
+        float a = c[3];
         float r = c[0];
         float g = c[1];
         float b = c[2];
-        float a = c[3];
 
-        /*float r = 1f;
-        float g = 0f;
-        float b = 0f;
-        float a = 1f;*/
+        buffer.pos(mat, ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ix, ay, iz).color(r, g, b, a).endVertex();
 
-        // UP
-        bufferbuilder.pos(-size + x, size + y, -size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(-size + x, size + y, size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(size + x, size + y, size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(size + x, size + y, -size + z).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ix, ay, iz).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ax, ay, iz).color(r, g, b, a).endVertex();
 
-        // DOWN
-        bufferbuilder.pos(-size + x, -size + y, size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(-size + x, -size + y, -size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(size + x, -size + y, -size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(size + x, -size + y, size + z).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ax, ay, iz).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ax, iy, iz).color(r, g, b, a).endVertex();
 
-        // LEFT
-        bufferbuilder.pos(size + x, -size + y, size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(size + x, -size + y, -size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(size + x, size + y, -size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(size + x, size + y, size + z).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ax, iy, iz).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ix, iy, iz).color(r, g, b, a).endVertex();
 
-        // RIGHT
-        bufferbuilder.pos(-size + x, -size + y, -size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(-size + x, -size + y, size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(-size + x, size + y, size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(-size + x, size + y, -size + z).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ix, iy, az).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ix, ay, az).color(r, g, b, a).endVertex();
 
-        // BACK
-        bufferbuilder.pos(-size + x, -size + y, -size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(-size + x, size + y, -size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(size + x, size + y, -size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(size + x, -size + y, -size + z).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ix, iy, az).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ax, iy, az).color(r, g, b, a).endVertex();
 
-        // FRONT
-        bufferbuilder.pos(size + x, -size + y, size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(size + x, size + y, size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(-size + x, size + y, size + z).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(-size + x, -size + y, size + z).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ax, iy, az).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ax, ay, az).color(r, g, b, a).endVertex();
+
+        buffer.pos(mat, ix, ay, az).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ax, ay, az).color(r, g, b, a).endVertex();
+
+        buffer.pos(mat, ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ix, iy, az).color(r, g, b, a).endVertex();
+
+        buffer.pos(mat, ix, ay, iz).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ix, ay, az).color(r, g, b, a).endVertex();
+
+        buffer.pos(mat, ax, iy, iz).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ax, iy, az).color(r, g, b, a).endVertex();
+
+        buffer.pos(mat, ax, ay, iz).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ax, ay, az).color(r, g, b, a).endVertex();
+    }
+
+    @SubscribeEvent
+    public void soundReload(SoundLoadEvent e) {
+        clear();
     }
 
     @SubscribeEvent
@@ -193,6 +185,8 @@ public class AmbienceController {
         soundsList.clear();
 
         delayList.clear();
+
+        RenderingEventHandler.clearEvent();
     }
 
     @SubscribeEvent
@@ -216,7 +210,7 @@ public class AmbienceController {
         List<AmbienceTileEntity> ambienceTiles = getListOfLoadedAmbienceTiles();
 
         //iterate through all ambienceslots to stop them from playing or
-        for(AmbienceSlot slot : soundsList) {
+        ambienceIteration: for(AmbienceSlot slot : soundsList) {
             //update volume, pitch, intro/outro, fade in/out first
             slot.tick();
 
@@ -259,7 +253,8 @@ public class AmbienceController {
             //are its conditions still fulfilled?
             if(slot.getData().isUsingCondition()) {
                 //condBool turns true if atleast one condition returns false
-                boolean condBool = false;
+                //was i drunk when i wrote this what is this
+                /*boolean condBool = false;
                 List<AbstractCond> conditions = slot.getData().getConditions();
                 for (AbstractCond condition : conditions) {
                     if(!condition.isTrue(new Vector3d(mc.player.getPosX(), mc.player.getPosY(), mc.player.getPosZ()), slot.getOwner().getPos(), mc.world, slot.getOwner())) {
@@ -269,6 +264,15 @@ public class AmbienceController {
                 if(condBool) {
                     stopMusic(slot, "conditions returned false");
                     continue;
+                }*/
+
+                List<AbstractCond> conditions = slot.getData().getConditions();
+                for (AbstractCond condition : conditions) {
+                    if(!condition.isTrue(new Vector3d(mc.player.getPosX(), mc.player.getPosY(), mc.player.getPosZ()), slot.getOwner().getPos(), mc.world, slot.getOwner())) {
+                        //if a single condition is false let's end this early
+                        stopMusic(slot, "conditions returned false");
+                        continue ambienceIteration;
+                    }
                 }
             }
 
@@ -358,7 +362,7 @@ public class AmbienceController {
             if (tileHasDelayRightNow(tile) && tile.data.isUsingDelay()) {
                 if(getDelayEntry(tile).isDone()) {
                     if(isTileEntityAlreadyPlaying(tile) == null){
-                        playMusicNoRepeat(tile);
+                        playMusicNoRepeat(tile, "valid delayed sound");
                         delayList.remove(getDelayEntry(tile));
                         continue;
                     }
@@ -368,7 +372,7 @@ public class AmbienceController {
                             if(tile.data.shouldStopPrevious()) {
                                 stopMusic(isTileEntityAlreadyPlaying(tile), "delay stopped it since it's playing again");
                             }
-                            playMusicNoRepeat(tile);
+                            playMusicNoRepeat(tile, "delayed sound can play over itself");
                             delayList.remove(getDelayEntry(tile));
                             continue;
                         }
@@ -441,20 +445,6 @@ public class AmbienceController {
         }
 
         soundsList.removeIf(AmbienceSlot::isMarkedForDeletion);
-
-        if(debugMode) {
-            System.out.println("List of audio blocks going on");
-            for (AmbienceSlot slot : soundsList) {
-                System.out.println(slot.toString());
-                //System.out.println(slot.getMusicString() + ", " + slot.getOwner().getPos() + " volume " + slot.getMusicInstance().getVolume() + " pitch " + slot.getMusicInstance().getPitch());
-            }
-            System.out.println("and");
-            System.out.println("List of audio delays going on");
-            for (AmbienceDelayRestriction slot : delayList) {
-                System.out.println(slot.getOrigin().data.getSoundName() + ", " + slot.getOrigin().getPos() + " with a tick of " + slot.tickLeft);
-            }
-            System.out.println("end");
-        }
     }
 
     public boolean isSoundPlaying(String sound) {
@@ -463,27 +453,6 @@ public class AmbienceController {
                 return true;
         }
         return false;
-    }
-
-    //didn't work out :(
-    public boolean isPlaying(ISound sound) {
-        //Gather variables
-        try {
-            //sndEngine = (SoundEngine) sndManager.get(handler);
-            engineSoundStopTime = (Map<ISound, Integer>) playingSoundsStopTime.get(sndEngine);
-            engineSoundChannel = (Map<ISound, ChannelManager.Entry>) playingSoundsChannel.get(sndEngine);
-            engineTick = soundTicks.getInt(sndEngine);
-            engineInit = soundInit.getBoolean(sndEngine);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        if (!engineInit) {
-            return false;
-        } else {
-            //return engineSoundStopTime.containsKey(sound) && engineSoundStopTime.get(sound) <= engineTick - 100 ? true : engineSoundChannel.containsKey(sound);
-            return engineSoundStopTime.containsKey(sound) && engineSoundStopTime.get(sound) <= engineTick + 10;
-            //return this.playingSoundsStopTime.containsKey(soundIn) && this.playingSoundsStopTime.get(soundIn) <= this.ticks ? true : this.playingSoundsChannel.containsKey(soundIn);
-        }
     }
 
     private boolean hasSameMusics(AmbienceTileEntityData oData, AmbienceTileEntityData nData) {
@@ -515,38 +484,17 @@ public class AmbienceController {
     }
 
     public void playMusic(AmbienceTileEntity tile, String source) {
-        if(debugMode) {
-            System.out.print("playing " + tile.data.getSoundName() + " at " + tile.getPos());
-            System.out.print(" from " + source);
-            System.out.println(" ");
-        }
-        //todo fuck
-        //soundsList.add(new CustomSoundSlot(tile.data.getSoundName(), playingMusic, tile));
+        if(debugMode)
+            RenderingEventHandler.addEvent("playing " + tile.data.getSoundName() + " at " + ParsingUtil.customBlockPosToString(tile.getPos()), source, RenderingEventHandler.cBlue);
+
         AmbienceSlot slot = new AmbienceSlot(handler, tile);
         slot.play();
         soundsList.add(slot);
     }
 
-    public void playMusicNoRepeat(AmbienceTileEntity tile) {
-        //System.out.println("playing non-looping " + tile.getMusicName() + " at " + tile.getPos());
-        /*float volume = getVolumeFromTileEntity(tile), pitch = tile.data.getPitch();
-
-        boolean usingRandomVolume = false;
-        if(tile.data.isUsingRandomVolume()) usingRandomVolume = true;
-        boolean usingRandomPitch = false;
-        if(tile.data.isUsingRandomPitch()) usingRandomPitch = true;
-
-        if(usingRandomVolume) volume = (float) (tile.data.getMinRandomVolume() + Math.random() * (tile.data.getMaxRandomVolume() - tile.data.getMinRandomVolume()));
-        if(usingRandomPitch) pitch = (float) (tile.data.getMinRandomPitch() + Math.random() * (tile.data.getMaxRandomPitch() - tile.data.getMinRandomPitch()));
-
-        ResourceLocation playingResource = new ResourceLocation(tile.data.getSoundName());
-        AmbienceInstance playingMusic = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(tile.data.getCategory().toUpperCase(), SoundCategory.MASTER), tile.getPos().add(ParsingUtil.Vec3dToVec3i(tile.data.getOffset())), volume, pitch, tile.data.getFadeIn(), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
-        handler.play(playingMusic);*/
-        //todo fuck lol
-        //CustomSoundSlot custom = new CustomSoundSlot(tile.data.getSoundName(), playingMusic, tile);
-        //soundsList.add(custom);
-        //if(usingRandomVolume) custom.setCachedVolume(volume);
-        //if(usingRandomPitch) custom.setCachedPitch(pitch);
+    public void playMusicNoRepeat(AmbienceTileEntity tile, String source) {
+        if(debugMode)
+            RenderingEventHandler.addEvent("playing non-looping " + tile.data.getSoundName() + " at " + ParsingUtil.customBlockPosToString(tile.getPos()), source, RenderingEventHandler.cBlue);
 
         float volume = getVolumeFromTileEntity(tile), pitch = tile.data.getPitch();
 
@@ -554,35 +502,28 @@ public class AmbienceController {
         if(tile.data.isUsingRandomPitch()) pitch = (float) (tile.data.getMinRandomPitch() + Math.random() * (tile.data.getMaxRandomPitch() - tile.data.getMinRandomPitch()));
 
         AmbienceSlot slot = new AmbienceSlot(handler, tile);
-        //slot.setIsSingle();
         //supply the randomly chosen volume and pitch
         slot.setCachedVolume(volume);
-        slot.setCachedVolume(pitch);
+        slot.setCachedPitch(pitch);
         slot.play();
         soundsList.add(slot);
     }
 
     public void stopMusic(AmbienceSlot soundSlot, String source) {
-        if(debugMode) {
-            System.out.print("stopping " + soundSlot.getMusicString() + " at " + soundSlot.getOwner().getPos());
-            System.out.print(" from " + source);
-            System.out.println(" ");
-        }
+        //no use stopping an already stopped sound
+        if(soundSlot.isStopping())
+            return;
+
+        if(debugMode)
+            RenderingEventHandler.addEvent("stopping " + soundSlot.getMusicString() + " at " + ParsingUtil.customBlockPosToString(soundSlot.getOwner().getPos()), source, RenderingEventHandler.cRed);
+
         soundSlot.stop();
-        //soundSlot.markForDeletion();
-        /*if(soundSlot.getOwner().data.getFadeOut() != 0f && !soundSlot.getOwner().data.isUsingDelay())
-            soundSlot.getMusicInstance().stop(soundSlot.getOwner().data.getFadeOut());
-        else
-            handler.stop(soundSlot.getMusicInstance());
-        soundSlot.markForDeletion();*/
     }
 
     public void stopMusicNoFadeOut(AmbienceSlot soundSlot, String source) {
-        if(debugMode) {
-            System.out.print("stopping " + soundSlot.getMusicString() + " at " + soundSlot.getOwner().getPos());
-            System.out.print(" from " + source);
-            System.out.println(" ");
-        }
+        if(debugMode)
+            RenderingEventHandler.addEvent("forced stopped " + soundSlot.getMusicString() + " at " + ParsingUtil.customBlockPosToString(soundSlot.getOwner().getPos()), source, RenderingEventHandler.cRed);
+
         soundSlot.forceStop();
         //handler.stop(soundSlot.getMusicInstance());
         //soundSlot.markForDeletion();
@@ -590,9 +531,9 @@ public class AmbienceController {
 
     //Swaps which tiles is currently owning a playing sound, used for relays and fusing
     public void swapOwner(AmbienceSlot soundSlot, AmbienceTileEntity tile) {
-        if(debugMode) {
-            System.out.println("swapping " + tile.data.getSoundName() + " from " + soundSlot.getOwner().getPos() + " to " + tile.getPos());
-        }
+        if(debugMode)
+            RenderingEventHandler.addEvent("swapping " + tile.data.getSoundName() + " from " + ParsingUtil.customBlockPosToString(soundSlot.getOwner().getPos()) + " to " + ParsingUtil.customBlockPosToString(tile.getPos()), null, RenderingEventHandler.cGreen);
+
         soundSlot.setOwner(tile);
         //soundSlot.getMusicInstance().setBlockPos(tile.getPos().add(ParsingUtil.Vec3dToVec3i(tile.data.getOffset())));
     }
@@ -945,6 +886,14 @@ public class AmbienceController {
 
         public void restart() {
             tickLeft = originalTick;
+        }
+
+        @Override
+        public String toString() {
+            return getOrigin().data.getSoundName() +
+                    ", " + ParsingUtil.customBlockPosToString(origin.getPos()) +
+                    ", originalTick=" + originalTick +
+                    ", tickLeft=" + tickLeft;
         }
     }
 

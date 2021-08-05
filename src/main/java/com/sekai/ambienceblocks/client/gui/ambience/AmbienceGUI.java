@@ -3,6 +3,7 @@ package com.sekai.ambienceblocks.client.gui.ambience;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sekai.ambienceblocks.Main;
+import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.ambience.tabs.*;
 import com.sekai.ambienceblocks.packets.PacketUpdateAmbienceTE;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
@@ -50,6 +51,7 @@ public class AmbienceGUI extends AmbienceScreen {
     private AbstractTab highlightedTab;
 
     private Button confirmChanges;
+    private Button cancel;
 
     private boolean help;
     private Button bHelp;
@@ -78,7 +80,8 @@ public class AmbienceGUI extends AmbienceScreen {
 
         drawHelp(matrix);
 
-        //drawDebug();
+        if(AmbienceController.debugMode)
+            drawDebug();
     }
 
     private void drawDebug() {
@@ -172,8 +175,14 @@ public class AmbienceGUI extends AmbienceScreen {
             }
         }
 
-        confirmChanges = addButton(new Button(xTopLeft + 8, yTopLeft + texHeight + 8, 100, 20, new StringTextComponent("Confirm Changes"), button -> {
+        confirmChanges = addButton(new Button(xTopLeft + 4, yTopLeft + texHeight + 4, 100, 20, new StringTextComponent("Confirm Changes"), button -> {
             saveDataToTile();
+
+            Minecraft.getInstance().displayGuiScreen(null);
+        }));
+
+        cancel = addButton(new Button(xTopLeft + texWidth - 80 - 4, yTopLeft + texHeight + 4, 80, 20, new StringTextComponent("Cancel"), button -> {
+            Minecraft.getInstance().displayGuiScreen(null);
         }));
 
         help = false;
