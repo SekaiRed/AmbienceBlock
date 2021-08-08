@@ -37,6 +37,9 @@ public class AmbienceSlot {
     //fade tick counter
     private int fadeCounter = 0;
 
+    //using a bound sound
+    private boolean hasBoundSound;
+
     private boolean markForDeletion = false;
 
     public AmbienceSlot(SoundHandler handler, AmbienceTileEntity owner) {
@@ -115,6 +118,12 @@ public class AmbienceSlot {
         //no outro or fade out so just stop it now
         if(!AmbienceSoundState.OUTRO.equals(stateSnd) && !AmbienceFadeState.FADE_OUT.equals(stateFade))
             forceStop();
+    }
+
+    //TODO forces the AmbienceSlot to adopt a specific sound instead of having it's own instance
+    // mostly used by always playing and linked ambience
+    public void bindSound(AmbienceInstance instance) {
+        this.instance = instance;
     }
 
     private void setFadeState(AmbienceFadeState state) {
@@ -333,8 +342,7 @@ public class AmbienceSlot {
     @Override
     public String toString() {
         return instance.getSoundLocation().toString() + ", " +
-                ParsingUtil.customBlockPosToString(getOwner().getPos()) + ", volume " + getVolume() + ", pitch " + getPitch() + ", priority " + getOwner().data.getPriority()
-                + ", channel " + getOwner().data.getChannel() + " with Sound : " + stateSnd.toString() + " and Fade : " + stateFade.toString();
+                ParsingUtil.customBlockPosToString(getOwner().getPos()) + ", volume " + getVolume() + ", pitch " + getPitch() + " with Sound : " + stateSnd.toString() + " and Fade : " + stateFade.toString();
     }
 
     public void setIsSingle() {

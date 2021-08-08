@@ -860,6 +860,11 @@ public class AmbienceController {
         }
     }*/
 
+    /*//lists off every counted up Ambiences
+    public class AmbienceEntry {
+
+    }*/
+
     public class AmbienceDelayRestriction {
         public AmbienceTileEntity getOrigin() {
             return origin;

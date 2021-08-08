@@ -27,10 +27,10 @@ import java.util.List;
 
 @Mod.EventBusSubscriber(modid = Main.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class RenderingEventHandler {
-    public final static int cWhite = 14737632;
-    public final static int cRed = 14680064;
-    public final static int cGreen = 57344;
-    public final static int cBlue = 224;
+    public final static int cWhite = 0xE0E0E0;//14737632;
+    public final static int cRed = 0xE02020;//14680064;
+    public final static int cGreen = 0x20E020;//57344;
+    public final static int cBlue = 0x2020E0;//224;
 
     private final static float scale = 2f;
     private final static int eventListLimit = 20;
@@ -41,12 +41,15 @@ public class RenderingEventHandler {
         if(!AmbienceController.debugMode)
             return;
 
+        if(Minecraft.getInstance().gameSettings.showDebugInfo)
+            return;
+
         RenderSystem.defaultBlendFunc();
 
         //RenderSystem.enableBlend();
 
         ArrayList<String> listL = new ArrayList<String>();
-        ArrayList<String> listR = new ArrayList<String>();
+        //ArrayList<String> listR = new ArrayList<String>();
 
         MatrixStack mStack = event.getMatrixStack();
         FontRenderer fontrenderer = Minecraft.getInstance().fontRenderer;
@@ -58,7 +61,7 @@ public class RenderingEventHandler {
         mStack.scale(1/scale, 1/scale, 1/scale);
 
         listL.addAll(getLeft());
-        listR.addAll(getRight());
+        //listR.addAll(getRight());
 
         int top = 2;
         for (String msg : listL)
@@ -106,12 +109,12 @@ public class RenderingEventHandler {
         return list;
     }
 
-    private static ArrayList<String> getRight() {
+    /*private static ArrayList<String> getRight() {
         ArrayList<String> list = new ArrayList<>();
         //list.add("Nothing here yet!");
         //eventList.forEach(event -> list.add(event.msg));
         return list;
-    }
+    }*/
 
     public static void clearEvent() {
         eventList.clear();
