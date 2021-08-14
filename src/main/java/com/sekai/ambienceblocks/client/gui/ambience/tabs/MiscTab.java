@@ -5,7 +5,7 @@ import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.client.rendering.RenderingEventHandler;
-import com.sekai.ambienceblocks.tileentity.AmbienceData;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.StringTextComponent;

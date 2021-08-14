@@ -1,10 +1,10 @@
 package com.sekai.ambienceblocks.client.ambiencecontroller;
 
 import com.sekai.ambienceblocks.client.rendering.RenderingEventHandler;
-import com.sekai.ambienceblocks.tileentity.AmbienceData;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
-import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
+import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.RegistryHandler;
 import com.sekai.ambienceblocks.world.CompendiumRegistry;

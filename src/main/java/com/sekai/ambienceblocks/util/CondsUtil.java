@@ -1,15 +1,11 @@
 package com.sekai.ambienceblocks.util;
 
-import com.sekai.ambienceblocks.tileentity.ambiencetilecond.*;
-import com.sekai.ambienceblocks.tileentity.util.*;
-import net.minecraft.entity.EntityType;
+import com.sekai.ambienceblocks.ambience.conds.*;
+import com.sekai.ambienceblocks.ambience.util.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.GameType;
 import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.gen.feature.structure.Structure;
-
-import static net.minecraftforge.registries.ForgeRegistries.BIOMES;
 
 public class CondsUtil {
     //nbt stuff

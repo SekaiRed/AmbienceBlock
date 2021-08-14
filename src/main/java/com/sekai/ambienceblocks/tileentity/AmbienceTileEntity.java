@@ -1,9 +1,9 @@
 package com.sekai.ambienceblocks.tileentity;
 
-import com.sekai.ambienceblocks.tileentity.util.AmbienceWorldSpace;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
+import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.util.RegistryHandler;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;

@@ -1,8 +1,8 @@
 package com.sekai.ambienceblocks.world;
 
-import com.sekai.ambienceblocks.tileentity.AmbienceData;
+import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceWorldSpace;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;

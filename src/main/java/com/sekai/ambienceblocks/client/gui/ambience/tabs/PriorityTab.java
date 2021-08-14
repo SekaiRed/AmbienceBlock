@@ -3,7 +3,7 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
-import com.sekai.ambienceblocks.tileentity.AmbienceData;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resources.I18n;

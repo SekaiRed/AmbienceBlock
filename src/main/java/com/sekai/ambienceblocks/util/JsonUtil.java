@@ -2,7 +2,7 @@ package com.sekai.ambienceblocks.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.AbstractBounds;
+import com.sekai.ambienceblocks.ambience.bounds.AbstractBounds;
 import com.sekai.ambienceblocks.util.json.AmbienceBoundsSerializer;
 
 public class JsonUtil {

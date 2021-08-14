@@ -1,11 +1,10 @@
 package com.sekai.ambienceblocks.util;
 
-import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceWorldSpace;
+import com.sekai.ambienceblocks.ambience.util.AmbienceType;
+import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import net.minecraft.util.SoundCategory;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class StaticUtil {
     public static <T extends Enum<T>> T getEnumValue(int index, T[] values) {

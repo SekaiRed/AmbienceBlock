@@ -1,11 +1,7 @@
 package com.sekai.ambienceblocks.util.json;
 
 import com.google.gson.*;
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.AbstractBounds;
-import com.sekai.ambienceblocks.util.BoundsUtil;
-import com.sekai.ambienceblocks.util.JsonUtil;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.common.util.JsonUtils;
+import com.sekai.ambienceblocks.ambience.bounds.AbstractBounds;
 
 import java.lang.reflect.Type;
 

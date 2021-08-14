@@ -1,13 +1,13 @@
 package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.sekai.ambienceblocks.ambience.bounds.*;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.CheckboxWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
-import com.sekai.ambienceblocks.tileentity.AmbienceData;
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.*;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceWorldSpace;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
+import com.sekai.ambienceblocks.ambience.util.AmbienceAxis;
+import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.gui.widget.TextFieldWidget;

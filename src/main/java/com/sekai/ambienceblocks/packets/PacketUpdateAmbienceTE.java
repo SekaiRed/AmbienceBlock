@@ -1,6 +1,6 @@
 package com.sekai.ambienceblocks.packets;
 
-import com.sekai.ambienceblocks.tileentity.AmbienceData;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.util.ClientPacketHandler;
 import com.sekai.ambienceblocks.util.PacketHandler;

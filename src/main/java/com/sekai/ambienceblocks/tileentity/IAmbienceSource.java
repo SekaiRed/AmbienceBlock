@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks.tileentity;
 
+import com.sekai.ambienceblocks.ambience.AmbienceData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.vector.Vector3d;
 

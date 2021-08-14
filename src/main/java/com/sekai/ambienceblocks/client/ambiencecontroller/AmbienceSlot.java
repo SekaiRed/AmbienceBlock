@@ -1,9 +1,9 @@
 package com.sekai.ambienceblocks.client.ambiencecontroller;
 
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
-import com.sekai.ambienceblocks.tileentity.AmbienceData;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
+import com.sekai.ambienceblocks.ambience.util.AmbienceType;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
