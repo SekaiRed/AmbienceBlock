@@ -1,6 +1,7 @@
 package com.sekai.ambienceblocks.util;
 
 import com.sekai.ambienceblocks.Main;
+import com.sekai.ambienceblocks.packets.PacketTargeting;
 import com.sekai.ambienceblocks.packets.PacketUpdateAmbienceTE;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;
@@ -17,11 +18,7 @@ public class PacketHandler {
 
     public static void register()
     {
-        //NET_CHANNEL.registerMessage();
-        //NET.registerMessage(0, PacketCapabilitiesWildCard.class, PacketCapabilitiesWildCard::encode, PacketCapabilitiesWildCard::decode, PacketCapabilitiesWildCard::handle);
-        //NET.registerMessage(1, PacketDebug.class, PacketDebug::encode, PacketDebug::decode, PacketDebug::handle);
-        //NET.registerMessage(0, PacketDebug.class, PacketDebug::encode, PacketDebug::decode, PacketDebug::handle);
         NET.registerMessage(0, PacketUpdateAmbienceTE.class, PacketUpdateAmbienceTE::encode, PacketUpdateAmbienceTE::decode, PacketUpdateAmbienceTE::handle);
-        //NET.registerMessage(2, PacketOpenAmbienceGui.class, PacketOpenAmbienceGui::encode, PacketOpenAmbienceGui::decode, PacketOpenAmbienceGui::handle);
+        NET.registerMessage(1, PacketTargeting.class, PacketTargeting::encode, PacketTargeting::decode, PacketTargeting::handle);
     }
 }

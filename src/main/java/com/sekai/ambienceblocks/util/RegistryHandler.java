@@ -29,8 +29,6 @@ public class RegistryHandler {
         PARTICLE_TYPE.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
-    //Items
-
     //Blocks
     public static final RegistryObject<Block> AMBIENCE_BLOCK = BLOCKS.register("ambience_block", AmbienceBlock::new);
     public static final RegistryObject<Block> INVISIBLE_AMBIENCE_BLOCK = BLOCKS.register("invisible_ambience_block", InvisibleAmbienceBlock::new);

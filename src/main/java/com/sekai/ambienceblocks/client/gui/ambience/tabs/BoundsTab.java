@@ -4,7 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.CheckboxWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.tileentity.AmbienceData;
 import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.*;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceWorldSpace;
@@ -337,7 +337,7 @@ public class BoundsTab extends AbstractTab {
     }
 
     @Override
-    public void setFieldFromData(AmbienceTileEntityData data) {
+    public void setFieldFromData(AmbienceData data) {
         //setCheckBoxChecked(isGlobal, data.isGlobal());
         isGlobal.setChecked(data.isGlobal());
 
@@ -353,7 +353,7 @@ public class BoundsTab extends AbstractTab {
     }
 
     @Override
-    public void setDataFromField(AmbienceTileEntityData data) {
+    public void setDataFromField(AmbienceData data) {
         data.setGlobal(isGlobal.isChecked());
 
         data.setSpace(offsetPos);
@@ -431,7 +431,7 @@ public class BoundsTab extends AbstractTab {
         }
     }
 
-    public void loadBoundType(AmbienceTileEntityData data) {
+    public void loadBoundType(AmbienceData data) {
         setBoundType(data.getBounds().getID());
         if(data.getBounds() instanceof SphereBounds) {
             SphereBounds bounds = (SphereBounds) data.getBounds();

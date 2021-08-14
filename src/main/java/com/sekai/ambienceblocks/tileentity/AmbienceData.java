@@ -11,6 +11,7 @@ import com.sekai.ambienceblocks.util.CondsUtil;
 import com.sekai.ambienceblocks.util.NBTHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.vector.Vector3d;
@@ -21,8 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 //data holder class
-public class AmbienceTileEntityData
-{
+public class AmbienceData {
     public static final int maxPriorities = 99;
     public static final int maxChannels = 9;
 
@@ -116,10 +116,21 @@ public class AmbienceTileEntityData
 
         compound.putBoolean("useCondition", this.useCondition);
         if(useCondition) {
-            compound.putInt("condSize", this.conditions.size());
+            /*compound.putInt("condSize", this.conditions.size());
             for(int i = 0; i < conditions.size(); i++) {
                 compound.put("cond" + i, CondsUtil.toNBT(conditions.get(i)));
-            }
+            }*/
+
+            ListNBT conds = new ListNBT();
+            conditions.forEach(cond -> {
+                conds.add(CondsUtil.toNBT(cond));
+            });
+            compound.put("conds", conds);
+
+            /*ListNBT conds = compound.getList("conds", 0); //wtf is a type
+            conds.forEach(inbt -> {
+                conditions.add(CondsUtil.fromNBT((CompoundNBT) inbt));
+            });*/
         }
 
         return compound;
@@ -171,14 +182,29 @@ public class AmbienceTileEntityData
         this.useCondition = compound.getBoolean("useCondition");
         if(useCondition) {
             conditions.clear();
-            int size = compound.getInt("condSize");
-            for(int i = 0; i < size; i++) {
-                conditions.add(CondsUtil.fromNBT((CompoundNBT) Objects.requireNonNull(compound.get("cond" + i))));
+
+            //if it's encoded in the old format, read it as such
+            if (isOldConditionFormat(compound)) {
+                int size = compound.getInt("condSize");
+                for(int i = 0; i < size; i++) {
+                    conditions.add(CondsUtil.fromNBT((CompoundNBT) Objects.requireNonNull(compound.get("cond" + i))));
+                }
+            } else {
+                //TODO read list nbt
+                ListNBT conds = compound.getList("conds", 10); //wtf is a type
+                conds.forEach(inbt -> {
+                    conditions.add(CondsUtil.fromNBT((CompoundNBT) inbt));
+                });
             }
         }
 
     }
     ////
+
+    private boolean isOldConditionFormat(CompoundNBT nbt) {
+        //if there is atleast a cond0 key it means it the old format
+        return nbt.contains("cond0");
+    }
 
     //Buffer util
     public void toBuff(PacketBuffer buf) {

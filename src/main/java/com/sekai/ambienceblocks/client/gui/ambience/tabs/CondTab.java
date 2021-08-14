@@ -4,7 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.ambience.EditCondGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.tileentity.AmbienceData;
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AlwaysTrueCond;
 import net.minecraft.client.Minecraft;
@@ -99,14 +99,14 @@ public class CondTab extends AbstractTab {
     }
 
     @Override
-    public void setFieldFromData(AmbienceTileEntityData data) {
+    public void setFieldFromData(AmbienceData data) {
         condList.clear();
         condList.addAll(data.getConditions());
         updateGuiCondList();
     }
 
     @Override
-    public void setDataFromField(AmbienceTileEntityData data) {
+    public void setDataFromField(AmbienceData data) {
         data.setConditions(condList);
     }
 

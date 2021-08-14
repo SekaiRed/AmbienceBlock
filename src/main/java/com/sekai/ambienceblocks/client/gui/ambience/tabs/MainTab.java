@@ -6,7 +6,7 @@ import com.sekai.ambienceblocks.client.gui.ambience.ChooseSoundGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.CheckboxWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.ScrollListWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.tileentity.AmbienceData;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.StaticUtil;
@@ -284,7 +284,7 @@ public class MainTab extends AbstractTab {
     }
 
     @Override
-    public void setFieldFromData(AmbienceTileEntityData data) {
+    public void setFieldFromData(AmbienceData data) {
         soundName.setText(data.getSoundName());
         listCategory.setSelectionByString(data.getCategory());
         listType.setSelectionByString(data.getType());
@@ -313,7 +313,7 @@ public class MainTab extends AbstractTab {
     }
 
     @Override
-    public void setDataFromField(AmbienceTileEntityData data) {
+    public void setDataFromField(AmbienceData data) {
         data.setSoundName(soundName.getText());
         //data.setCategory(SoundCategory.valueOf(listCategory.getSelectedString()).getName());
         data.setCategory(ParsingUtil.tryParseEnum(listCategory.getSelectedString().toUpperCase(), SoundCategory.MASTER).getName());

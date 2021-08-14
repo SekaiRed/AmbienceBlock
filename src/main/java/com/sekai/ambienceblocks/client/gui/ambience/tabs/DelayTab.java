@@ -4,13 +4,12 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.CheckboxWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.tileentity.AmbienceData;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.client.gui.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -236,7 +235,7 @@ public class DelayTab extends AbstractTab {
     }
 
     @Override
-    public void setFieldFromData(AmbienceTileEntityData data) {
+    public void setFieldFromData(AmbienceData data) {
         minDelay.setText(String.valueOf(data.getMinDelay()));
         maxDelay.setText(String.valueOf(data.getMaxDelay()));
 
@@ -251,7 +250,7 @@ public class DelayTab extends AbstractTab {
     }
 
     @Override
-    public void setDataFromField(AmbienceTileEntityData data) {
+    public void setDataFromField(AmbienceData data) {
         data.setMinDelay(ParsingUtil.tryParseInt(minDelay.getText()));
         data.setMaxDelay(ParsingUtil.tryParseInt(maxDelay.getText()));
 

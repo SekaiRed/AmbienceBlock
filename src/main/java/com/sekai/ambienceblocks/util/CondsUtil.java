@@ -2,9 +2,14 @@ package com.sekai.ambienceblocks.util;
 
 import com.sekai.ambienceblocks.tileentity.ambiencetilecond.*;
 import com.sekai.ambienceblocks.tileentity.util.*;
+import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.GameType;
+import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.gen.feature.structure.Structure;
+
+import static net.minecraftforge.registries.ForgeRegistries.BIOMES;
 
 public class CondsUtil {
     //nbt stuff
@@ -36,17 +41,24 @@ public class CondsUtil {
 
     public enum CondList {
         ALWAYS_TRUE(0, new AlwaysTrueCond()),
-        PLAYER_POS_AXIS(10, new PlayerPosAxisCond(AmbienceTest.EQUAL_TO, AmbienceWorldSpace.ABSOLUTE, AmbienceAxis.X, 0)),
-        PLAYER_HEALTH(11, new PlayerHealthCond(AmbienceTest.GREATER_THAN, 10)),
-        PLAYER_HUNGER(12, new PlayerHungerCond(AmbienceTest.GREATER_THAN, 10)),
-        PLAYER_GAMEMODE(13, new PlayerGamemodeCond(AmbienceEquality.EQUAL_TO, GameType.SURVIVAL)),
-        WORLD_WEATHER(20, new WorldWeatherCond(AmbienceEquality.EQUAL_TO, AmbienceWeather.CLEAR)),
-        WORLD_DAYTIME(21, new WorldDaytimeCond(AmbienceTest.GREATER_THAN, 0)),
-        WORLD_ISDAY(23, new WorldNeedDayCond(AmbienceEquality.EQUAL_TO)),
-        WORLD_REDSTONE(22, new WorldNeedRedstoneCond(AmbienceEquality.EQUAL_TO)),
-        AMBIENCE_PRIORITY(30, new AmbiencePriorityCond(AmbienceTest.EQUAL_TO, 0, 0)),
-        AMBIENCE_ISPLAYING(31, new AmbienceIsPlayingCond(AmbienceEquality.EQUAL_TO, ""));
+        PLAYER_POS_AXIS(100, new PlayerPosAxisCond(AmbienceTest.EQUAL_TO, AmbienceWorldSpace.ABSOLUTE, AmbienceAxis.X, 0)),
+        PLAYER_POS_WITHIN_REGION(101, new PlayerPosWithinRegionCond(0, 0, 0, 0, 0, 0, AmbienceEquality.EQUAL_TO, AmbienceWorldSpace.RELATIVE)),
+        PLAYER_POS_WITHIN_RADIUS(102, new PlayerPosWithinRadiusCond(0, 0, 0, 16, AmbienceTest.LESSER_THAN, AmbienceWorldSpace.RELATIVE)),
+        PLAYER_BLOCK(103, new PlayerBlockCond(0, 0, 0, AmbienceEquality.EQUAL_TO, AmbienceWorldSpace.RELATIVE, "")),
+        PLAYER_HEALTH(104, new PlayerHealthCond(AmbienceTest.GREATER_THAN, 10)),
+        PLAYER_HUNGER(105, new PlayerHungerCond(AmbienceTest.GREATER_THAN, 10)),
+        PLAYER_GAMEMODE(106, new PlayerGamemodeCond(AmbienceEquality.EQUAL_TO, GameType.SURVIVAL)),
+        PLAYER_BIOME(107, new PlayerBiomeCond(AmbienceEquality.EQUAL_TO, Biomes.PLAINS.getLocation().toString())),
+        //PLAYER_STRUCTURE(108, new PlayerStructureCond(AmbienceEquality.EQUAL_TO, Structure.VILLAGE.getStructureName())),
+        PLAYER_INBATTLE(109, new PlayerInBattleCond(AmbienceEquality.EQUAL_TO, "")),
+        WORLD_WEATHER(200, new WorldWeatherCond(AmbienceEquality.EQUAL_TO, AmbienceWeather.CLEAR)),
+        WORLD_DAYTIME(201, new WorldDaytimeCond(AmbienceTest.GREATER_THAN, 0)),
+        WORLD_ISDAY(202, new WorldNeedDayCond(AmbienceEquality.EQUAL_TO)),
+        WORLD_REDSTONE(203, new WorldNeedRedstoneCond(AmbienceEquality.EQUAL_TO)),
+        AMBIENCE_PRIORITY(300, new AmbiencePriorityCond(AmbienceTest.EQUAL_TO, 0, 0)),
+        AMBIENCE_ISPLAYING(301, new AmbienceIsPlayingCond(AmbienceEquality.EQUAL_TO, ""));
 
+        //You can freely edit the meta value because it's only used on packet transfers, which should be the same independently from the version
         int metaValue;
         AbstractCond defaultCond;
 

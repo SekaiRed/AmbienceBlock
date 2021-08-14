@@ -9,8 +9,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.vector.Vector3d;
 
-public class AmbienceTileEntity extends TileEntity {
-    public AmbienceTileEntityData data = new AmbienceTileEntityData();
+public class AmbienceTileEntity extends TileEntity implements IAmbienceSource {
+    public AmbienceData data = new AmbienceData();
 
     public AmbienceTileEntity(final TileEntityType<?> tileEntityTypeIn) {
         super(tileEntityTypeIn);
@@ -46,7 +46,21 @@ public class AmbienceTileEntity extends TileEntity {
         data.fromNBT(tag);
     }
 
-    //fancy
+    //I have no idea if this is a good idea
+    @Override
+    public CompoundNBT getTileData() {
+        CompoundNBT tag = new CompoundNBT();
+        data.toNBT(tag);
+        super.write(tag);
+        return tag;
+    }
+
+    //interface
+    @Override
+    public AmbienceData getData() {
+        return data;
+    }
+
     public Vector3d getOrigin() {
         Vector3d oPos = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
         if(AmbienceWorldSpace.RELATIVE.equals(data.getSpace()))
@@ -55,11 +69,11 @@ public class AmbienceTileEntity extends TileEntity {
             return data.getOffset().add(new Vector3d(0.5, 0.5, 0.5));
     }
 
-    public boolean isWithinBounds(PlayerEntity player) {
+    /*public boolean isWithinBounds(PlayerEntity player) {
         return data.isWithinBounds(player, getOrigin());
     }
 
     public double distanceTo(PlayerEntity player) {
         return data.distanceFromCenter(player, getOrigin());
-    }
+    }*/
 }

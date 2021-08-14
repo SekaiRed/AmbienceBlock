@@ -4,7 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.ambience.ChooseSoundGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.tileentity.AmbienceData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
@@ -137,13 +137,13 @@ public class MusicTab extends AbstractTab {
     }
 
     @Override
-    public void setFieldFromData(AmbienceTileEntityData data) {
+    public void setFieldFromData(AmbienceData data) {
         introName.setText(data.getIntroName());
         outroName.setText(data.getOutroName());
     }
 
     @Override
-    public void setDataFromField(AmbienceTileEntityData data) {
+    public void setDataFromField(AmbienceData data) {
         data.setIntroName(introName.getText());
         data.setOutroName(outroName.getText());
     }

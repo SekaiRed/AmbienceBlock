@@ -1,6 +1,6 @@
 package com.sekai.ambienceblocks.tileentity.ambiencetilecond;
 
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
+import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceTest;
@@ -10,7 +10,6 @@ import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
@@ -27,11 +26,6 @@ public class PlayerPosAxisCond extends AbstractCond {
     private static final String SPACE = "space";
     private static final String AXIS = "axis";
     private static final String VALUE = "value";
-
-    //gui
-    /*private static Button bTest;
-    private static Button bAxis;
-    private static TextFieldWidget textValue;*/
 
     public PlayerPosAxisCond(AmbienceTest test, AmbienceWorldSpace space, AmbienceAxis axis, double value) {
         this.test = test;
@@ -57,16 +51,16 @@ public class PlayerPosAxisCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
+    public boolean isTrue(Vector3d playerPos, World worldIn, IAmbienceSource sourceIn) {
         double playerValue = 0.0D;
         if(AmbienceWorldSpace.ABSOLUTE.equals(space)) {
             if (axis == AmbienceAxis.X) playerValue = playerPos.x;
             if (axis == AmbienceAxis.Y) playerValue = playerPos.y;
             if (axis == AmbienceAxis.Z) playerValue = playerPos.z;
         } else {
-            if (axis == AmbienceAxis.X) playerValue = playerPos.x - tileIn.getOrigin().x;
-            if (axis == AmbienceAxis.Y) playerValue = playerPos.y - tileIn.getOrigin().y;
-            if (axis == AmbienceAxis.Z) playerValue = playerPos.z - tileIn.getOrigin().z;
+            if (axis == AmbienceAxis.X) playerValue = playerPos.x - sourceIn.getOrigin().x;
+            if (axis == AmbienceAxis.Y) playerValue = playerPos.y - sourceIn.getOrigin().y;
+            if (axis == AmbienceAxis.Z) playerValue = playerPos.z - sourceIn.getOrigin().z;
         }
         return test.testForDouble(playerValue, value);
     }

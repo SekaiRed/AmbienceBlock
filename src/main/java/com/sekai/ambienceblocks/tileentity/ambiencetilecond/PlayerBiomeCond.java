@@ -1,55 +1,64 @@
 package com.sekai.ambienceblocks.tileentity.ambiencetilecond;
 
+import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
 import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceEquality;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetEnum;
+import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetSound;
+import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetString;
+import com.sekai.ambienceblocks.util.StaticUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorldNeedDayCond extends AbstractCond {
+public class PlayerBiomeCond extends AbstractCond {
+    //this.mc.world.func_241828_r().getRegistry(Registry.BIOME_KEY).getKey(this.mc.world.getBiome(blockpos))
+
     private AmbienceEquality equal;
+    private String biome;
 
     private static final String EQUAL = "equal";
+    private static final String BIOME = "biome";
 
-    public WorldNeedDayCond(AmbienceEquality equal) {
+    public PlayerBiomeCond(AmbienceEquality equal, String biome) {
         this.equal = equal;
+        this.biome = biome;
     }
 
     @Override
     public AbstractCond clone() {
-        WorldNeedDayCond cond = new WorldNeedDayCond(equal);
+        PlayerBiomeCond cond = new PlayerBiomeCond(equal, biome);
         return cond;
     }
 
     @Override
     public String getName() {
-        return "world.isday";
+        return "player.biome";
     }
 
     @Override
     public String getListDescription() {
-        return "[" + getName() + "] " + equal.getName();
+        return "[" + getName() + "] " + equal.getName() + " " + biome;
     }
 
     @Override
     public boolean isTrue(Vector3d playerPos, World worldIn, IAmbienceSource sourceIn) {
-        //System.out.println(worldIn.getSkylightSubtracted());
-        //info.getWorldTime()%24000
-        //WorldInfo info = worldIn.getWorldInfo();13000
-        long time = worldIn.getWorldInfo().getDayTime()%24000;
-        return equal.testFor(time < 13000 || time >= 23500);
+        return equal.testFor(worldIn.getBiome(new BlockPos(playerPos)).getRegistryName().toString().contains(biome));
     }
 
     @Override
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
+        list.add(new AmbienceWidgetString(BIOME, "Biome :", 160, biome));
         return list;
     }
 
@@ -58,6 +67,8 @@ public class WorldNeedDayCond extends AbstractCond {
         for(AbstractAmbienceWidgetMessenger widget : allWidgets) {
             if(EQUAL.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
                 equal = (AmbienceEquality) ((AmbienceWidgetEnum) widget).getValue();
+            if(BIOME.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
+                biome = ((AmbienceWidgetString) widget).getValue();
         }
     }
 
@@ -65,21 +76,25 @@ public class WorldNeedDayCond extends AbstractCond {
     public CompoundNBT toNBT() {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt(EQUAL, equal.ordinal());
+        nbt.putString(BIOME, biome);
         return nbt;
     }
 
     @Override
     public void fromNBT(CompoundNBT nbt) {
-        equal = AmbienceEquality.values()[nbt.getInt(EQUAL) < AmbienceEquality.values().length ? nbt.getInt(EQUAL) : 0];
+        equal = StaticUtil.getEnumValue(nbt.getInt(EQUAL), AmbienceEquality.values());
+        biome = nbt.getString(BIOME);
     }
 
     @Override
     public void toBuff(PacketBuffer buf) {
         buf.writeInt(equal.ordinal());
+        buf.writeString(biome, 50);
     }
 
     @Override
     public void fromBuff(PacketBuffer buf) {
         this.equal = AmbienceEquality.values()[buf.readInt()];
+        this.biome = buf.readString(50);
     }
 }

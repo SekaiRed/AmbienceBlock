@@ -19,6 +19,6 @@ public class AmbienceReservation {
 
         //reserved = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), getPitchInternal(d), false);
 
-        AmbienceController.handler.play(reserved);
+        AmbienceController.instance.handler.play(reserved);
     }
 }

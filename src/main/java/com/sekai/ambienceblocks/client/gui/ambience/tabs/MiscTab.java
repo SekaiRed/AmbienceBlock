@@ -5,12 +5,11 @@ import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.client.rendering.RenderingEventHandler;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.tileentity.AmbienceData;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.client.gui.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,7 +130,7 @@ public class MiscTab extends AbstractTab {
     }
 
     @Override
-    public void setFieldFromData(AmbienceTileEntityData data) {
+    public void setFieldFromData(AmbienceData data) {
         if(AmbienceController.debugMode)
             bDebug.setMessage(new StringTextComponent("ON"));
         else
@@ -139,7 +138,7 @@ public class MiscTab extends AbstractTab {
     }
 
     @Override
-    public void setDataFromField(AmbienceTileEntityData data) {
+    public void setDataFromField(AmbienceData data) {
 
     }
 

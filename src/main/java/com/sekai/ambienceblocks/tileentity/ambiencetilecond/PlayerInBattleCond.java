@@ -4,52 +4,67 @@ import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceEquality;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetEnum;
+import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetString;
+import com.sekai.ambienceblocks.util.StaticUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorldNeedDayCond extends AbstractCond {
+public class PlayerInBattleCond extends AbstractCond {
+    //TODO Either move to a config or leave it as a parameter for the condition
+    public static final int SEARCH_RANGE = 40;
+
     private AmbienceEquality equal;
+    private String entity;
 
     private static final String EQUAL = "equal";
+    private static final String ENTITY = "entity";
 
-    public WorldNeedDayCond(AmbienceEquality equal) {
+    public PlayerInBattleCond(AmbienceEquality equal, String entity) {
         this.equal = equal;
+        this.entity = entity;
     }
 
     @Override
     public AbstractCond clone() {
-        WorldNeedDayCond cond = new WorldNeedDayCond(equal);
+        PlayerInBattleCond cond = new PlayerInBattleCond(equal, entity);
         return cond;
     }
 
     @Override
     public String getName() {
-        return "world.isday";
+        return "player.in_battle";
     }
 
     @Override
     public String getListDescription() {
-        return "[" + getName() + "] " + equal.getName();
+        return "[" + getName() + "] " + equal.getName() + " " + entity;
     }
 
     @Override
     public boolean isTrue(Vector3d playerPos, World worldIn, IAmbienceSource sourceIn) {
-        //System.out.println(worldIn.getSkylightSubtracted());
-        //info.getWorldTime()%24000
-        //WorldInfo info = worldIn.getWorldInfo();13000
-        long time = worldIn.getWorldInfo().getDayTime()%24000;
-        return equal.testFor(time < 13000 || time >= 23500);
+        //worldIn.getWorldInfo()
+        //worldIn.getChunkAt(Minecraft.getInstance().player.getPosition()).getStructureStarts()
+        List<MobEntity> mobs = worldIn.getEntitiesWithinAABB(MobEntity.class, AxisAlignedBB.fromVector(playerPos).grow(SEARCH_RANGE));
+        for (MobEntity mob : mobs) {
+            if (mob.getAttackTarget() != null && mob.getType().getRegistryName().toString().contains(entity))
+                return equal.testFor(true);
+        }
+        return equal.testFor(false);
     }
 
     @Override
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
+        list.add(new AmbienceWidgetString(ENTITY, "Entity :", 160, entity));
         return list;
     }
 
@@ -58,6 +73,8 @@ public class WorldNeedDayCond extends AbstractCond {
         for(AbstractAmbienceWidgetMessenger widget : allWidgets) {
             if(EQUAL.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
                 equal = (AmbienceEquality) ((AmbienceWidgetEnum) widget).getValue();
+            if(ENTITY.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
+                entity = ((AmbienceWidgetString) widget).getValue();
         }
     }
 
@@ -65,21 +82,25 @@ public class WorldNeedDayCond extends AbstractCond {
     public CompoundNBT toNBT() {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt(EQUAL, equal.ordinal());
+        nbt.putString(ENTITY, entity);
         return nbt;
     }
 
     @Override
     public void fromNBT(CompoundNBT nbt) {
-        equal = AmbienceEquality.values()[nbt.getInt(EQUAL) < AmbienceEquality.values().length ? nbt.getInt(EQUAL) : 0];
+        equal = StaticUtil.getEnumValue(nbt.getInt(EQUAL), AmbienceEquality.values());
+        entity = nbt.getString(ENTITY);
     }
 
     @Override
     public void toBuff(PacketBuffer buf) {
         buf.writeInt(equal.ordinal());
+        buf.writeString(entity, 50);
     }
 
     @Override
     public void fromBuff(PacketBuffer buf) {
-        this.equal = AmbienceEquality.values()[buf.readInt()];
+        this.equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
+        this.entity = buf.readString(50);
     }
 }

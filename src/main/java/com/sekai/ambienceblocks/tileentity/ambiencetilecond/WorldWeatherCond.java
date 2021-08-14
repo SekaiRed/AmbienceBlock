@@ -1,12 +1,11 @@
 package com.sekai.ambienceblocks.tileentity.ambiencetilecond;
 
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
+import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
 import com.sekai.ambienceblocks.tileentity.util.*;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.tileentity.util.messenger.AmbienceWidgetEnum;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.IWorldInfo;
@@ -43,7 +42,7 @@ public class WorldWeatherCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
+    public boolean isTrue(Vector3d playerPos, World worldIn, IAmbienceSource sourceIn) {
         IWorldInfo info = worldIn.getWorldInfo();
         boolean verified = false;
         if(weather == AmbienceWeather.CLEAR)

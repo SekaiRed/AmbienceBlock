@@ -6,14 +6,15 @@ import com.sekai.ambienceblocks.Main;
 import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.ambience.tabs.*;
 import com.sekai.ambienceblocks.packets.PacketUpdateAmbienceTE;
+import com.sekai.ambienceblocks.tileentity.AmbienceData;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
 import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
+import com.sekai.ambienceblocks.util.JsonUtil;
 import com.sekai.ambienceblocks.util.PacketHandler;
+import com.sekai.ambienceblocks.world.CompendiumEntry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -52,6 +53,10 @@ public class AmbienceGUI extends AmbienceScreen {
 
     private Button confirmChanges;
     private Button cancel;
+
+    private Button jsonTest;
+
+    private Button addToCompendium;
 
     private boolean help;
     private Button bHelp;
@@ -188,6 +193,24 @@ public class AmbienceGUI extends AmbienceScreen {
         help = false;
         bHelp = addButton(new Button(xTopLeft + texWidth - 16 - 8, yTopLeft + texHeight - 16 - 8, 16, 16, new StringTextComponent(""), button -> { clickHelp(); }));
 
+        jsonTest = addButton(new Button(xTopLeft - 4 - 40, yTopLeft + texHeight + 4, 40, 20, new StringTextComponent("test"), button -> {
+            //saveDataToTile();
+
+            //JsonObject json = Json
+            //Gson gson = new Gson();
+            //Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            //String output = gson.toJson(getData());
+            String output = JsonUtil.toJson(getData());
+            System.out.println(output);
+        }));
+
+        addToCompendium = addButton(new Button(xTopLeft - 4 - 60, yTopLeft + texHeight - 20, 60, 20, new StringTextComponent("compendium"), button -> {
+            AmbienceController.instance.compendium.entries.add(new CompendiumEntry(getData()));
+        }));
+        /*
+        JsonObject
+        */
+
         //loadDataFromTile();
     }
 
@@ -211,15 +234,15 @@ public class AmbienceGUI extends AmbienceScreen {
         PacketHandler.NET.sendToServer(new PacketUpdateAmbienceTE(target.getPos(), getData()));
     }
 
-    public AmbienceTileEntityData getData() {
-        AmbienceTileEntityData data = new AmbienceTileEntityData();
+    public AmbienceData getData() {
+        AmbienceData data = new AmbienceData();
 
         for(AbstractTab tab : getActiveTabs()) tab.setDataFromField(data);
 
         return data;
     }
 
-    public void setData(AmbienceTileEntityData data) {
+    public void setData(AmbienceData data) {
         mainTab.setFieldFromData(data);
 
         for(AbstractTab tab : getActiveTabs()) if(!(tab instanceof MainTab)) tab.setFieldFromData(data);

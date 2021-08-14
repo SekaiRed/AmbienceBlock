@@ -210,7 +210,8 @@ public class EditCondGUI extends AmbienceScreen {
         int indexY = offset + rowHeight + separation;
         for(AmbienceWidgetHolder element : condWidgets) {
             Widget widget = element.get();
-            if(indexX > texWidth - offset) {
+            //new line if the widget that is about to be added leaks out of the main window
+            if(indexX + widget.getWidth() + separation > texWidth - offset) {
                 indexX = offset;
                 indexY += rowHeight + separation;
             }
@@ -218,6 +219,11 @@ public class EditCondGUI extends AmbienceScreen {
             widget.y = yTopLeft + indexY + (rowHeight - widget.getHeightRealms())/2;
             //widget.y = yTopLeft + offset + rowHeight + separation;
             indexX += widget.getWidth() + separation;
+            //moved down here so that the position truly is the next one to be moved to the new line
+            /*if(indexX > texWidth - offset) {
+                indexX = offset;
+                indexY += rowHeight + separation;
+            }*/
             if(widget instanceof ScrollListWidget) ((ScrollListWidget)widget).updateWidgetPosition();
         }
     }
