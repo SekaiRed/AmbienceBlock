@@ -1,11 +1,7 @@
 package com.sekai.ambienceblocks.packets;
 
-import com.sekai.ambienceblocks.ambience.AmbienceData;
-import com.sekai.ambienceblocks.compendium.CompendiumEntry;
-import com.sekai.ambienceblocks.compendium.ServerCompendium;
 import com.sekai.ambienceblocks.util.ClientPacketHandler;
 import com.sekai.ambienceblocks.util.PacketHandler;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -13,8 +9,6 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Supplier;
 
 public class PacketAskCompendiumGui {

@@ -1,6 +1,4 @@
-package com.sekai.ambienceblocks.compendium;
-
-import com.sekai.ambienceblocks.ambience.IAmbienceSource;
+package com.sekai.ambienceblocks.ambience.compendium;
 
 import java.util.ArrayList;
 import java.util.List;

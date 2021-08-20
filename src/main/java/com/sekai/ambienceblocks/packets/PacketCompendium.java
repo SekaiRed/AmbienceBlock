@@ -1,12 +1,10 @@
 package com.sekai.ambienceblocks.packets;
 
 import com.sekai.ambienceblocks.ambience.AmbienceData;
-import com.sekai.ambienceblocks.compendium.CompendiumEntry;
-import com.sekai.ambienceblocks.compendium.ServerCompendium;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
+import com.sekai.ambienceblocks.ambience.compendium.CompendiumEntry;
+import com.sekai.ambienceblocks.ambience.compendium.ServerCompendium;
 import com.sekai.ambienceblocks.util.ClientPacketHandler;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkDirection;

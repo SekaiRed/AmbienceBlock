@@ -2,16 +2,17 @@ package com.sekai.ambienceblocks.client.ambience;
 
 import com.sekai.ambienceblocks.client.rendering.RenderingEventHandler;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
-import com.sekai.ambienceblocks.compendium.CompendiumEntry;
+import com.sekai.ambienceblocks.ambience.compendium.CompendiumEntry;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.RegistryHandler;
-import com.sekai.ambienceblocks.compendium.ClientCompendium;
+import com.sekai.ambienceblocks.ambience.compendium.ClientCompendium;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.item.ItemStack;
+import net.minecraft.profiler.IProfiler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameType;
@@ -31,12 +32,12 @@ public class AmbienceController {
     //Static references
     public static AmbienceController instance;
     public final Minecraft mc;
+    private IProfiler prf;
     public final SoundHandler handler;
     public final ClientCompendium compendium;
     public static boolean debugMode = false;
 
     //System variables
-    boolean inactive = false;
     public AmbienceData clipboard;
 
     //System lists
@@ -46,6 +47,7 @@ public class AmbienceController {
     public AmbienceController() {
         instance = this;
         mc = Minecraft.getInstance();
+        prf = mc.getProfiler();
         handler = Minecraft.getInstance().getSoundHandler();
         compendium = new ClientCompendium();
     }
@@ -72,26 +74,24 @@ public class AmbienceController {
         soundsList.clear();
         delayList.clear();
 
+        //I can clear the client compendium, it gets refreshed by the server upon joining anyway.
+        compendium.clear();
+
         //AmbienceCompendiumRegistry.instance.entries.clear();
         //compendium.clear();
 
+        //Clear the events for debug logging from memory.
         RenderingEventHandler.clearEvent();
     }
 
     @SubscribeEvent
     public void tick(TickEvent.ClientTickEvent e) {
+        //prf = mc.getProfiler();
+        //prf = mc.world.getProfiler();
+        //prf.startTick();
+        prf.startSection("ambTick");
         //there's no player, probably on the main menu or something
-        if(mc.world == null) {
-            if(inactive) {
-                inactive = true;
-                clear();
-            }
-            return;
-        }
-
-        inactive = false;
-
-        if(mc.player == null || e.phase.equals(TickEvent.Phase.END))
+        if(mc.world == null || mc.player == null || e.phase.equals(TickEvent.Phase.END))
             return;
 
         //waits if the game is paused
@@ -102,16 +102,26 @@ public class AmbienceController {
         if(mc.world.loadedTileEntityList == null)
             return;
 
+        prf.startSection("renderParticles");
         //render the invisible ambience block particles client side
         renderInvisibleTileEntityParticles();
+        prf.endSection();
 
+        prf.startSection("tick");
         systemTick();
+        prf.endSection();
+
+        prf.endSection();
+        //prf.endTick();
     }
 
     private void systemTick() {
         //get all of the loaded ambience sources
+        prf.startSection("getAllSources");
         List<IAmbienceSource> ambienceSources = getListOfAmbienceSources();
+        prf.endSection();
 
+        prf.startSection("ambSlotIter");
         for (AmbienceSlot slot : soundsList) {
             //update volume, pitch, intro/outro, fade in/out first
             slot.tick();
@@ -160,9 +170,11 @@ public class AmbienceController {
             slot.setHasForcedVolume(false);
             slot.setHasForcedPitch(false);
         }
+        prf.endSection();
 
         ArrayList<IAmbienceSource> ambienceSourcesToPlay = new ArrayList<>();
 
+        prf.startSection("getCandidates");
         for (IAmbienceSource source : ambienceSources) {
             if(source.getData().isUsingDelay()) {
                 if (tileHasDelayRightNow(source)) {
@@ -181,7 +193,9 @@ public class AmbienceController {
                 ambienceSourcesToPlay.add(source);
             }
         }
+        prf.endSection();
 
+        prf.startSection("candidateIter");
         for (IAmbienceSource source : ambienceSourcesToPlay) {
             //this tile uses delay which is a special case
             if (tileHasDelayRightNow(source) && source.getData().isUsingDelay()) {
@@ -211,14 +225,11 @@ public class AmbienceController {
                 continue;
 
             //if the music is already playing and can be fused, check if you can't replace it with the new tile
-            if (isMusicAlreadyPlaying(source.getData()) != null && canTilePlay(source) && source.getData().shouldFuse()) {
-                //AmbienceSlot slot = isMusicAlreadyPlaying(tile.data.getSoundName());
-                AmbienceSlot slot = isMusicAlreadyPlaying(source.getData());
-
-                //todo holy shit you can't just grab the first tile and call it a day, please change this to iterate all of them
-                //todo and check if they can fuse individually (even if it's unlikely that someone use both fuse and not fuse on the same music)
-                if(!slot.getData().shouldFuse())
-                    continue;
+            //TODO getValidFuseTarget could potentially use a list for maximal compability, but technically only one
+            // can play at a time by design, so I don't really know, come back here if a change break this
+            // like changing hasSameMusic to check for intro and outro separately.
+            if(source.getData().shouldFuse() && getValidFuseTarget(source.getData()) != null) {
+                AmbienceSlot slot = getValidFuseTarget(source.getData());
 
                 double distOld = slot.getOwner().distanceTo(mc.player); //distance to already playing tile
                 double distNew = source.distanceTo(mc.player); //distance to new tile we're iterating through
@@ -239,11 +250,14 @@ public class AmbienceController {
             //survived the gauntlet of conditions, this tile can safely play
             playMusic(source, EventContext.VALID_AMBIENCE);
         }
+        prf.endSection();
 
+        prf.startSection("removeUnused");
         //no use counting down the delay of an unloaded tile
         delayList.removeIf(delay -> (delay.getOrigin() instanceof AmbienceTileEntity) && !mc.world.loadedTileEntityList.contains((AmbienceTileEntity) delay.getOrigin()));
 
         soundsList.removeIf(AmbienceSlot::isMarkedForDeletion);
+        prf.endSection();
     }
 
     private boolean isOwnerLoaded(List<IAmbienceSource> ambienceSources, AmbienceSlot slot) {
@@ -383,14 +397,16 @@ public class AmbienceController {
         if(!tile.isWithinBounds(mc.player))
             return false;
 
-        List<AbstractCond> conditions = tile.getData().getConditions();
-        for (AbstractCond condition : conditions) {
-            if(!condition.isTrue(new Vector3d(mc.player.getPosX(), mc.player.getPosY(), mc.player.getPosZ()), mc.world, tile))
-                return false;
+        if(tile.getData().isUsingCondition()) {
+            List<AbstractCond> conditions = tile.getData().getConditions();
+            for (AbstractCond condition : conditions) {
+                if (!condition.isTrue(new Vector3d(mc.player.getPosX(), mc.player.getPosY(), mc.player.getPosZ()), mc.world, tile))
+                    return false;
+            }
         }
 
         int priority = getHighestPriorityByChannel(tile.getData().getChannel());
-        if (tile.getData().getPriority() < priority)
+        if (tile.getData().isUsingPriority() && tile.getData().getPriority() < priority)
             return false;
 
         return true;
@@ -400,14 +416,16 @@ public class AmbienceController {
         if(!tile.isWithinBounds(mc.player))
             return EventContext.OUT_OF_BOUNDS;
 
-        List<AbstractCond> conditions = tile.getData().getConditions();
-        for (AbstractCond condition : conditions) {
-            if(!condition.isTrue(new Vector3d(mc.player.getPosX(), mc.player.getPosY(), mc.player.getPosZ()), mc.world, tile))
-                return EventContext.CONDITION_IS_FALSE;
+        if(tile.getData().isUsingCondition()) {
+            List<AbstractCond> conditions = tile.getData().getConditions();
+            for (AbstractCond condition : conditions) {
+                if (!condition.isTrue(new Vector3d(mc.player.getPosX(), mc.player.getPosY(), mc.player.getPosZ()), mc.world, tile))
+                    return EventContext.CONDITION_IS_FALSE;
+            }
         }
 
         int priority = getHighestPriorityByChannel(tile.getData().getChannel());
-        if (tile.getData().getPriority() < priority)
+        if (tile.getData().isUsingPriority() && tile.getData().getPriority() < priority)
             return EventContext.OUT_PRIORITIZED;
             //return "lower priority than the maximal one : slot priority " + tile.getData().getPriority() + " and max priority " + priority;
 
@@ -441,6 +459,20 @@ public class AmbienceController {
     public AmbienceSlot isMusicAlreadyPlaying(AmbienceData data) {
         for(AmbienceSlot slot : soundsList) {
             if(hasSameMusics(data, slot.getOwner().getData()) && !slot.isMarkedForDeletion())
+                return slot;
+        }
+        return null;
+    }
+
+    public AmbienceSlot getValidFuseTarget(AmbienceData data) {
+        //no point looking
+        if(!data.shouldFuse())
+            return null;
+
+        for(AmbienceSlot slot : soundsList) {
+            //has both compatible music and can fuse
+            //copied from isMusicAlreadyPlaying because there should by logic be only one instance of the fusing music being played
+            if(hasSameMusics(data, slot.getOwner().getData()) && !slot.isMarkedForDeletion() && slot.getData().shouldFuse())
                 return slot;
         }
         return null;
@@ -490,6 +522,7 @@ public class AmbienceController {
     }
 
     public enum EventContext {
+        //TODO I could easily replace comment with translation keys and translate them on the client
         VALID_AMBIENCE("this tile passed every test and can play", RenderingEventHandler.cBlue),
         DELAY_OVER_ITSELF("delayed sound can play over itself", RenderingEventHandler.cBlue),
         VALID_DELAY("valid delayed sound", RenderingEventHandler.cBlue),
@@ -501,7 +534,7 @@ public class AmbienceController {
         OUT_OF_BOUNDS("not within bounds", RenderingEventHandler.cRed),
         CONDITION_IS_FALSE("at least one condition returned false", RenderingEventHandler.cRed),
         OUT_PRIORITIZED("lower priority than the highest one on this channel", RenderingEventHandler.cRed),
-        UNKNOWN("how tho", RenderingEventHandler.cWhite);
+        UNKNOWN("no idea why that happened", RenderingEventHandler.cWhite);
 
         private final String comment;
         private final int color;

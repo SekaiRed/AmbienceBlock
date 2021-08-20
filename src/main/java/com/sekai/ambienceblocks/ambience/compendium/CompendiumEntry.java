@@ -1,4 +1,4 @@
-package com.sekai.ambienceblocks.compendium;
+package com.sekai.ambienceblocks.ambience.compendium;
 
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.ambience.AmbienceData;

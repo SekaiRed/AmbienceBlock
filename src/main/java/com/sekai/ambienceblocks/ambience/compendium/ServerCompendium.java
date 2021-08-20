@@ -1,7 +1,6 @@
-package com.sekai.ambienceblocks.compendium;
+package com.sekai.ambienceblocks.ambience.compendium;
 
 import com.google.gson.JsonSyntaxException;
-import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.packets.PacketCompendium;
 import com.sekai.ambienceblocks.util.JsonUtil;
 import com.sekai.ambienceblocks.util.PacketHandler;
@@ -17,8 +16,6 @@ import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
-
-import java.util.ArrayList;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -49,7 +46,7 @@ public class ServerCompendium extends BaseCompendium {
 
     @SubscribeEvent
     public void worldLoad(FMLServerStartedEvent e) {
-        System.out.println("load");
+        //System.out.println("load");
         //simulateCompendiumLoad();
 
         try {
@@ -81,7 +78,7 @@ public class ServerCompendium extends BaseCompendium {
 
     @SubscribeEvent
     public void worldSave(FMLServerStoppingEvent e) {
-        System.out.println("save");
+        //System.out.println("save");
         try {
             SaveFormat.LevelSave storage = (SaveFormat.LevelSave) fieldStorage.get(e.getServer());
             end(storage.getWorldDir());
