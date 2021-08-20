@@ -12,6 +12,15 @@ public enum AmbienceEquality implements AmbienceEnumName {
         return name;
     }
 
+    /*public static AmbienceEquality fromName(String name)
+    {
+        for (AmbienceEquality val : vals) {
+            if (val.getName().equals(name))
+                return val;
+        }
+        return EQUAL_TO;
+    }*/
+
     public boolean testForInt(int from, int comparedTo) {
         if(this == EQUAL_TO)
             return from == comparedTo;

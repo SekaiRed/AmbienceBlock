@@ -1,7 +1,7 @@
 package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
+import com.sekai.ambienceblocks.client.ambience.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.client.rendering.RenderingEventHandler;

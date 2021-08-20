@@ -1,6 +1,8 @@
 package com.sekai.ambienceblocks.ambience.bounds;
 
+import com.google.gson.JsonObject;
 import com.sekai.ambienceblocks.ambience.util.AmbienceAxis;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -73,26 +75,6 @@ public class CapsuleBounds extends AbstractBounds {
 
         if(playerPos < originPos - length / 2D)
             bottomFlag = true;
-        /*switch (axis) {
-            case X:
-                if(player.getPosX() > origin.x + blockOffset.x + length / 2D)
-                    upperFlag = true;
-                if(player.getPosX() < origin.x + blockOffset.x - length / 2D)
-                    bottomFlag = true;
-                break;
-            case Y:
-                if(player.getPosY() > origin.y + blockOffset.y + length / 2D)
-                    upperFlag = true;
-                if(player.getPosY() < origin.y + blockOffset.y - length / 2D)
-                    bottomFlag = true;
-                break;
-            case Z:
-                if(player.getPosZ() > origin.z + blockOffset.z + length / 2D)
-                    upperFlag = true;
-                if(player.getPosZ() < origin.z + blockOffset.z - length / 2D)
-                    bottomFlag = true;
-                break;
-        }*/
 
         Vector3d vecPlayer = new Vector3d(player.getPosX(), player.getPosY(), player.getPosZ());
 
@@ -121,8 +103,6 @@ public class CapsuleBounds extends AbstractBounds {
         }
 
         return dist < radius && playerPos < originPos + length / 2D && playerPos > originPos - length / 2D;
-
-        //return dist < radius && player.getPosY() < origin.getY() - 1 + length && player.getPosY() > origin.getY() - 1;
     }
 
     //We can ignore y, we're only interested in the other two coordinates
@@ -138,27 +118,6 @@ public class CapsuleBounds extends AbstractBounds {
 
         if(playerPos < originPos - length / 2D)
             bottomFlag = true;
-
-        /*switch (axis) {
-            case X:
-                if(player.getPosX() > origin.x + blockOffset.x + length / 2D)
-                    upperFlag = true;
-                if(player.getPosX() < origin.x + blockOffset.x - length / 2D)
-                    bottomFlag = true;
-                break;
-            case Y:
-                if(player.getPosY() > origin.y + blockOffset.y + length / 2D)
-                    upperFlag = true;
-                if(player.getPosY() < origin.y + blockOffset.y - length / 2D)
-                    bottomFlag = true;
-                break;
-            case Z:
-                if(player.getPosZ() > origin.z + blockOffset.z + length / 2D)
-                    upperFlag = true;
-                if(player.getPosZ() < origin.z + blockOffset.z - length / 2D)
-                    bottomFlag = true;
-                break;
-        }*/
 
         Vector3d vecPlayer = new Vector3d(player.getPosX(), player.getPosY(), player.getPosZ());
 
@@ -229,6 +188,20 @@ public class CapsuleBounds extends AbstractBounds {
         this.radius = buf.readDouble();
         this.length = buf.readDouble();
         this.axis = AmbienceAxis.getAxisFromInt(buf.readInt());
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty("radius", radius);
+        json.addProperty("length", length);
+        json.addProperty("axis", axis.name());
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        radius = json.get("radius").getAsDouble();
+        length = json.get("length").getAsDouble();
+        axis = StaticUtil.getEnumValue(json.get("axis").getAsString(), AmbienceAxis.values());
     }
 
     @Override

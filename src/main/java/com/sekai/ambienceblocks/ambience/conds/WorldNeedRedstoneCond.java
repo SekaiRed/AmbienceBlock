@@ -1,10 +1,13 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
+import com.google.gson.JsonObject;
+import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
-import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.vector.Vector3d;
@@ -86,7 +89,7 @@ public class WorldNeedRedstoneCond extends AbstractCond {
 
     @Override
     public void fromNBT(CompoundNBT nbt) {
-        equal = AmbienceEquality.values()[nbt.getInt(EQUAL) < AmbienceEquality.values().length ? nbt.getInt(EQUAL) : 0];
+        equal = StaticUtil.getEnumValue(nbt.getInt(EQUAL), AmbienceEquality.values());//AmbienceEquality.values()[nbt.getInt(EQUAL) < AmbienceEquality.values().length ? nbt.getInt(EQUAL) : 0];
     }
 
     @Override
@@ -96,6 +99,16 @@ public class WorldNeedRedstoneCond extends AbstractCond {
 
     @Override
     public void fromBuff(PacketBuffer buf) {
-        this.equal = AmbienceEquality.values()[buf.readInt()];
+        this.equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(EQUAL, equal.name());
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        equal = StaticUtil.getEnumValue(json.get(EQUAL).getAsString(), AmbienceEquality.values());
     }
 }

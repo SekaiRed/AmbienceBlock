@@ -190,8 +190,7 @@ public class AmbienceData {
                     conditions.add(CondsUtil.fromNBT((CompoundNBT) Objects.requireNonNull(compound.get("cond" + i))));
                 }
             } else {
-                //TODO read list nbt
-                ListNBT conds = compound.getList("conds", 10); //wtf is a type
+                ListNBT conds = compound.getList("conds", 10); //wtf is a type and why did 10 work out, i'm not complaining
                 conds.forEach(inbt -> {
                     conditions.add(CondsUtil.fromNBT((CompoundNBT) inbt));
                 });
@@ -656,5 +655,17 @@ public class AmbienceData {
         c[3] = 1f;
 
         return c;*/
+    }
+
+    public AmbienceData copy() {
+        AmbienceData data = new AmbienceData();
+
+        //I'm pretty sure this is illegal in multiple countries but this is the simplest and maintainable way I found to do this.
+        //I have no idea why everyone hates clone() lol
+        CompoundNBT nbt = new CompoundNBT();
+        toNBT(nbt);
+        data.fromNBT(nbt);
+
+        return data;
     }
 }

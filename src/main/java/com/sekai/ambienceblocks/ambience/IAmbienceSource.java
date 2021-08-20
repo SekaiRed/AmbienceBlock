@@ -1,4 +1,4 @@
-package com.sekai.ambienceblocks.tileentity;
+package com.sekai.ambienceblocks.ambience;
 
 import com.sekai.ambienceblocks.ambience.AmbienceData;
 import net.minecraft.entity.player.PlayerEntity;

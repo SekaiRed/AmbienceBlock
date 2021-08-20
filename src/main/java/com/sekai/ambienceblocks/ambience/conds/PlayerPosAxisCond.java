@@ -1,13 +1,17 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.Expose;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceAxis;
+import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.ParsingUtil;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.vector.Vector3d;
@@ -103,9 +107,9 @@ public class PlayerPosAxisCond extends AbstractCond {
 
     @Override
     public void fromNBT(CompoundNBT nbt) {
-        test = AmbienceTest.values()[nbt.getInt(TEST) < AmbienceTest.values().length ? nbt.getInt(TEST) : 0];
-        space = AmbienceWorldSpace.values()[nbt.getInt(SPACE) < AmbienceWorldSpace.values().length ? nbt.getInt(SPACE) : 0];
-        axis = AmbienceAxis.values()[nbt.getInt(AXIS) < AmbienceAxis.values().length ? nbt.getInt(AXIS) : 0];
+        test = StaticUtil.getEnumValue(nbt.getInt(TEST), AmbienceTest.values());//AmbienceTest.values()[nbt.getInt(TEST) < AmbienceTest.values().length ? nbt.getInt(TEST) : 0];
+        space = StaticUtil.getEnumValue(nbt.getInt(SPACE), AmbienceWorldSpace.values());//AmbienceWorldSpace.values()[nbt.getInt(SPACE) < AmbienceWorldSpace.values().length ? nbt.getInt(SPACE) : 0];
+        axis = StaticUtil.getEnumValue(nbt.getInt(AXIS), AmbienceAxis.values());//AmbienceAxis.values()[nbt.getInt(AXIS) < AmbienceAxis.values().length ? nbt.getInt(AXIS) : 0];
         value = nbt.getDouble(VALUE);
     }
 
@@ -119,10 +123,26 @@ public class PlayerPosAxisCond extends AbstractCond {
 
     @Override
     public void fromBuff(PacketBuffer buf) {
-        this.test = AmbienceTest.values()[buf.readInt()];
-        this.space = AmbienceWorldSpace.values()[buf.readInt()];
-        this.axis = AmbienceAxis.values()[buf.readInt()];
+        this.test = StaticUtil.getEnumValue(buf.readInt(), AmbienceTest.values());//AmbienceTest.values()[buf.readInt()];
+        this.space = StaticUtil.getEnumValue(buf.readInt(), AmbienceWorldSpace.values());//AmbienceWorldSpace.values()[buf.readInt()];
+        this.axis = StaticUtil.getEnumValue(buf.readInt(), AmbienceAxis.values());//AmbienceAxis.values()[buf.readInt()];
         this.value = buf.readDouble();
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(TEST, test.name());
+        json.addProperty(SPACE, space.name());
+        json.addProperty(AXIS, axis.name());
+        json.addProperty(VALUE, value);
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        test = StaticUtil.getEnumValue(json.get(TEST).getAsString(), AmbienceTest.values());
+        space = StaticUtil.getEnumValue(json.get(SPACE).getAsString(), AmbienceWorldSpace.values());
+        axis = StaticUtil.getEnumValue(json.get(AXIS).getAsString(), AmbienceAxis.values());
+        value = json.get(VALUE).getAsDouble();
     }
 
     /*@Override

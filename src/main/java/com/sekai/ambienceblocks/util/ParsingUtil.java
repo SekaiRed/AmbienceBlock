@@ -18,6 +18,16 @@ public class ParsingUtil {
             return value.name();
     }
 
+    /*public static <E extends Enum<E>> E tryParseEnumFromName(String value, E defaultVal) {
+        try {
+            if(defaultVal instanceof AmbienceEnumName)
+                return E.
+            //return E.valueOf(defaultVal.getDeclaringClass(), value);
+        } catch (IllegalArgumentException e) {
+            return defaultVal;
+        }
+    }*/
+
     public static <E extends Enum<E>> E tryParseEnum(String value, E defaultVal) {
         try {
             return E.valueOf(defaultVal.getDeclaringClass(), value);

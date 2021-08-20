@@ -1,8 +1,4 @@
-package com.sekai.ambienceblocks.client.ambiencecontroller;
-
-import com.sekai.ambienceblocks.util.ParsingUtil;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
+package com.sekai.ambienceblocks.client.ambience;
 
 //holds reference to a sound which can be grabbed later
 public class AmbienceReservation {

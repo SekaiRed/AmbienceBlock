@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks.ambience.bounds;
 
+import com.google.gson.JsonObject;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -77,6 +78,16 @@ public class SphereBounds extends AbstractBounds {
     @Override
     public void fromBuff(PacketBuffer buf) {
         this.radius = buf.readDouble();
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty("radius", radius);
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        radius = json.get("radius").getAsDouble();
     }
 
     @Override

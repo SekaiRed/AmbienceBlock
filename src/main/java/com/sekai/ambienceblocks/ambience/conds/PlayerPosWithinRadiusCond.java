@@ -1,6 +1,9 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.Expose;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
+import com.sekai.ambienceblocks.ambience.util.AmbienceAxis;
 import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
@@ -139,6 +142,26 @@ public class PlayerPosWithinRadiusCond extends AbstractCond {
 
         space = StaticUtil.getEnumValue(buf.readInt(), AmbienceWorldSpace.values());
         test = StaticUtil.getEnumValue(buf.readInt(), AmbienceTest.values());
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(X, x);
+        json.addProperty(Y, y);
+        json.addProperty(Z, z);
+        json.addProperty(RADIUS, radius);
+        json.addProperty(SPACE, space.name());
+        json.addProperty(TEST, test.name());
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        x = json.get(X).getAsDouble();
+        y = json.get(Y).getAsDouble();
+        z = json.get(Z).getAsDouble();
+        radius = json.get(RADIUS).getAsDouble();
+        space = StaticUtil.getEnumValue(json.get(SPACE).getAsString(), AmbienceWorldSpace.values());
+        test = StaticUtil.getEnumValue(json.get(TEST).getAsString(), AmbienceTest.values());
     }
 
     private Vector3d getPos() {

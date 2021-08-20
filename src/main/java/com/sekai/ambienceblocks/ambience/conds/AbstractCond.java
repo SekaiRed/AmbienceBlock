@@ -1,6 +1,7 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
+import com.google.gson.JsonObject;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -32,4 +33,8 @@ public abstract class AbstractCond {
     //buff
     public abstract void toBuff(PacketBuffer buf);
     public abstract void fromBuff(PacketBuffer buf);
+
+    //json
+    public abstract void toJson(JsonObject json);
+    public abstract void fromJson(JsonObject json);
 }

@@ -1,7 +1,10 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.Expose;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
+import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
@@ -101,5 +104,17 @@ public class PlayerInBattleCond extends AbstractCond {
     public void fromBuff(PacketBuffer buf) {
         this.equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
         this.entity = buf.readString(50);
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(EQUAL, equal.name());
+        json.addProperty(ENTITY, entity);
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        equal = StaticUtil.getEnumValue(json.get(EQUAL).getAsString(), AmbienceEquality.values());
+        entity = json.get(ENTITY).getAsString();
     }
 }

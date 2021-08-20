@@ -3,15 +3,15 @@ package com.sekai.ambienceblocks.client.gui.ambience;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sekai.ambienceblocks.Main;
-import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
+import com.sekai.ambienceblocks.client.ambience.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.ambience.tabs.*;
 import com.sekai.ambienceblocks.packets.PacketUpdateAmbienceTE;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.ambience.util.AmbienceType;
+import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.util.JsonUtil;
 import com.sekai.ambienceblocks.util.PacketHandler;
-import com.sekai.ambienceblocks.world.CompendiumEntry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.IGuiEventListener;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AmbienceGUI extends AmbienceScreen {
-    private final AmbienceTileEntity target;
+    private final IAmbienceSource source;
     private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(Main.MODID, "textures/gui/ambience_gui.png");
 
     public static final int texWidth = 256;
@@ -62,11 +62,12 @@ public class AmbienceGUI extends AmbienceScreen {
     private Button bHelp;
 
     private boolean initialized = false;
+    private boolean closing = false;
 
-    public AmbienceGUI(AmbienceTileEntity target) {
+    public AmbienceGUI(IAmbienceSource source) {
         super(new TranslationTextComponent("narrator.screen.globalambiencegui"));
 
-        this.target = target;
+        this.source = source;
     }
 
     @Override
@@ -183,11 +184,13 @@ public class AmbienceGUI extends AmbienceScreen {
         confirmChanges = addButton(new Button(xTopLeft + 4, yTopLeft + texHeight + 4, 100, 20, new StringTextComponent("Confirm Changes"), button -> {
             saveDataToTile();
 
-            Minecraft.getInstance().displayGuiScreen(null);
+            //Minecraft.getInstance().displayGuiScreen(null);
+            quit(minecraft);
         }));
 
         cancel = addButton(new Button(xTopLeft + texWidth - 80 - 4, yTopLeft + texHeight + 4, 80, 20, new StringTextComponent("Cancel"), button -> {
-            Minecraft.getInstance().displayGuiScreen(null);
+            quit(minecraft);
+            //Minecraft.getInstance().displayGuiScreen(null);
         }));
 
         help = false;
@@ -201,11 +204,17 @@ public class AmbienceGUI extends AmbienceScreen {
             //Gson gson = new GsonBuilder().setPrettyPrinting().create();
             //String output = gson.toJson(getData());
             String output = JsonUtil.toJson(getData());
+            /*CompoundNBT nbt = new CompoundNBT();
+            String output = JsonUtil.toJson(getData().toNBT(nbt));*/
             System.out.println(output);
+            AmbienceData data = JsonUtil.GSON.fromJson(output, AmbienceData.class);
+            //PacketHandler.NET.sendToServer(new PacketUpdateAmbienceTE(source.getPos(), data));
+            //AmbienceController.instance.compendium.addEntry(new CompendiumEntry(data));
         }));
 
         addToCompendium = addButton(new Button(xTopLeft - 4 - 60, yTopLeft + texHeight - 20, 60, 20, new StringTextComponent("compendium"), button -> {
-            AmbienceController.instance.compendium.entries.add(new CompendiumEntry(getData()));
+            //AmbienceController.instance.compendium.addEntry(new CompendiumEntry(getData()));
+            AmbienceController.instance.compendium.clear();
         }));
         /*
         JsonObject
@@ -222,7 +231,7 @@ public class AmbienceGUI extends AmbienceScreen {
         /*mainTab.setFieldFromData(target.data);
 
         for(AbstractTab tab : getActiveTabs()) if(!(tab instanceof MainTab)) tab.setFieldFromData(target.data);*/
-        setData(target.data);
+        setData(source.getData());
     }
 
     private void saveDataToTile() {
@@ -231,7 +240,22 @@ public class AmbienceGUI extends AmbienceScreen {
         for(AbstractTab tab : getActiveTabs()) tab.setDataFromField(data);
 
         PacketHandler.NET.sendToServer(new PacketUpdateAmbienceTE(target.getPos(), data));*/
-        PacketHandler.NET.sendToServer(new PacketUpdateAmbienceTE(target.getPos(), getData()));
+
+        if(isSourceTypeTileEntity())
+            PacketHandler.NET.sendToServer(new PacketUpdateAmbienceTE(((AmbienceTileEntity) source).getPos(), getData()));
+        else {
+            //quit(minecraft);
+            if(previousScreen instanceof CompendiumGUI) {
+                CompendiumGUI gui = (CompendiumGUI) previousScreen;
+                gui.applyData(getData());
+            }
+        }
+
+        //quit(minecraft);
+    }
+
+    public boolean isSourceTypeTileEntity() {
+        return source instanceof AmbienceTileEntity;
     }
 
     public AmbienceData getData() {
@@ -247,6 +271,24 @@ public class AmbienceGUI extends AmbienceScreen {
 
         for(AbstractTab tab : getActiveTabs()) if(!(tab instanceof MainTab)) tab.setFieldFromData(data);
     }
+
+    @Override
+    public void quit(Minecraft mc) {
+        //mc.displayGuiScreen(previousScreen);
+
+        //if(previousScreen instanceof )
+        //TODO Add an instance of CompendiumScreen
+
+        super.quit(mc);
+    }
+
+    /*@Override
+    public void onClose() {
+        if(!closing) {
+            closing = true;
+            quit(minecraft);
+        }
+    }*/
 
     @Override
     public void tick() {

@@ -1,10 +1,9 @@
-package com.sekai.ambienceblocks.client.ambiencecontroller;
+package com.sekai.ambienceblocks.client.ambience;
 
 import net.minecraft.client.audio.TickableSound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;

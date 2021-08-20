@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks.ambience.bounds;
 
+import com.google.gson.JsonObject;
 import com.sekai.ambienceblocks.ambience.util.AmbienceAxis;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -24,11 +25,17 @@ public abstract class AbstractBounds {
     public abstract double distanceFromCenter(PlayerEntity player, Vector3d origin);
     public abstract double getPercentageHowCloseIsPlayer(PlayerEntity player, Vector3d origin);
 
+    //NBT
     public abstract CompoundNBT toNBT();
     public abstract void fromNBT(CompoundNBT compound);
 
+    //Packet
     public abstract void toBuff(PacketBuffer buf);
     public abstract void fromBuff(PacketBuffer buf);
+
+    //JSON
+    public abstract void toJson(JsonObject json);
+    public abstract void fromJson(JsonObject json);
 
     //util
     /*public Vector3d getFixedOrigin(Vector3d origin) {

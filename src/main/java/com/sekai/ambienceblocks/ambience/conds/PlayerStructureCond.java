@@ -1,6 +1,7 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
+import com.google.gson.JsonObject;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
@@ -104,5 +105,17 @@ public class PlayerStructureCond extends AbstractCond {
     public void fromBuff(PacketBuffer buf) {
         this.equal = AmbienceEquality.values()[buf.readInt()];
         this.structure = buf.readString(50);
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(EQUAL, equal.name());
+        json.addProperty(STRUCTURE, structure);
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        equal = StaticUtil.getEnumValue(json.get(EQUAL).getAsString(), AmbienceEquality.values());
+        structure = json.get(STRUCTURE).getAsString();
     }
 }

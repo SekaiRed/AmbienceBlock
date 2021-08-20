@@ -1,13 +1,14 @@
-package com.sekai.ambienceblocks.client.ambiencecontroller;
+package com.sekai.ambienceblocks.client.ambience;
 
 import com.sekai.ambienceblocks.client.rendering.RenderingEventHandler;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
+import com.sekai.ambienceblocks.compendium.CompendiumEntry;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
-import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.RegistryHandler;
-import com.sekai.ambienceblocks.world.CompendiumRegistry;
+import com.sekai.ambienceblocks.compendium.ClientCompendium;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.item.ItemStack;
@@ -31,11 +32,11 @@ public class AmbienceController {
     public static AmbienceController instance;
     public final Minecraft mc;
     public final SoundHandler handler;
-    public final CompendiumRegistry compendium;
+    public final ClientCompendium compendium;
     public static boolean debugMode = false;
 
     //System variables
-    public int tick = 0;
+    boolean inactive = false;
     public AmbienceData clipboard;
 
     //System lists
@@ -46,7 +47,7 @@ public class AmbienceController {
         instance = this;
         mc = Minecraft.getInstance();
         handler = Minecraft.getInstance().getSoundHandler();
-        compendium = new CompendiumRegistry();
+        compendium = new ClientCompendium();
     }
 
     @SubscribeEvent
@@ -72,15 +73,25 @@ public class AmbienceController {
         delayList.clear();
 
         //AmbienceCompendiumRegistry.instance.entries.clear();
-        compendium.clear();
+        //compendium.clear();
 
         RenderingEventHandler.clearEvent();
     }
 
     @SubscribeEvent
     public void tick(TickEvent.ClientTickEvent e) {
-        //there's no world, probably on the main menu or something
-        if(mc.world == null || mc.player == null || e.phase.equals(TickEvent.Phase.END))
+        //there's no player, probably on the main menu or something
+        if(mc.world == null) {
+            if(inactive) {
+                inactive = true;
+                clear();
+            }
+            return;
+        }
+
+        inactive = false;
+
+        if(mc.player == null || e.phase.equals(TickEvent.Phase.END))
             return;
 
         //waits if the game is paused
@@ -94,66 +105,31 @@ public class AmbienceController {
         //render the invisible ambience block particles client side
         renderInvisibleTileEntityParticles();
 
-        //get all of the loaded ambienceTileEntities
-        //List<AmbienceTileEntity> ambienceTiles = getListOfLoadedAmbienceTiles();
+        systemTick();
+    }
+
+    private void systemTick() {
+        //get all of the loaded ambience sources
         List<IAmbienceSource> ambienceSources = getListOfAmbienceSources();
 
-        //iterate through all ambienceslots
-        ambienceIteration: for(AmbienceSlot slot : soundsList) {
+        for (AmbienceSlot slot : soundsList) {
             //update volume, pitch, intro/outro, fade in/out first
             slot.tick();
 
-            if(slot.getOwner() instanceof AmbienceTileEntity && !mc.world.loadedTileEntityList.contains(slot.getOwner())) {
-                stopMusic(slot, "the owner doesn't exist");
-                continue;
-            }
+            if (isOwnerLoaded(ambienceSources, slot)) continue;
 
-            //the tile is out of bounds
-            if(!slot.getOwner().isWithinBounds(mc.player)) {
-                //it could be fused with another better candidate
-                //it does this by checking if there's a valid fusing target loaded right now and
-                //it just grabs the first available candidate and swaps with it instead of stopping the sound
-                if (slot.getData().shouldFuse()) {
-                    List<IAmbienceSource> ambienceTileEntityList = new ArrayList<>(ambienceSources);
-                    //ambienceTileEntityList.removeIf(tile -> !tile.data.shouldFuse() || !tile.data.getSoundName().equals(slot.getMusicString()) || !canTilePlay(tile));
-                    //ambienceTileEntityList.removeIf(tile -> !tile.data.shouldFuse() || !hasSameMusics(tile.data, slot.getOwner().data) || !canTilePlay(tile));
-                    ambienceTileEntityList.removeIf(tile -> !tile.getData().shouldFuse() || !hasSameMusics(tile.getData(), slot.getData()) || !canTilePlay(tile));
-
-                    if(ambienceTileEntityList.size() != 0) {
-                        swapOwner(slot, ambienceTileEntityList.get(0));
-                        continue;
-                    }
-                }
-
-                stopMusic(slot, "not within bounds and couldn't find another block to fuse with");
-                continue;
-            }
-
-            //does it have a lower priority to an already playing ambience?
-            if(slot.getData().isUsingPriority())
-            {
-                int priority = getHighestPriorityByChannel(slot.getData().getChannel());
-                if (slot.getData().getPriority() < priority) {
-                    stopMusic(slot, "lower priority than the maximal one : slot priority " + slot.getData().getPriority() + " and max priority " + priority);
+            if (!canTilePlay(slot.getOwner())) {
+                if (aboutToStopAndNeedToFuse(ambienceSources, slot))
                     continue;
-                }
-            }
 
-            //are its conditions still fulfilled?
-            if(slot.getData().isUsingCondition()) {
-                List<AbstractCond> conditions = slot.getData().getConditions();
-                for (AbstractCond condition : conditions) {
-                    if(!condition.isTrue(new Vector3d(mc.player.getPosX(), mc.player.getPosY(), mc.player.getPosZ()), mc.world, slot.getOwner())) {
-                        //if a single condition is false let's end this early
-                        stopMusic(slot, "conditions returned false");
-                        continue ambienceIteration;
-                    }
-                }
+                //only doing this disgusting thing to avoid the costly canTilePlayFailureContext, it's like checking canTilePlay twice, like please don't
+                stopMusic(slot, debugMode ? canTilePlayFailureContext(slot.getOwner()) : EventContext.UNKNOWN);
+                continue;
             }
 
             //fusing volume and pitch shenanigans
-            //todo priority is broken with this system, maybe i could cache a priority value based on the collective one of all fuse blocks?
-            if(slot.getOwner().getData().shouldFuse()) {
+            //todo priority is broken with this system, maybe i could cache a priority value based on the collective one of all fuse blocks? (maybe i fixed it right now)
+            if (slot.getOwner().getData().shouldFuse()) {
                 float volume = 0;
                 float pitch = 0;
                 double totalBias = 0;
@@ -162,11 +138,11 @@ public class AmbienceController {
                 List<AmbienceTileEntity> ambienceTileEntityList = getListOfLoadedAmbienceTiles();
                 //only keep tiles that can fuse, possess the same music and is able to play right now
                 ambienceTileEntityList.removeIf(tile -> !tile.data.shouldFuse() || !hasSameMusics(slot.getOwner().getData(), tile.data) || !canTilePlay(tile));
-                for(AmbienceTileEntity tile : ambienceTileEntityList) {
+                for (AmbienceTileEntity tile : ambienceTileEntityList) {
                     volume += getVolumeFromTileEntity(tile);
                     totalBias += tile.getPercentageHowCloseIsPlayer(mc.player);
                 }
-                for(AmbienceTileEntity tile : ambienceTileEntityList) {
+                for (AmbienceTileEntity tile : ambienceTileEntityList) {
                     pitch += tile.data.getPitch() * (tile.getPercentageHowCloseIsPlayer(mc.player) / totalBias);
                 }
 
@@ -177,8 +153,6 @@ public class AmbienceController {
                 slot.setForcedPitch(pitch);
             }
 
-            //update fade/intro/outro tick
-            //slot.tick();
             //forces to update the volume and pitch
             slot.forceVolumeAndPitchUpdate();
 
@@ -187,58 +161,33 @@ public class AmbienceController {
             slot.setHasForcedPitch(false);
         }
 
-        //no use counting down the delay of an unloaded tile
-        //TODO SUS call to list.contain
-        delayList.removeIf(delay -> (delay.getOrigin() instanceof AmbienceTileEntity) && !mc.world.loadedTileEntityList.contains(delay.getOrigin()));
+        ArrayList<IAmbienceSource> ambienceSourcesToPlay = new ArrayList<>();
 
         for (IAmbienceSource source : ambienceSources) {
-            if (tileHasDelayRightNow(source)) {
-                AmbienceDelayRestriction delay = getDelayEntry(source);
-                if (!delay.isDone())
-                    delay.tick();
-                else
-                    delay.restart();
-            } else {
-                if (source.getData().isUsingDelay()) {
+            if(source.getData().isUsingDelay()) {
+                if (tileHasDelayRightNow(source)) {
+                    AmbienceDelayRestriction delay = getDelayEntry(source);
+                    if (!delay.isDone())
+                        delay.tick();
+                    else
+                        delay.restart();
+                } else {
                     delayList.add(new AmbienceDelayRestriction(source, source.getData().getDelay()));
                 }
             }
-        }
 
-        //getting all of the max priorities by channel
-        int[] maxPriorityByChannel = new int[AmbienceData.maxChannels];
-        for(int i = 0; i < AmbienceData.maxChannels; i++) {
-            maxPriorityByChannel[i] = 0;
-            for (IAmbienceSource source : ambienceSources) {
-                if (source.getData().getChannel() == i && source.getData().getPriority() > maxPriorityByChannel[i] && source.getData().isUsingPriority() && canTilePlay(source))
-                    maxPriorityByChannel[i] = source.getData().getPriority();
+            //this tile can play
+            if (canTilePlay(source)) {
+                ambienceSourcesToPlay.add(source);
             }
         }
 
-        ArrayList<IAmbienceSource> ambienceSourcesToPlay = new ArrayList<>();
-
-        for(IAmbienceSource source : ambienceSources)
-        {
-            //this tile cannot play lol
-            if(!canTilePlay(source))
-                continue;
-
-            //this tile is using priority with a valid channel
-            if(source.getData().isUsingPriority() && source.getData().getChannel() <= AmbienceData.maxChannels)
-                //this tile has too low of a priority, skip it '^'
-                if(source.getData().getPriority() < maxPriorityByChannel[source.getData().getChannel()])
-                    continue;
-
-            ambienceSourcesToPlay.add(source);
-        }
-
-        //final boss : go through every tile and check if they're allowed to play
         for (IAmbienceSource source : ambienceSourcesToPlay) {
             //this tile uses delay which is a special case
             if (tileHasDelayRightNow(source) && source.getData().isUsingDelay()) {
                 if(getDelayEntry(source).isDone()) {
                     if(isTileEntityAlreadyPlaying(source) == null){
-                        playMusicNoRepeat(source, "valid delayed sound");
+                        playMusicNoRepeat(source, EventContext.VALID_DELAY);
                         delayList.remove(getDelayEntry(source));
                         continue;
                     }
@@ -246,9 +195,9 @@ public class AmbienceController {
                     {
                         if(source.getData().canPlayOverSelf()){
                             if(source.getData().shouldStopPrevious()) {
-                                stopMusic(isTileEntityAlreadyPlaying(source), "delay stopped it since it's playing again");
+                                stopMusic(isTileEntityAlreadyPlaying(source), EventContext.DELAY_STOP_PREVIOUS);
                             }
-                            playMusicNoRepeat(source, "delayed sound can play over itself");
+                            playMusicNoRepeat(source, EventContext.DELAY_OVER_ITSELF);
                             delayList.remove(getDelayEntry(source));
                             continue;
                         }
@@ -257,40 +206,11 @@ public class AmbienceController {
                 continue;
             }
 
-            //that tile entity already owns a song in the list, check if it has the same song too
-            //todo retired, it's tougher to implement now and seems kinda useless, the song can't change without receiving an update that resets all tile sounds
-            /*if (isTileEntityAlreadyPlaying(tile) != null) {
-                continue;
-                //stopMusic(isTileEntityAlreadyPlaying(tile), "already playing i guess");
-                //canBeFused
-                //if (isTileEntityAlreadyPlaying(tile).getMusicString().equals(tile.data.getSoundName()))
-                //if (hasSameMusics(isTileEntityAlreadyPlaying(tile).getOwner().data, tile.data)) {
-                //if(isTileEntityAlreadyPlaying(tile)) {
-                //    continue; //litterally the same tile, don't bother and skip it
-                //} else {
-                //    stopMusic(isTileEntityAlreadyPlaying(tile), "stopped because the song playing was different"); //stops the previous one since it has an outdated song
-                //    //playMusic(tile);
-                //    //continue;
-                //}
-            }*/
-
             //this tile is already in the ambience list, please don't play it again it hurts my ears
-            if (isTileEntityAlreadyPlaying(source) != null) {
+            if (isTileEntityAlreadyPlaying(source) != null)
                 continue;
-                //stopMusic(isTileEntityAlreadyPlaying(tile), "already playing i guess");
-                //canBeFused
-                //if (isTileEntityAlreadyPlaying(tile).getMusicString().equals(tile.data.getSoundName()))
-                //if (hasSameMusics(isTileEntityAlreadyPlaying(tile).getOwner().data, tile.data)) {
-                //if(isTileEntityAlreadyPlaying(tile)) {
-                //    continue; //litterally the same tile, don't bother and skip it
-                //} else {
-                //    stopMusic(isTileEntityAlreadyPlaying(tile), "stopped because the song playing was different"); //stops the previous one since it has an outdated song
-                //    //playMusic(tile);
-                //    //continue;
-                //}
-            }
 
-            //if the music is already playing, check if you can't replace it with the new tile
+            //if the music is already playing and can be fused, check if you can't replace it with the new tile
             if (isMusicAlreadyPlaying(source.getData()) != null && canTilePlay(source) && source.getData().shouldFuse()) {
                 //AmbienceSlot slot = isMusicAlreadyPlaying(tile.data.getSoundName());
                 AmbienceSlot slot = isMusicAlreadyPlaying(source.getData());
@@ -317,10 +237,47 @@ public class AmbienceController {
             }
 
             //survived the gauntlet of conditions, this tile can safely play
-            playMusic(source, "reached the end of tile to play");
+            playMusic(source, EventContext.VALID_AMBIENCE);
         }
 
+        //no use counting down the delay of an unloaded tile
+        delayList.removeIf(delay -> (delay.getOrigin() instanceof AmbienceTileEntity) && !mc.world.loadedTileEntityList.contains((AmbienceTileEntity) delay.getOrigin()));
+
         soundsList.removeIf(AmbienceSlot::isMarkedForDeletion);
+    }
+
+    private boolean isOwnerLoaded(List<IAmbienceSource> ambienceSources, AmbienceSlot slot) {
+        //is the tile unloaded? (broken or from unloaded chunk)
+        if (slot.getOwner() instanceof AmbienceTileEntity && !mc.world.loadedTileEntityList.contains((AmbienceTileEntity) slot.getOwner())) {
+            if (aboutToStopAndNeedToFuse(ambienceSources, slot))
+                return true;
+
+            stopMusic(slot, EventContext.OWNER_NOT_LOADED);
+            return true;
+        }
+
+        //is the compendium entry removed? (updated by compendium)
+        if (slot.getOwner() instanceof CompendiumEntry && !compendium.contains((CompendiumEntry) slot.getOwner())) {
+            if (aboutToStopAndNeedToFuse(ambienceSources, slot))
+                return true;
+
+            stopMusic(slot, EventContext.ENTRY_NOT_LOADED);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean aboutToStopAndNeedToFuse(List<IAmbienceSource> ambienceSources, AmbienceSlot slot) {
+        if (slot.getData().shouldFuse()) {
+            List<IAmbienceSource> ambienceTileEntityList = new ArrayList<>(ambienceSources);
+            ambienceTileEntityList.removeIf(tile -> !tile.getData().shouldFuse() || !hasSameMusics(tile.getData(), slot.getData()) || !canTilePlay(tile) || slot.getOwner().equals(tile));
+
+            if(ambienceTileEntityList.size() != 0) {
+                swapOwner(slot, ambienceTileEntityList.get(0));
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isSoundPlaying(String sound) {
@@ -356,21 +313,21 @@ public class AmbienceController {
                 mc.world.addParticle(RegistryHandler.PARTICLE_SPEAKER.get(), tile.getPos().getX() + 0.5D, tile.getPos().getY() + 0.5D, tile.getPos().getZ() + 0.5D, 0.0D, 0.0D, 0.0D);
             }
         }
-        //mc.world.addParticle(RegistryHandler.PARTICLE_SPEAKER.get(), tile.getPos().getX() + 0.5D, tile.getPos().getY() + 0.5D + 1D, tile.getPos().getZ() + 0.5D, 0.0D, 0.0D, 0.0D);
     }
 
-    public void playMusic(IAmbienceSource source, String reason) {
+    public void playMusic(IAmbienceSource source, EventContext ctx) {
         if(debugMode)
-            RenderingEventHandler.addEvent("playing " + source.getData().getSoundName() + " at " + getAmbienceSourceName(source), reason, RenderingEventHandler.cBlue);
+            RenderingEventHandler.addEvent("playing " + source.getData().getSoundName() + " at " + getAmbienceSourceName(source), ctx);
+            //RenderingEventHandler.addEvent("playing " + source.getData().getSoundName() + " at " + getAmbienceSourceName(source), reason, RenderingEventHandler.cBlue);
 
         AmbienceSlot slot = new AmbienceSlot(handler, source);
         slot.play();
         soundsList.add(slot);
     }
 
-    public void playMusicNoRepeat(IAmbienceSource source, String reason) {
+    public void playMusicNoRepeat(IAmbienceSource source, EventContext ctx) {
         if(debugMode)
-            RenderingEventHandler.addEvent("playing non-looping " + source.getData().getSoundName() + " at " + getAmbienceSourceName(source), reason, RenderingEventHandler.cBlue);
+            RenderingEventHandler.addEvent("playing non-looping " + source.getData().getSoundName() + " at " + getAmbienceSourceName(source), ctx);
 
         float volume = getVolumeFromTileEntity(source), pitch = source.getData().getPitch();
 
@@ -385,49 +342,37 @@ public class AmbienceController {
         soundsList.add(slot);
     }
 
-    public void stopMusic(AmbienceSlot soundSlot, String source) {
+    public void stopMusic(AmbienceSlot soundSlot, EventContext ctx) {
         //no use stopping an already stopped sound
         if(soundSlot.isStopping())
             return;
 
         if(debugMode)
-            RenderingEventHandler.addEvent("stopping " + soundSlot.getMusicString() + " at " + getAmbienceSourceName(soundSlot.getOwner()), source, RenderingEventHandler.cRed);
+            RenderingEventHandler.addEvent("stopping " + soundSlot.getMusicString() + " at " + getAmbienceSourceName(soundSlot.getOwner()), ctx);
+            //RenderingEventHandler.addEvent("stopping " + soundSlot.getMusicString() + " at " + getAmbienceSourceName(soundSlot.getOwner()), source, RenderingEventHandler.cRed);
 
         soundSlot.stop();
     }
 
-    public void stopMusicNoFadeOut(AmbienceSlot soundSlot, String source) {
-        if(debugMode)
-            RenderingEventHandler.addEvent("force stopped " + soundSlot.getMusicString() + " at " + getAmbienceSourceName(soundSlot.getOwner()), source, RenderingEventHandler.cRed);
-
-        soundSlot.forceStop();
-        //handler.stop(soundSlot.getMusicInstance());
-        //soundSlot.markForDeletion();
-    }
-
     //Swaps which tiles is currently owning a playing sound, used for relays and fusing
     public void swapOwner(AmbienceSlot soundSlot, IAmbienceSource source) {
-        RenderingEventHandler.addEvent("swapping " + source.getData().getSoundName() + " from " + getAmbienceSourceName(soundSlot.getOwner()) + " to " + getAmbienceSourceName(source), null, RenderingEventHandler.cGreen);
+        if(debugMode)
+            RenderingEventHandler.addEvent("swapping " + source.getData().getSoundName() + " from " + getAmbienceSourceName(soundSlot.getOwner()) + " to " + getAmbienceSourceName(source), EventContext.SWAPPING);
+
         soundSlot.setOwner(source);
-        //soundSlot.getMusicInstance().setBlockPos(tile.getPos().add(ParsingUtil.Vec3dToVec3i(tile.data.getOffset())));
     }
 
     //Mostly used when the tile gets update from a request by the server
     public void stopFromTile(AmbienceTileEntity tile) {
         for(AmbienceSlot slot : soundsList) {
             if(slot.getOwner().equals(tile) && !slot.isMarkedForDeletion())
-                stopMusic(slot, "stopped by stopFromTile, updated by server?");
+                stopMusic(slot, EventContext.PACKET_RECEIVED);
         }
 
         delayList.removeIf(delay -> delay.getOrigin() == tile);
-
-        /*for(AmbienceDelayRestriction delay : delayList) {
-            if(delay.getOrigin().equals(tile))
-                fhf
-        }*/
     }
 
-    private String getAmbienceSourceName(IAmbienceSource source) {
+    public String getAmbienceSourceName(IAmbienceSource source) {
         if(source instanceof TileEntity)
             return ParsingUtil.customBlockPosToString(((TileEntity) source).getPos());
         else
@@ -444,7 +389,29 @@ public class AmbienceController {
                 return false;
         }
 
+        int priority = getHighestPriorityByChannel(tile.getData().getChannel());
+        if (tile.getData().getPriority() < priority)
+            return false;
+
         return true;
+    }
+
+    private EventContext canTilePlayFailureContext(IAmbienceSource tile) {
+        if(!tile.isWithinBounds(mc.player))
+            return EventContext.OUT_OF_BOUNDS;
+
+        List<AbstractCond> conditions = tile.getData().getConditions();
+        for (AbstractCond condition : conditions) {
+            if(!condition.isTrue(new Vector3d(mc.player.getPosX(), mc.player.getPosY(), mc.player.getPosZ()), mc.world, tile))
+                return EventContext.CONDITION_IS_FALSE;
+        }
+
+        int priority = getHighestPriorityByChannel(tile.getData().getChannel());
+        if (tile.getData().getPriority() < priority)
+            return EventContext.OUT_PRIORITIZED;
+            //return "lower priority than the maximal one : slot priority " + tile.getData().getPriority() + " and max priority " + priority;
+
+        return EventContext.UNKNOWN;
     }
 
     public List<IAmbienceSource> getListOfAmbienceSources() {
@@ -453,15 +420,13 @@ public class AmbienceController {
         //add all of the tiles
         ambienceSourceList.addAll(getListOfLoadedAmbienceTiles());
         //add all of the compendium entries
-        //System.out.println(AmbienceCompendiumRegistry.instance.entries.size());
-        ambienceSourceList.addAll(compendium.entries);
+        ambienceSourceList.addAll(compendium.getAllEntries());
 
         return ambienceSourceList;
     }
 
     public List<AmbienceTileEntity> getListOfLoadedAmbienceTiles() {
-        List<AmbienceTileEntity> ambienceTileEntityList = mc.world.loadedTileEntityList.stream().filter(tile -> tile instanceof AmbienceTileEntity).map(tile -> (AmbienceTileEntity) tile).collect(Collectors.toList());
-        return ambienceTileEntityList;
+        return mc.world.loadedTileEntityList.stream().filter(tile -> tile instanceof AmbienceTileEntity).map(tile -> (AmbienceTileEntity) tile).collect(Collectors.toList());
     }
 
     public int getHighestPriorityByChannel(int index) {
@@ -513,43 +478,6 @@ public class AmbienceController {
 
     }*/
 
-    public class AmbienceDelayRestriction {
-        public IAmbienceSource getOrigin() {
-            return origin;
-        }
-
-        private final IAmbienceSource origin;
-        private int tickLeft;
-
-        private final int originalTick;
-
-        public AmbienceDelayRestriction(IAmbienceSource origin, int tickLeft) {
-            this.origin = origin;
-            this.tickLeft = tickLeft;
-            this.originalTick = tickLeft;
-        }
-
-        public void tick() {
-            tickLeft--;
-        }
-
-        public boolean isDone() {
-            return tickLeft <= 0;
-        }
-
-        public void restart() {
-            tickLeft = originalTick;
-        }
-
-        @Override
-        public String toString() {
-            return getOrigin().getData().getSoundName() +
-                    ", " + getAmbienceSourceName(origin) + //ParsingUtil.customBlockPosToString(origin.getPos()) +
-                    ", originalTick=" + originalTick +
-                    ", tickLeft=" + tickLeft;
-        }
-    }
-
     public AmbienceDelayRestriction getDelayEntry(IAmbienceSource origin) {
         for(AmbienceDelayRestriction restriction : delayList) {
             if(restriction.getOrigin() == origin) return restriction;
@@ -559,5 +487,36 @@ public class AmbienceController {
 
     public boolean tileHasDelayRightNow(IAmbienceSource origin) {
         return getDelayEntry(origin) != null;
+    }
+
+    public enum EventContext {
+        VALID_AMBIENCE("this tile passed every test and can play", RenderingEventHandler.cBlue),
+        DELAY_OVER_ITSELF("delayed sound can play over itself", RenderingEventHandler.cBlue),
+        VALID_DELAY("valid delayed sound", RenderingEventHandler.cBlue),
+        SWAPPING("", RenderingEventHandler.cGreen),
+        DELAY_STOP_PREVIOUS("delay stopped it since it's playing again", RenderingEventHandler.cRed),
+        OWNER_NOT_LOADED("the owner doesn't exist", RenderingEventHandler.cRed),
+        ENTRY_NOT_LOADED("the entry doesn't exist", RenderingEventHandler.cRed),
+        PACKET_RECEIVED("forcefully stopped, updated by server?", RenderingEventHandler.cRed),
+        OUT_OF_BOUNDS("not within bounds", RenderingEventHandler.cRed),
+        CONDITION_IS_FALSE("at least one condition returned false", RenderingEventHandler.cRed),
+        OUT_PRIORITIZED("lower priority than the highest one on this channel", RenderingEventHandler.cRed),
+        UNKNOWN("how tho", RenderingEventHandler.cWhite);
+
+        private final String comment;
+        private final int color;
+
+        EventContext(String comment, int color) {
+            this.comment = comment;
+            this.color = color;
+        }
+
+        public String getComment() {
+            return comment;
+        }
+
+        public int getColor() {
+            return color;
+        }
     }
 }

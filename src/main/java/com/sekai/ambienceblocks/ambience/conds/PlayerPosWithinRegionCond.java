@@ -1,7 +1,10 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.Expose;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
+import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
@@ -9,6 +12,7 @@ import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.NBTHelper;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.StaticUtil;
+import com.sekai.ambienceblocks.util.json.Hidden;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -42,6 +46,7 @@ public class PlayerPosWithinRegionCond extends AbstractCond {
     private static final String FINAL = "finalPos";
 
     //only generated with cond to not have to create a new one every time I need to check the condition
+    @Hidden
     private AxisAlignedBB boundingBox;
 
     public PlayerPosWithinRegionCond(double xS, double yS, double zS, double xF, double yF, double zF, AmbienceEquality equal, AmbienceWorldSpace space) {
@@ -168,6 +173,32 @@ public class PlayerPosWithinRegionCond extends AbstractCond {
 
         space = StaticUtil.getEnumValue(buf.readInt(), AmbienceWorldSpace.values());
         equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
+
+        updateBoundingBox();
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(XS, xS);
+        json.addProperty(YS, yS);
+        json.addProperty(ZS, zS);
+        json.addProperty(XF, xF);
+        json.addProperty(YF, yF);
+        json.addProperty(ZF, zF);
+        json.addProperty(SPACE, space.name());
+        json.addProperty(EQUAL, equal.name());
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        xS = json.get(XS).getAsDouble();
+        yS = json.get(YS).getAsDouble();
+        zS = json.get(ZS).getAsDouble();
+        xF = json.get(XF).getAsDouble();
+        yF = json.get(YF).getAsDouble();
+        zF = json.get(ZF).getAsDouble();
+        space = StaticUtil.getEnumValue(json.get(SPACE).getAsString(), AmbienceWorldSpace.values());
+        equal = StaticUtil.getEnumValue(json.get(EQUAL).getAsString(), AmbienceEquality.values());
 
         updateBoundingBox();
     }

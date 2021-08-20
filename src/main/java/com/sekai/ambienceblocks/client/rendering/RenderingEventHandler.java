@@ -4,7 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.sekai.ambienceblocks.Main;
-import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
+import com.sekai.ambienceblocks.client.ambience.AmbienceController;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.util.RegistryHandler;
 import net.minecraft.client.Minecraft;
@@ -48,7 +48,6 @@ public class RenderingEventHandler {
 
         //RenderSystem.enableBlend();
 
-        ArrayList<String> listL = new ArrayList<String>();
         //ArrayList<String> listR = new ArrayList<String>();
 
         MatrixStack mStack = event.getMatrixStack();
@@ -60,7 +59,7 @@ public class RenderingEventHandler {
 
         mStack.scale(1/scale, 1/scale, 1/scale);
 
-        listL.addAll(getLeft());
+        ArrayList<String> listL = new ArrayList<>(getLeft());
         //listR.addAll(getRight());
 
         int top = 2;
@@ -120,12 +119,19 @@ public class RenderingEventHandler {
         eventList.clear();
     }
 
-    public static void addEvent(String msg, String src, int color) {
+    public static void addEvent(String msg, AmbienceController.EventContext ctx) {
+        if(eventList.size() >= eventListLimit)
+            eventList.remove(0);
+
+        eventList.add(new AmbienceEvent(msg, ctx.getComment(), ctx.getColor()));
+    }
+
+    /*public static void addEvent(String msg, String src, int color) {
         if(eventList.size() >= eventListLimit)
             eventList.remove(0);
 
         eventList.add(new AmbienceEvent(msg, src, color));
-    }
+    }*/
 
     private static class AmbienceEvent {
         private String msg;

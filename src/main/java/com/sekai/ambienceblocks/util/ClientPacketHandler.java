@@ -1,6 +1,8 @@
 package com.sekai.ambienceblocks.util;
 
-import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
+import com.sekai.ambienceblocks.client.ambience.AmbienceController;
+import com.sekai.ambienceblocks.client.gui.ambience.CompendiumGUI;
+import com.sekai.ambienceblocks.packets.PacketCompendium;
 import com.sekai.ambienceblocks.packets.PacketTargeting;
 import com.sekai.ambienceblocks.packets.PacketUpdateAmbienceTE;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
@@ -67,6 +69,42 @@ public class ClientPacketHandler {
                 AmbienceTileEntity finalTile = (AmbienceTileEntity) tile;
                 finalTile.data = pkt.data;
                 AmbienceController.instance.stopFromTile(finalTile);
+            }
+        };
+    }
+
+    public static DistExecutor.SafeRunnable handlePacketCompendium(PacketCompendium pkt) {
+        return new DistExecutor.SafeRunnable() {
+            @Override
+            public void run() {
+                Minecraft mc = Minecraft.getInstance();
+
+                if (mc.world == null)
+                    return;
+
+                if (!mc.world.isRemote())
+                    return;
+
+                AmbienceController.instance.compendium.clear();
+
+                AmbienceController.instance.compendium.addAllEntries(pkt.entries);
+            }
+        };
+    }
+
+    public static DistExecutor.SafeRunnable handlePacketAskForCompendium() {
+        return new DistExecutor.SafeRunnable() {
+            @Override
+            public void run() {
+                Minecraft mc = Minecraft.getInstance();
+
+                if (mc.world == null)
+                    return;
+
+                if (!mc.world.isRemote())
+                    return;
+
+                mc.displayGuiScreen(new CompendiumGUI());
             }
         };
     }

@@ -1,12 +1,14 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
-import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
+import com.google.gson.JsonObject;
+import com.sekai.ambienceblocks.client.ambience.AmbienceController;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.ParsingUtil;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.vector.Vector3d;
@@ -83,7 +85,7 @@ public class AmbiencePriorityCond extends AbstractCond {
 
     @Override
     public void fromNBT(CompoundNBT nbt) {
-        test = AmbienceTest.values()[nbt.getInt(TEST) < AmbienceTest.values().length ? nbt.getInt(TEST) : 0];
+        test = StaticUtil.getEnumValue(nbt.getInt(TEST), AmbienceTest.values());
         priority = nbt.getInt(PRIORITY);
         channel = nbt.getInt(CHANNEL);
     }
@@ -97,8 +99,22 @@ public class AmbiencePriorityCond extends AbstractCond {
 
     @Override
     public void fromBuff(PacketBuffer buf) {
-        this.test = AmbienceTest.values()[buf.readInt()];
+        this.test = StaticUtil.getEnumValue(buf.readInt(), AmbienceTest.values());
         this.priority = buf.readInt();
         this.channel = buf.readInt();
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(TEST, test.name());
+        json.addProperty(PRIORITY, priority);
+        json.addProperty(CHANNEL, channel);
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        test = StaticUtil.getEnumValue(json.get(TEST).getAsString(), AmbienceTest.values());
+        priority = json.get(PRIORITY).getAsInt();
+        channel = json.get(CHANNEL).getAsInt();
     }
 }

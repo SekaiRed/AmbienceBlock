@@ -1,6 +1,7 @@
 package com.sekai.ambienceblocks.tileentity;
 
 import com.sekai.ambienceblocks.ambience.AmbienceData;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.util.RegistryHandler;
 import net.minecraft.block.BlockState;

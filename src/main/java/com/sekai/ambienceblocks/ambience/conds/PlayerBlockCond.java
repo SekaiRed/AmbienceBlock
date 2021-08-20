@@ -1,6 +1,8 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.Expose;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
@@ -37,6 +39,7 @@ public class PlayerBlockCond extends AbstractCond {
     private static final String POSITION = "pos";
 
     //internal reference
+    @Expose(serialize = false, deserialize = false)
     private BlockPos pos;
 
     public PlayerBlockCond(double x, double y, double z, AmbienceEquality equal, AmbienceWorldSpace space, String block) {
@@ -147,6 +150,26 @@ public class PlayerBlockCond extends AbstractCond {
         equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
         space = StaticUtil.getEnumValue(buf.readInt(), AmbienceWorldSpace.values());
         block = buf.readString(50);
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(X, x);
+        json.addProperty(Y, y);
+        json.addProperty(Z, z);
+        json.addProperty(EQUAL, equal.name());
+        json.addProperty(SPACE, space.name());
+        json.addProperty(BLOCK, block);
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        x = json.get(X).getAsDouble();
+        y = json.get(Y).getAsDouble();
+        z = json.get(Z).getAsDouble();
+        equal = StaticUtil.getEnumValue(json.get(EQUAL).getAsString(), AmbienceEquality.values());
+        space = StaticUtil.getEnumValue(json.get(SPACE).getAsString(), AmbienceWorldSpace.values());
+        block = json.get(BLOCK).getAsString();
     }
 
     private Vector3d getPos() {

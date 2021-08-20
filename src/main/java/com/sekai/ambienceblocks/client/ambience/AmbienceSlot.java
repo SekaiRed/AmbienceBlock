@@ -1,8 +1,8 @@
-package com.sekai.ambienceblocks.client.ambiencecontroller;
+package com.sekai.ambienceblocks.client.ambience;
 
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
-import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceType;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.Minecraft;
@@ -19,13 +19,14 @@ public class AmbienceSlot {
     private AmbienceSoundState stateSnd;
     private AmbienceFadeState stateFade;
 
-    //this sound should not repeat
-    private boolean isSingle = false;
-
     private boolean hasCachedVolume = false;
     private float cachedVolume = 0f;
     private boolean hasCachedPitch = false;
     private float cachedPitch = 0f;
+    /*private boolean hasCachedPriority = false;
+    private int cachedPriority = 0;
+    private boolean hasCachedChannel = false;
+    private int cachedChannel = 0;*/
 
     //exclusive to fusing, forces a certain volume
     private boolean hasForcedVolume = false;
@@ -334,22 +335,12 @@ public class AmbienceSlot {
         return AmbienceFadeState.MAIN.equals(stateFade);
     }
 
-    /*public CustomSoundSlot clone() {
-        //todo fuck
-        //return new CustomSoundSlot(this.musicName, this.musicRef, this.owner);
-        return new CustomSoundSlot(this.musicName, this.owner);
-    }*/
-
     @Override
     public String toString() {
         if(owner instanceof AmbienceTileEntity)
             return instance.getSoundLocation().toString() + ", " + ParsingUtil.customBlockPosToString(((AmbienceTileEntity) owner).getPos()) + ", volume " + getVolume() + ", pitch " + getPitch() + " with Sound : " + stateSnd.toString() + " and Fade : " + stateFade.toString();
         else
             return instance.getSoundLocation().toString() + ", volume " + getVolume() + ", pitch " + getPitch() + " with Sound : " + stateSnd.toString() + " and Fade : " + stateFade.toString();
-    }
-
-    public void setIsSingle() {
-        isSingle = true;
     }
 
     private enum AmbienceSoundState {

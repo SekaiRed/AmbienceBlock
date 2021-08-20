@@ -1,8 +1,8 @@
-package com.sekai.ambienceblocks.world;
+package com.sekai.ambienceblocks.compendium;
 
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
-import com.sekai.ambienceblocks.tileentity.IAmbienceSource;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,9 +15,18 @@ public class CompendiumEntry implements IAmbienceSource {
         this.data = data;
     }
 
+    //I thought this would be way easier to pull off, what the fuck
+    public CompendiumEntry copy() {
+        return new CompendiumEntry(data.copy());
+    }
+
     @Override
     public AmbienceData getData() {
         return data;
+    }
+
+    public void setData(AmbienceData data) {
+        this.data = data;
     }
 
     @Override
