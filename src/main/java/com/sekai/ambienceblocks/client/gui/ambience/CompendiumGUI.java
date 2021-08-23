@@ -4,11 +4,10 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sekai.ambienceblocks.Main;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
+import com.sekai.ambienceblocks.ambience.compendium.BaseCompendium;
+import com.sekai.ambienceblocks.ambience.compendium.CompendiumEntry;
 import com.sekai.ambienceblocks.client.ambience.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
-import com.sekai.ambienceblocks.ambience.compendium.BaseCompendium;
-import com.sekai.ambienceblocks.ambience.compendium.ClientCompendium;
-import com.sekai.ambienceblocks.ambience.compendium.CompendiumEntry;
 import com.sekai.ambienceblocks.packets.PacketCompendium;
 import com.sekai.ambienceblocks.util.PacketHandler;
 import net.minecraft.client.gui.widget.button.Button;
@@ -28,7 +27,7 @@ public class CompendiumGUI extends AmbienceScreen {
     private static final int buttonWidth = 30;
     private static final int buttonHeight = 20;
 
-    private final ClientCompendium comp;
+    private final BaseCompendium comp;
     private final BaseCompendium internalCompendium = new BaseCompendium();
 
     //keeps in memory the slot we were editing
@@ -115,6 +114,8 @@ public class CompendiumGUI extends AmbienceScreen {
 
             PacketHandler.NET.sendToServer(new PacketCompendium(internalCompendium.getAllEntries()));
 
+            AmbienceController.instance.stopAllCompendium();
+
             minecraft.displayGuiScreen(null);
         }));
 
@@ -152,7 +153,13 @@ public class CompendiumGUI extends AmbienceScreen {
     }
 
     private String getEntryText(AmbienceData data) {
-        return data.getSoundName() + " " + data.getVolume() + " " + data.getBounds().getName() + " " + data.getCategory();
+        //return data.getSoundName() + " " + data.getVolume() + " " + data.;
+        String text = !data.getSoundName().isEmpty() ? data.getSoundName() : "<No sound yet>";
+        if(data.isUsingCondition()) text += " cond,";
+        if(data.isUsingDelay()) text += " delay,";
+        if(data.isUsingPriority()) text += " prio,";
+        text += " " + data.getVolume();
+        return text;
     }
 
     private void addCompendiumEntry() {

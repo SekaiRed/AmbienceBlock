@@ -11,6 +11,7 @@ import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.NBTHelper;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.StaticUtil;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
@@ -68,17 +69,18 @@ public class PlayerBlockCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, World worldIn, IAmbienceSource sourceIn) {
+    public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
         if(AmbienceWorldSpace.ABSOLUTE.equals(space))
             pos = new BlockPos(getPos());
         else
-            pos = new BlockPos(playerPos.add(getPos()));
+            pos = new BlockPos(getPos().add(getPlayerPos(player)));
 
         return equal.testFor(doesBlockRegistryNameHasString(worldIn, pos, block));
     }
 
     private boolean doesBlockRegistryNameHasString(World world, BlockPos pos, String contain) {
-        return world.getBlockState(pos).getBlock().getRegistryName().toString().contains(contain);
+        //return world.getBlockState(pos).getBlock().getRegistryName().toString().contains(contain);
+        return stringValidation(world.getBlockState(pos).getBlock().getRegistryName().toString(), contain);
     }
 
     @Override

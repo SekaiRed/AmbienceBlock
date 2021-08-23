@@ -8,8 +8,12 @@ import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
+import com.sekai.ambienceblocks.config.AmbienceConfig;
+import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.StaticUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -20,23 +24,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerInBattleCond extends AbstractCond {
-    //TODO Either move to a config or leave it as a parameter for the condition
-    public static final int SEARCH_RANGE = 40;
+    //public static final int SEARCH_RANGE = 40;
 
     private AmbienceEquality equal;
     private String entity;
+    private double range;
 
     private static final String EQUAL = "equal";
     private static final String ENTITY = "entity";
+    private static final String RANGE = "range";
 
-    public PlayerInBattleCond(AmbienceEquality equal, String entity) {
+    public PlayerInBattleCond(AmbienceEquality equal, String entity, double range) {
         this.equal = equal;
         this.entity = entity;
+        this.range = range;
     }
 
     @Override
     public AbstractCond clone() {
-        PlayerInBattleCond cond = new PlayerInBattleCond(equal, entity);
+        PlayerInBattleCond cond = new PlayerInBattleCond(equal, entity, range);
         return cond;
     }
 
@@ -47,16 +53,19 @@ public class PlayerInBattleCond extends AbstractCond {
 
     @Override
     public String getListDescription() {
-        return "[" + getName() + "] " + equal.getName() + " " + entity;
+        return "[" + getName() + "] " + equal.getName() + " " + entity + " in " + range;
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, World worldIn, IAmbienceSource sourceIn) {
+    public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
         //worldIn.getWorldInfo()
         //worldIn.getChunkAt(Minecraft.getInstance().player.getPosition()).getStructureStarts()
-        List<MobEntity> mobs = worldIn.getEntitiesWithinAABB(MobEntity.class, AxisAlignedBB.fromVector(playerPos).grow(SEARCH_RANGE));
+        double searchRange = Math.min(range, AmbienceConfig.maxEntitySearchRange);
+        List<MobEntity> mobs = worldIn.getEntitiesWithinAABB(MobEntity.class, AxisAlignedBB.fromVector(getPlayerPos(player)).grow(searchRange));
         for (MobEntity mob : mobs) {
-            if (mob.getAttackTarget() != null && mob.getType().getRegistryName().toString().contains(entity))
+            /*if (mob.getAttackTarget() != null && mob.getType().getRegistryName().toString().contains(entity))
+                return equal.testFor(true);*/
+            if (/*mob.getAttackTarget() != null*/ mob.getAttackTarget() == Minecraft.getInstance().player && stringValidation(mob.getType().getRegistryName().toString(), entity))
                 return equal.testFor(true);
         }
         return equal.testFor(false);
@@ -67,6 +76,7 @@ public class PlayerInBattleCond extends AbstractCond {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
         list.add(new AmbienceWidgetString(ENTITY, "Entity :", 160, entity));
+        list.add(new AmbienceWidgetString(RANGE, "Range :", 60, Double.toString(range), 8, ParsingUtil.negativeDecimalNumberFilter));
         return list;
     }
 
@@ -77,6 +87,8 @@ public class PlayerInBattleCond extends AbstractCond {
                 equal = (AmbienceEquality) ((AmbienceWidgetEnum) widget).getValue();
             if(ENTITY.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
                 entity = ((AmbienceWidgetString) widget).getValue();
+            if (RANGE.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
+                range = ParsingUtil.tryParseDouble(((AmbienceWidgetString) widget).getValue());
         }
     }
 
@@ -85,6 +97,7 @@ public class PlayerInBattleCond extends AbstractCond {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt(EQUAL, equal.ordinal());
         nbt.putString(ENTITY, entity);
+        nbt.putDouble(RANGE, range);
         return nbt;
     }
 
@@ -92,29 +105,34 @@ public class PlayerInBattleCond extends AbstractCond {
     public void fromNBT(CompoundNBT nbt) {
         equal = StaticUtil.getEnumValue(nbt.getInt(EQUAL), AmbienceEquality.values());
         entity = nbt.getString(ENTITY);
+        range = nbt.getDouble(RANGE);
     }
 
     @Override
     public void toBuff(PacketBuffer buf) {
         buf.writeInt(equal.ordinal());
         buf.writeString(entity, 50);
+        buf.writeDouble(range);
     }
 
     @Override
     public void fromBuff(PacketBuffer buf) {
         this.equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
         this.entity = buf.readString(50);
+        this.range = buf.readDouble();
     }
 
     @Override
     public void toJson(JsonObject json) {
         json.addProperty(EQUAL, equal.name());
         json.addProperty(ENTITY, entity);
+        json.addProperty(RANGE, range);
     }
 
     @Override
     public void fromJson(JsonObject json) {
         equal = StaticUtil.getEnumValue(json.get(EQUAL).getAsString(), AmbienceEquality.values());
         entity = json.get(ENTITY).getAsString();
+        range = json.get(RANGE).getAsDouble();
     }
 }

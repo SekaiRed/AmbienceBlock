@@ -1,27 +1,27 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
 import com.google.gson.JsonObject;
-import com.google.gson.annotations.Expose;
 import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
+import com.sekai.ambienceblocks.client.ambience.AmbienceController;
+import com.sekai.ambienceblocks.client.ambience.AmbienceSlot;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.StaticUtil;
-import net.minecraft.client.Minecraft;
+import com.sekai.ambienceblocks.util.Unused;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerHungerCond extends AbstractCond {
+public class AmbienceSlotAmountCond extends AbstractCond {
     private AmbienceTest test;
-    private double value;
+    private int value;
 
     private static final String TEST = "test";
     private static final String VALUE = "value";
@@ -31,20 +31,20 @@ public class PlayerHungerCond extends AbstractCond {
     private static Button bAxis;
     private static TextFieldWidget textValue;*/
 
-    public PlayerHungerCond(AmbienceTest test, double value) {
+    public AmbienceSlotAmountCond(AmbienceTest test, int value) {
         this.test = test;
         this.value = value;
     }
 
     @Override
     public AbstractCond clone() {
-        PlayerHungerCond cond = new PlayerHungerCond(test, value);
+        AmbienceSlotAmountCond cond = new AmbienceSlotAmountCond(test, value);
         return cond;
     }
 
     @Override
     public String getName() {
-        return "player.hunger";
+        return "ambience.amount";
     }
 
     @Override
@@ -54,17 +54,30 @@ public class PlayerHungerCond extends AbstractCond {
 
     @Override
     public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
-        float val = player.getFoodStats().getFoodLevel();
-        return test.testForDouble(val, value);
-    }
+        /*int amount = AmbienceController.instance.soundsList.size();
 
-    //gui
+
+        if(AmbienceController.instance.isSourceAlreadyPlaying(sourceIn) != null)
+            amount--;*/
+
+        int amount = 0;
+
+        for (AmbienceSlot slot : AmbienceController.instance.soundsList) {
+            if (slot.getSource() != sourceIn) {
+                //Valid, add
+                amount++;
+            }
+            //This AmbienceSource is already playing and shouldn't be counted
+        }
+
+        return test.testForDouble(amount, value);
+    }
 
     @Override
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(TEST, "", 20, test));
-        list.add(new AmbienceWidgetString(VALUE, "Hunger :", 50, Double.toString(value), 8, ParsingUtil.decimalNumberFilter));
+        list.add(new AmbienceWidgetString(VALUE, "Amount of playing ambiences :", 30, Integer.toString(value), 3, ParsingUtil.numberFilter));
         return list;
     }
 
@@ -74,55 +87,34 @@ public class PlayerHungerCond extends AbstractCond {
             if(TEST.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
                 test = (AmbienceTest) ((AmbienceWidgetEnum) widget).getValue();
             if(VALUE.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
-                value = ParsingUtil.tryParseDouble(((AmbienceWidgetString) widget).getValue());
+                value = ParsingUtil.tryParseInt(((AmbienceWidgetString) widget).getValue());
         }
     }
-
-    /*@Override
-    public List<AmbienceWidgetHolder> getWidgets() {
-        List<AmbienceWidgetHolder> list = new ArrayList<>();
-        list.add(new AmbienceWidgetHolder(getName() + "." + TEST, new Button(0, 0, 20, 20, new StringTextComponent(test.getName()), button -> {
-            test = test.next();
-            button.setMessage(new StringTextComponent(test.getName()));
-        })));
-        list.add(new AmbienceWidgetHolder(getName() + "." + VALUE, new CustomTextField(0, 0, 50, 20, "")));
-        ((CustomTextField) list.get(list.size() - 1).get()).setText(Double.toString(value));
-        return list;
-    }
-
-    @Override
-    public void getDataFromWidgets(List<AmbienceWidgetHolder> allWidgets) {
-        for(AmbienceWidgetHolder widgetHolder : allWidgets) {
-            if(widgetHolder.isKey(getName() + "." + VALUE) && widgetHolder.get() instanceof CustomTextField) {
-                value = ParsingUtil.tryParseDouble(((CustomTextField) widgetHolder.get()).getText());
-            }
-        }
-    }*/
 
     @Override
     public CompoundNBT toNBT() {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt(TEST, test.ordinal());
-        nbt.putDouble(VALUE, value);
+        nbt.putInt(VALUE, value);
         return nbt;
     }
 
     @Override
     public void fromNBT(CompoundNBT nbt) {
-        test = StaticUtil.getEnumValue(nbt.getInt(TEST), AmbienceTest.values()); //AmbienceTest.values()[nbt.getInt(TEST) < AmbienceTest.values().length ? nbt.getInt(TEST) : 0];
-        value = nbt.getDouble(VALUE);
+        test = StaticUtil.getEnumValue(nbt.getInt(TEST), AmbienceTest.values());
+        value = nbt.getInt(VALUE);
     }
 
     @Override
     public void toBuff(PacketBuffer buf) {
         buf.writeInt(test.ordinal());
-        buf.writeDouble(value);
+        buf.writeInt(value);
     }
 
     @Override
     public void fromBuff(PacketBuffer buf) {
-        this.test = StaticUtil.getEnumValue(buf.readInt(), AmbienceTest.values()); //AmbienceTest.values()[buf.readInt()];
-        this.value = buf.readDouble();
+        this.test = StaticUtil.getEnumValue(buf.readInt(), AmbienceTest.values());
+        this.value = buf.readInt();
     }
 
     @Override
@@ -134,6 +126,6 @@ public class PlayerHungerCond extends AbstractCond {
     @Override
     public void fromJson(JsonObject json) {
         test = StaticUtil.getEnumValue(json.get(TEST).getAsString(), AmbienceTest.values());
-        value = json.get(VALUE).getAsDouble();
+        value = json.get(VALUE).getAsInt();
     }
 }

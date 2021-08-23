@@ -3,57 +3,59 @@ package com.sekai.ambienceblocks.ambience.conds;
 import com.google.gson.JsonObject;
 import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
-import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
+import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorldNeedDayCond extends AbstractCond {
+public class PlayerDimensionCond extends AbstractCond {
     private AmbienceEquality equal;
+    private String dimension;
 
     private static final String EQUAL = "equal";
+    private static final String DIMENSION = "dimension";
 
-    public WorldNeedDayCond(AmbienceEquality equal) {
+    public PlayerDimensionCond(AmbienceEquality equal, String dimension) {
         this.equal = equal;
+        this.dimension = dimension;
     }
 
     @Override
     public AbstractCond clone() {
-        WorldNeedDayCond cond = new WorldNeedDayCond(equal);
+        PlayerDimensionCond cond = new PlayerDimensionCond(equal, dimension);
         return cond;
     }
 
     @Override
     public String getName() {
-        return "world.isday";
+        return "player.dimension";
     }
 
     @Override
     public String getListDescription() {
-        return "[" + getName() + "] " + equal.getName();
+        return "[" + getName() + "] " + equal.getName() + " " + dimension;
     }
 
     @Override
     public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
-        //System.out.println(worldIn.getSkylightSubtracted());
-        //info.getWorldTime()%24000
-        //WorldInfo info = worldIn.getWorldInfo();13000
-        long time = worldIn.getWorldInfo().getDayTime()%24000;
-        return equal.testFor(time < 13000 || time >= 23500);
+        //return equal.testFor(worldIn.getBiome(new BlockPos(playerPos)).getRegistryName().toString().contains(dimension));
+        return equal.testFor(stringValidation(worldIn.getDimensionKey().getLocation().toString(), dimension));
     }
 
     @Override
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
+        list.add(new AmbienceWidgetString(DIMENSION, "Dimension :", 130, dimension));
         return list;
     }
 
@@ -62,6 +64,8 @@ public class WorldNeedDayCond extends AbstractCond {
         for(AbstractAmbienceWidgetMessenger widget : allWidgets) {
             if(EQUAL.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
                 equal = (AmbienceEquality) ((AmbienceWidgetEnum) widget).getValue();
+            if(DIMENSION.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
+                dimension = ((AmbienceWidgetString) widget).getValue();
         }
     }
 
@@ -69,31 +73,37 @@ public class WorldNeedDayCond extends AbstractCond {
     public CompoundNBT toNBT() {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt(EQUAL, equal.ordinal());
+        nbt.putString(DIMENSION, dimension);
         return nbt;
     }
 
     @Override
     public void fromNBT(CompoundNBT nbt) {
         equal = StaticUtil.getEnumValue(nbt.getInt(EQUAL), AmbienceEquality.values());
+        dimension = nbt.getString(DIMENSION);
     }
 
     @Override
     public void toBuff(PacketBuffer buf) {
         buf.writeInt(equal.ordinal());
+        buf.writeString(dimension, 50);
     }
 
     @Override
     public void fromBuff(PacketBuffer buf) {
-        this.equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
+        this.equal = AmbienceEquality.values()[buf.readInt()];
+        this.dimension = buf.readString(50);
     }
 
     @Override
     public void toJson(JsonObject json) {
         json.addProperty(EQUAL, equal.name());
+        json.addProperty(DIMENSION, dimension);
     }
 
     @Override
     public void fromJson(JsonObject json) {
         equal = StaticUtil.getEnumValue(json.get(EQUAL).getAsString(), AmbienceEquality.values());
+        dimension = json.get(DIMENSION).getAsString();
     }
 }

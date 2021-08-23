@@ -8,7 +8,9 @@ import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
 import com.sekai.ambienceblocks.ambience.conds.AlwaysTrueCond;
 import com.sekai.ambienceblocks.util.CondsUtil;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class ChooseCondGUI extends Screen {
@@ -26,6 +28,8 @@ public class ChooseCondGUI extends Screen {
     //public FontRenderer font;
 
     private StringListWidget list;
+
+    private Button cancel;
 
     boolean closing = false;
 
@@ -78,13 +82,17 @@ public class ChooseCondGUI extends Screen {
                 AbstractCond returnCond = new AlwaysTrueCond();
                 CondsUtil.CondList[] conds = CondsUtil.CondList.values();
                 for (CondsUtil.CondList cond : conds) {
-                    if(cond.getDefault().getName().contains(name)) returnCond = cond.getDefault();
+                    if(cond.getDefault().getName().equals(name)) returnCond = cond.getDefault();
                 }
                 prevScreen.setCond(returnCond);
                 displayOriginalScreen();
             }
         });
         this.children.add(list);
+
+        cancel = addButton(new Button(xTopLeft + texWidth - 80 - 4, yTopLeft + texHeight + 4, 80, 20, new StringTextComponent("Cancel"), button -> {
+            minecraft.displayGuiScreen(prevScreen);
+        }));
 
         CondsUtil.CondList[] conds = CondsUtil.CondList.values();
         for (CondsUtil.CondList cond : conds) {
@@ -97,13 +105,13 @@ public class ChooseCondGUI extends Screen {
         return false;
     }
 
-    @Override
+    /*@Override
     public void onClose() {
         if(!closing) {
             closing = true;
             displayOriginalScreen();
         }
-    }
+    }*/
 
     private void displayOriginalScreen() {
         if(!closing) {

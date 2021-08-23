@@ -9,6 +9,7 @@ import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMe
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.StaticUtil;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
@@ -49,8 +50,9 @@ public class PlayerBiomeCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, World worldIn, IAmbienceSource sourceIn) {
-        return equal.testFor(worldIn.getBiome(new BlockPos(playerPos)).getRegistryName().toString().contains(biome));
+    public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
+        //return equal.testFor(worldIn.getBiome(new BlockPos(playerPos)).getRegistryName().toString().contains(biome));
+        return equal.testFor(stringValidation(worldIn.getBiome(player.getPosition()).getRegistryName().toString(), biome));
     }
 
     @Override

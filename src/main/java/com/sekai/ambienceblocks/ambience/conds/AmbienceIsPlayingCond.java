@@ -8,6 +8,7 @@ import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMe
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetSound;
 import com.sekai.ambienceblocks.util.StaticUtil;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.vector.Vector3d;
@@ -45,7 +46,7 @@ public class AmbienceIsPlayingCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, World worldIn, IAmbienceSource sourceIn) {
+    public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
         return equal.testFor(AmbienceController.instance.isSoundPlaying(sound));
     }
 

@@ -3,10 +3,12 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.ambience.EditCondGUI;
+import com.sekai.ambienceblocks.client.gui.ambience.IFetchCond;
 import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
 import com.sekai.ambienceblocks.ambience.conds.AlwaysTrueCond;
+import com.sekai.ambienceblocks.config.AmbienceConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.StringTextComponent;
@@ -15,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CondTab extends AbstractTab {
+public class CondTab extends AbstractTab implements IFetchCond {
     List<AbstractCond> condList = new ArrayList<>();
 
     //widgets
@@ -24,6 +26,9 @@ public class CondTab extends AbstractTab {
     });
     Button add = new Button(0, 0, 30, 20, new StringTextComponent("Add"), button -> {
         buttonAdd();
+    });
+    Button copy = new Button(0, 0, 30, 20, new StringTextComponent("Copy"), button -> {
+        buttonCopy();
     });
     Button remove = new Button(0, 0, 30, 20, new StringTextComponent("Del"), button -> {
         buttonRemove();
@@ -61,6 +66,7 @@ public class CondTab extends AbstractTab {
 
         addButton(edit);
         addButton(add);
+        addButton(copy);
         addButton(remove);
         addButton(up);
         addButton(down);
@@ -71,7 +77,8 @@ public class CondTab extends AbstractTab {
     public void updateWidgetPosition() {
         edit.x = getBaseX(); edit.y = getRowY(5);
         add.x = getNeighbourX(edit); add.y = getRowY(5);
-        remove.x = getNeighbourX(add); remove.y = getRowY(5);
+        copy.x = getNeighbourX(add); copy.y = getRowY(5);
+        remove.x = getNeighbourX(copy); remove.y = getRowY(5);
         up.x = getNeighbourX(remove); up.y = getRowY(5);
         down.x = getNeighbourX(up); down.y = getRowY(5);
         condGuiList.x = getBaseX(); condGuiList.y = getRowY(0);
@@ -81,6 +88,7 @@ public class CondTab extends AbstractTab {
     public void render(MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
         edit.render(matrix, mouseX, mouseY,partialTicks);
         add.render(matrix, mouseX, mouseY,partialTicks);
+        copy.render(matrix, mouseX, mouseY,partialTicks);
         remove.render(matrix, mouseX, mouseY,partialTicks);
         up.render(matrix, mouseX, mouseY,partialTicks);
         down.render(matrix, mouseX, mouseY,partialTicks);
@@ -122,12 +130,19 @@ public class CondTab extends AbstractTab {
 
     private void buttonEdit() {
         if(condGuiList.getSelectionIndex() < condGuiList.getAmountOfElements() && condGuiList.getSelectionIndex() >= 0) {
-            Minecraft.getInstance().displayGuiScreen(new EditCondGUI(this.guiRef, this, condList.get(condGuiList.getSelectionIndex()).clone(), condGuiList.getSelectionIndex()));
+            //Minecraft.getInstance().displayGuiScreen(new EditCondGUI(this.guiRef, this, condList.get(condGuiList.getSelectionIndex()).clone(), condGuiList.getSelectionIndex()));
+            Minecraft.getInstance().displayGuiScreen(new EditCondGUI(this.guiRef, this, condList.get(condGuiList.getSelectionIndex())));
         }
     }
 
     private void buttonAdd() {
         addCond(new AlwaysTrueCond());
+    }
+
+    private void buttonCopy() {
+        if(condGuiList.getSelectionIndex() < condGuiList.getAmountOfElements() && condGuiList.getSelectionIndex() >= 0) {
+            addCond(condList.get(condGuiList.getSelectionIndex()).copy());
+        }
     }
 
     private void buttonRemove() {
@@ -153,9 +168,11 @@ public class CondTab extends AbstractTab {
     }
 
     public void addCond(AbstractCond cond) {
-        condList.add(cond);
-        updateGuiCondList();
-        condGuiList.setSelectionIndexToLast();
+        if(condList.size() <= AmbienceConfig.maxAmountOfConditions) {
+            condList.add(cond);
+            updateGuiCondList();
+            condGuiList.setSelectionIndexToLast();
+        }
     }
 
     public void removeCond(int index) {
@@ -183,5 +200,17 @@ public class CondTab extends AbstractTab {
             condGuiList.addElement(cond.getListDescription());
         }
         //condGuiList.addElement("[player.test.axis] < Y 120");
+    }
+
+    @Override
+    public void fetch(AbstractCond newCond, AbstractCond oldCond) {
+        System.out.println("new : " + newCond + ", old : " + oldCond);
+        for (int i = 0; i < condList.size(); i++) {
+            AbstractCond cond = condList.get(i);
+            if (cond.equals(oldCond)) {
+                replaceCond(i, newCond.copy());
+                return;
+            }
+        }
     }
 }

@@ -14,6 +14,12 @@ public class CondDeserializer implements JsonDeserializer<AbstractCond> {
         //return null;
         JsonObject json = jsonElement.getAsJsonObject();
 
+        //System.out.println(json == null);//(
+        //System.out.println(json.get("name") == null);
+
+        if(json.get("name") == null)
+            return CondsUtil.getDefault();
+
         String name = json.get("name").getAsString();
         AbstractCond cond = CondsUtil.CondList.getCondFromName(name);
 

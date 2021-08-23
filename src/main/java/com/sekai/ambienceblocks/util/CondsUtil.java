@@ -1,10 +1,13 @@
 package com.sekai.ambienceblocks.util;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.sekai.ambienceblocks.ambience.conds.*;
 import com.sekai.ambienceblocks.ambience.util.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.GameType;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biomes;
 
 public class CondsUtil {
@@ -35,26 +38,59 @@ public class CondsUtil {
         return cond;
     }
 
+    public static JsonObject toJson(AbstractCond cond) {
+        JsonObject json = new JsonObject();
+
+        json.addProperty("name", cond.getName());
+
+        cond.toJson(json);
+
+        return json;
+    }
+
+    public static AbstractCond fromJson(JsonObject json) {
+        if(json.get("name") == null)
+            return CondsUtil.getDefault();
+
+        String name = json.get("name").getAsString();
+        AbstractCond cond = CondsUtil.CondList.getCondFromName(name);
+
+        cond.fromJson(json);
+
+        return cond;
+    }
+
+    public static AbstractCond getDefault() {
+        return CondList.ALWAYS_TRUE.getDefault();
+    }
+
     public enum CondList {
         ALWAYS_TRUE(0, new AlwaysTrueCond()),
+        AND(1, new AndCond(ALWAYS_TRUE.getDefault(), ALWAYS_TRUE.getDefault())),
+        OR(2, new OrCond(ALWAYS_TRUE.getDefault(), ALWAYS_TRUE.getDefault())),
         PLAYER_POS_AXIS(100, new PlayerPosAxisCond(AmbienceTest.EQUAL_TO, AmbienceWorldSpace.ABSOLUTE, AmbienceAxis.X, 0)),
         PLAYER_POS_WITHIN_REGION(101, new PlayerPosWithinRegionCond(0, 0, 0, 0, 0, 0, AmbienceEquality.EQUAL_TO, AmbienceWorldSpace.RELATIVE)),
         PLAYER_POS_WITHIN_RADIUS(102, new PlayerPosWithinRadiusCond(0, 0, 0, 16, AmbienceTest.LESSER_THAN, AmbienceWorldSpace.RELATIVE)),
-        PLAYER_BLOCK(103, new PlayerBlockCond(0, 0, 0, AmbienceEquality.EQUAL_TO, AmbienceWorldSpace.RELATIVE, "")),
-        PLAYER_HEALTH(104, new PlayerHealthCond(AmbienceTest.GREATER_THAN, 10)),
-        PLAYER_HUNGER(105, new PlayerHungerCond(AmbienceTest.GREATER_THAN, 10)),
-        PLAYER_GAMEMODE(106, new PlayerGamemodeCond(AmbienceEquality.EQUAL_TO, GameType.SURVIVAL)),
-        PLAYER_BIOME(107, new PlayerBiomeCond(AmbienceEquality.EQUAL_TO, Biomes.PLAINS.getLocation().toString())),
+        PLAYER_MOTION_AXIS(103, new PlayerMotionAxisCond(AmbienceTest.EQUAL_TO, AmbienceAxis.Y, 0)),
+        PLAYER_BLOCK(104, new PlayerBlockCond(0, 0, 0, AmbienceEquality.EQUAL_TO, AmbienceWorldSpace.RELATIVE, "")),
+        PLAYER_HEALTH(105, new PlayerHealthCond(AmbienceTest.GREATER_THAN, 10)),
+        PLAYER_HUNGER(106, new PlayerHungerCond(AmbienceTest.GREATER_THAN, 10)),
+        PLAYER_GAMEMODE(107, new PlayerGamemodeCond(AmbienceEquality.EQUAL_TO, GameType.SURVIVAL)),
+        PLAYER_BIOME(108, new PlayerBiomeCond(AmbienceEquality.EQUAL_TO, Biomes.PLAINS.getLocation().toString())),
+        PLAYER_DIMENSION(109, new PlayerDimensionCond(AmbienceEquality.EQUAL_TO, World.OVERWORLD.getLocation().toString())),
         //PLAYER_STRUCTURE(108, new PlayerStructureCond(AmbienceEquality.EQUAL_TO, Structure.VILLAGE.getStructureName())),
-        PLAYER_INBATTLE(109, new PlayerInBattleCond(AmbienceEquality.EQUAL_TO, "")),
+        PLAYER_IN_BATTLE(110, new PlayerInBattleCond(AmbienceEquality.EQUAL_TO, "", 32D)),
+        PLAYER_ENTITY_IN_RANGE(111, new PlayerEntityInRangeCond(AmbienceEquality.EQUAL_TO, "", 8D)),
         WORLD_WEATHER(200, new WorldWeatherCond(AmbienceEquality.EQUAL_TO, AmbienceWeather.CLEAR)),
         WORLD_DAYTIME(201, new WorldDaytimeCond(AmbienceTest.GREATER_THAN, 0)),
-        WORLD_ISDAY(202, new WorldNeedDayCond(AmbienceEquality.EQUAL_TO)),
+        WORLD_IS_DAY(202, new WorldNeedDayCond(AmbienceEquality.EQUAL_TO)),
         WORLD_REDSTONE(203, new WorldNeedRedstoneCond(AmbienceEquality.EQUAL_TO)),
         AMBIENCE_PRIORITY(300, new AmbiencePriorityCond(AmbienceTest.EQUAL_TO, 0, 0)),
-        AMBIENCE_ISPLAYING(301, new AmbienceIsPlayingCond(AmbienceEquality.EQUAL_TO, ""));
+        AMBIENCE_ISPLAYING(301, new AmbienceIsPlayingCond(AmbienceEquality.EQUAL_TO, "")),
+        AMBIENCE_AMOUNT(302, new AmbienceSlotAmountCond(AmbienceTest.GREATER_THAN, 0));
 
-        //You can freely edit the meta value because it's only used on packet transfers, which should be the same independently from the version
+        //You can freely edit the meta value because it's only used on packet transfers
+        // which should be the same independently from the version
         int metaValue;
         AbstractCond defaultCond;
 

@@ -12,6 +12,7 @@ import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.NBTHelper;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.StaticUtil;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.vector.Vector3d;
@@ -63,12 +64,12 @@ public class PlayerPosWithinRadiusCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, World worldIn, IAmbienceSource sourceIn) {
+    public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
         Vector3d pos = getPos();
         if(AmbienceWorldSpace.ABSOLUTE.equals(space))
-            return test.testForDouble(pos.distanceTo(playerPos), radius);
+            return test.testForDouble(pos.distanceTo(getPlayerPos(player)), radius);
         else
-            return test.testForDouble(sourceIn.getOrigin().add(pos).distanceTo(playerPos), radius);
+            return test.testForDouble(sourceIn.getOrigin().add(pos).distanceTo(getPlayerPos(player)), radius);
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
 import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.ambience.util.AmbienceType;
+import com.sekai.ambienceblocks.config.AmbienceConfig;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.CondsUtil;
 import com.sekai.ambienceblocks.util.NBTHelper;
@@ -187,18 +188,34 @@ public class AmbienceData {
             if (isOldConditionFormat(compound)) {
                 int size = compound.getInt("condSize");
                 for(int i = 0; i < size; i++) {
-                    conditions.add(CondsUtil.fromNBT((CompoundNBT) Objects.requireNonNull(compound.get("cond" + i))));
+                    //conditions.add(CondsUtil.fromNBT((CompoundNBT) Objects.requireNonNull(compound.get("cond" + i))));
+                    conditionAdd(CondsUtil.fromNBT((CompoundNBT) Objects.requireNonNull(compound.get("cond" + i))));
                 }
             } else {
                 ListNBT conds = compound.getList("conds", 10); //wtf is a type and why did 10 work out, i'm not complaining
                 conds.forEach(inbt -> {
-                    conditions.add(CondsUtil.fromNBT((CompoundNBT) inbt));
+                    //conditions.add(CondsUtil.fromNBT((CompoundNBT) inbt));
+                    conditionAdd(CondsUtil.fromNBT((CompoundNBT) inbt));
                 });
             }
         }
 
     }
     ////
+
+    private void conditionAdd(AbstractCond cond) {
+        if(conditions.size() < AmbienceConfig.maxAmountOfConditions) {
+            conditions.add(cond);
+        }
+    }
+
+    /*private void conditionAddAll(List<AbstractCond> conditions) {
+        if(this.conditions.size() + conditions.size() <= AmbienceConfig.maxAmountOfConditions)
+            this.conditions.addAll(conditions);
+        else {
+            this.conditions.addAll(conditions.subList(0, AmbienceConfig.maxAmountOfConditions - this.conditions.size() - 1));
+        }
+    }*/
 
     private boolean isOldConditionFormat(CompoundNBT nbt) {
         //if there is atleast a cond0 key it means it the old format
@@ -315,7 +332,8 @@ public class AmbienceData {
             conditions.clear();
             int size = buf.readInt();
             for (int i = 0; i < size; i++) {
-                conditions.add(CondsUtil.fromBuff(buf));
+                //conditions.add(CondsUtil.fromBuff(buf));
+                conditionAdd(CondsUtil.fromBuff(buf));
             }
         }
     }

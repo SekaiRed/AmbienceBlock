@@ -13,6 +13,7 @@ import com.sekai.ambienceblocks.util.NBTHelper;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.StaticUtil;
 import com.sekai.ambienceblocks.util.json.Hidden;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -78,11 +79,11 @@ public class PlayerPosWithinRegionCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, World worldIn, IAmbienceSource sourceIn) {
+    public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
         if(AmbienceWorldSpace.ABSOLUTE.equals(space))
-            return equal.testFor(boundingBox.contains(playerPos));
+            return equal.testFor(boundingBox.contains(getPlayerPos(player)));
         else
-            return equal.testFor(boundingBox.contains(playerPos.subtract(sourceIn.getOrigin())));
+            return equal.testFor(boundingBox.contains(getPlayerPos(player).subtract(sourceIn.getOrigin())));
     }
 
     @Override

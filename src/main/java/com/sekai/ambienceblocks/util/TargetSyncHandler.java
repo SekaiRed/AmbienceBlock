@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks.util;
 
+import com.sekai.ambienceblocks.config.AmbienceConfig;
 import com.sekai.ambienceblocks.packets.PacketTargeting;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -32,6 +33,10 @@ public class TargetSyncHandler {
 
     @SubscribeEvent
     public void onTargetingEvent(LivingSetAttackTargetEvent event) {
+        //Config decided we should skip this
+        if(!AmbienceConfig.shouldTrackBattles)
+            return;
+
         if(event.getEntityLiving().world.isRemote)
             return;
 
@@ -44,7 +49,7 @@ public class TargetSyncHandler {
             }
         }
 
-        //The mob is no longer targetting the player, notify the clients that are looking at this entity
+        //The mob is no longer targeting the player, notify the clients that are looking at this entity
         if(event.getTarget() == null) {
             if(!entityLastTargetCountdown.containsKey(source) || !entityLastTargetCountdown.get(source).removeTarget) {
                 entityLastTargetCountdown.put(source, new EntityCountdown(maxTick, true));

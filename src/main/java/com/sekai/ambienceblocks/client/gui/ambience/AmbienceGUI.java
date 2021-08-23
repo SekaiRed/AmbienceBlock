@@ -358,8 +358,9 @@ public class AmbienceGUI extends AmbienceScreen {
             e.printStackTrace();
         }
 
-
-        list.add(boundsTab);
+        if(isSourceTypeTileEntity()) {
+            list.add(boundsTab);
+        }
 
         //if(mainTab.shouldFuse.isChecked())
         //    list.add(fuseTab);

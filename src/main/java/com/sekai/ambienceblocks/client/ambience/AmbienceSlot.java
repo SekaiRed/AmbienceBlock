@@ -14,7 +14,7 @@ import net.minecraft.util.SoundCategory;
 public class AmbienceSlot {
     private final SoundHandler handler;
     private AmbienceInstance instance;
-    private IAmbienceSource owner;
+    private IAmbienceSource source;
 
     private AmbienceSoundState stateSnd;
     private AmbienceFadeState stateFade;
@@ -44,13 +44,13 @@ public class AmbienceSlot {
 
     private boolean markForDeletion = false;
 
-    public AmbienceSlot(SoundHandler handler, IAmbienceSource owner) {
+    public AmbienceSlot(SoundHandler handler, IAmbienceSource source) {
         this.handler = handler;
-        this.owner = owner;
+        this.source = source;
     }
 
     public void play() {
-        AmbienceData d = owner.getData();
+        AmbienceData d = source.getData();
 
         if(d.getFadeIn() > 0)
             setFadeState(AmbienceFadeState.FADE_IN);
@@ -59,15 +59,15 @@ public class AmbienceSlot {
 
         ResourceLocation playingResource;
         if(d.getType().equals(AmbienceType.MUSIC.getName())) {
-            if(ParsingUtil.isValidSound(owner.getData().getIntroName())) {
-                playingResource = new ResourceLocation(owner.getData().getIntroName());
+            if(ParsingUtil.isValidSound(source.getData().getIntroName())) {
+                playingResource = new ResourceLocation(source.getData().getIntroName());
                 stateSnd = AmbienceSoundState.INTRO;
             } else {
-                playingResource = new ResourceLocation(owner.getData().getSoundName());
+                playingResource = new ResourceLocation(source.getData().getSoundName());
                 stateSnd = AmbienceSoundState.LOOP;
             }
         } else {
-            playingResource = new ResourceLocation(owner.getData().getSoundName());
+            playingResource = new ResourceLocation(source.getData().getSoundName());
             stateSnd = AmbienceSoundState.LOOP;
         }
 
@@ -75,9 +75,9 @@ public class AmbienceSlot {
             stateSnd = AmbienceSoundState.SINGLE;
 
         if(AmbienceSoundState.LOOP.equals(stateSnd) && !d.isUsingDelay())
-            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), getPitchInternal(d), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), getPitchInternal(d), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
         else
-            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), getPitchInternal(d), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), getPitchInternal(d), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
 
         handler.play(instance);
     }
@@ -87,7 +87,7 @@ public class AmbienceSlot {
     }
 
     public void stop() {
-        AmbienceData d = owner.getData();
+        AmbienceData d = source.getData();
 
         //don't apply stop logic if we're already in the outro or fade out state
         if(isStopping())
@@ -99,7 +99,7 @@ public class AmbienceSlot {
             if(ParsingUtil.isValidSound(d.getOutroName())) {
                 ResourceLocation playingResource = new ResourceLocation(d.getOutroName());
                 handler.stop(instance);
-                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), d.getPitch(), false);
+                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), d.getPitch(), false);
                 handler.play(instance);
                 stateSnd = AmbienceSoundState.OUTRO;
             }
@@ -149,7 +149,7 @@ public class AmbienceSlot {
     }
 
     public void tick() {
-        AmbienceData d = owner.getData();
+        AmbienceData d = source.getData();
 
         if(AmbienceSoundState.SINGLE.equals(stateSnd)) {
             if(!isPlaying(instance)) /*if(!handler.isPlaying(instance))*/ {
@@ -165,7 +165,7 @@ public class AmbienceSlot {
                 //System.out.println("end reached lol " + instance.canRepeat());
                 ResourceLocation playingResource = new ResourceLocation(d.getSoundName());
                 handler.stop(instance);
-                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), d.getPitch(), true);
+                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), d.getPitch(), true);
                 handler.play(instance);
                 stateSnd = AmbienceSoundState.LOOP;
             }
@@ -202,7 +202,7 @@ public class AmbienceSlot {
     }
 
     public void forceVolumeAndPitchUpdate() {
-        AmbienceData d = owner.getData();
+        AmbienceData d = source.getData();
         setVolume(getVolumeInternal(d));
         setPitch(getPitchInternal(d));
     }
@@ -220,7 +220,7 @@ public class AmbienceSlot {
             if (d.isGlobal())
                 return multVolume * volume;
             else
-                return (float) (multVolume * volume * owner.getPercentageHowCloseIsPlayer(Minecraft.getInstance().player));
+                return (float) (multVolume * volume * source.getPercentageHowCloseIsPlayer(Minecraft.getInstance().player));
         }
     }
 
@@ -240,12 +240,12 @@ public class AmbienceSlot {
 
     public String getMusicString() { return instance.getSoundLocation().toString(); }
     public AmbienceInstance getMusicInstance() { return instance; }
-    public IAmbienceSource getOwner() { return owner; }
-    public AmbienceData getData() { return owner.getData(); }
+    public IAmbienceSource getSource() { return source; }
+    public AmbienceData getData() { return source.getData(); }
 
-    public void setOwner(IAmbienceSource owner) {
-        this.owner = owner;
-        getMusicInstance().setBlockPos(owner.getOrigin());
+    public void setSource(IAmbienceSource source) {
+        this.source = source;
+        getMusicInstance().setBlockPos(source.getOrigin());
     }
 
     public boolean isMarkedForDeletion() {
@@ -337,8 +337,8 @@ public class AmbienceSlot {
 
     @Override
     public String toString() {
-        if(owner instanceof AmbienceTileEntity)
-            return instance.getSoundLocation().toString() + ", " + ParsingUtil.customBlockPosToString(((AmbienceTileEntity) owner).getPos()) + ", volume " + getVolume() + ", pitch " + getPitch() + " with Sound : " + stateSnd.toString() + " and Fade : " + stateFade.toString();
+        if(source instanceof AmbienceTileEntity)
+            return instance.getSoundLocation().toString() + ", " + ParsingUtil.customBlockPosToString(((AmbienceTileEntity) source).getPos()) + ", volume " + getVolume() + ", pitch " + getPitch() + " with Sound : " + stateSnd.toString() + " and Fade : " + stateFade.toString();
         else
             return instance.getSoundLocation().toString() + ", volume " + getVolume() + ", pitch " + getPitch() + " with Sound : " + stateSnd.toString() + " and Fade : " + stateFade.toString();
     }

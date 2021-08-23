@@ -197,4 +197,18 @@ public class ParsingUtil {
         }
         return false;
     }
+
+    public static boolean validateString(String original, String compared) {
+        //Length of 0, always returns true
+        if(compared.length() == 0)
+            return true;
+
+        if(compared.charAt(0) == '#') {
+            //Starts with '#' which means this is an absolute comparision
+            return original.equals(compared.substring(1));
+        } else {
+            //No special case, check if original contains compared
+            return original.contains(compared);
+        }
+    }
 }

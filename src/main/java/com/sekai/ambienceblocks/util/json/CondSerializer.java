@@ -15,6 +15,8 @@ public class CondSerializer implements JsonSerializer<AbstractCond> {
         //JsonObject json = (JsonObject) JsonUtil.GSON_NO_CUSTOM.toJsonTree(src);
         JsonObject json = new JsonObject();
 
+        System.out.println(src != null ? src.getListDescription() : "null");
+
         json.addProperty("name", src.getName());
 
         src.toJson(json);

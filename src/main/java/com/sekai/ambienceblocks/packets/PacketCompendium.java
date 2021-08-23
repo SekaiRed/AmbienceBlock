@@ -3,6 +3,7 @@ package com.sekai.ambienceblocks.packets;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.ambience.compendium.CompendiumEntry;
 import com.sekai.ambienceblocks.ambience.compendium.ServerCompendium;
+import com.sekai.ambienceblocks.config.AmbienceConfig;
 import com.sekai.ambienceblocks.util.ClientPacketHandler;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -33,11 +34,13 @@ public class PacketCompendium {
     }
 
     public static void encode(PacketCompendium msg, PacketBuffer buf) {
-        buf.writeInt(msg.entries.size());
+        int size = Math.min(msg.entries.size(), AmbienceConfig.maxAmountOfCompendiumEntries);
+        buf.writeInt(size);
         for(int i = 0; i < msg.entries.size(); i++) {
-            /*AmbienceData data = new AmbienceData();
-            data.toBuff(buf);
-            entries.add(new CompendiumEntry(data));*/
+            //We have surpassed the config limit, stop
+            if(i == AmbienceConfig.maxAmountOfCompendiumEntries)
+                return;
+
             msg.entries.get(i).getData().toBuff(buf);
         }
         //buf.writeInt(msg.source);

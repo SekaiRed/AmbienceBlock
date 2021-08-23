@@ -39,6 +39,7 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
     StringListWidget list;
     Button play;
     Button stop;
+    Button cancel;
 
     private String selectedDomain = "";
     private String selected = "";
@@ -124,6 +125,15 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
         });
         addButton(stop);
 
+        cancel = new Button(xTopLeft + texWidth - 80 - separation/4, yTopLeft + texHeight + 4, 80, 20, new StringTextComponent("Cancel"), button -> {
+            mc.displayGuiScreen(prevScreen);
+        });
+        addButton(cancel);
+
+        /*cancel = addButton(new Button(xTopLeft + texWidth - 80 - 4, yTopLeft + texHeight + 4, 80, 20, new StringTextComponent("Cancel"), button -> {
+            minecraft.displayGuiScreen(null);
+        }));*/
+
         this.children.add(list = new StringListWidget(xTopLeft + separation, yTopLeft + separation + yOffset, texWidth - separation * 2, texHeight - separation * 2 - yOffset, 4, 16, font, new StringListWidget.IPressable() {
             @Override
             public void onClick(StringListWidget list, int index, String name) {
@@ -132,21 +142,20 @@ public class ChooseSoundGUI extends Screen implements StringListWidget.IPressabl
 
             @Override
             public void onDoubleClick(StringListWidget list, int index, String name) {
-                if(selectedDomain.equals("")) {
+                if(selectedDomain.isEmpty()) {
                     selectedDomain = name;
                     updateList();
                 } else {
                     if(name.equals("<...>")) {
-                        if(selected.equals("")) {
+                        if(selected.isEmpty()) {
                             selectedDomain = "";
-                            updateList();
                         } else {
                             int firstIndex = selected.lastIndexOf(".", selected.lastIndexOf(".") - 1) + 1;
                             int lastIndex = selected.lastIndexOf(".") + 1;
 
                             selected = selected.replaceAll(selected.substring(firstIndex, lastIndex), "");
-                            updateList();
                         }
+                        updateList();
                     } else {
                         if(name.contains("<")) {
                             name = name.replace("<", "").replace(">", "");

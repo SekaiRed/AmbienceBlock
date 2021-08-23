@@ -9,6 +9,7 @@ import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.StaticUtil;
 import com.sekai.ambienceblocks.util.Unused;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.vector.Vector3d;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-//TODO add something similar to InBattle with more delay and a config option, it'd need a query packet too to ask for info on structures
+//TODO add something similar to the InBattle sync system with more delay and a config option, it'd need a query packet too to ask for info on structures
 @Unused(type = Unused.Type.TO_FIX)
 public class PlayerStructureCond extends AbstractCond {
     private AmbienceEquality equal;
@@ -51,7 +52,7 @@ public class PlayerStructureCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, World worldIn, IAmbienceSource sourceIn) {
+    public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
         //Map<Structure<?>, LongSet> structureReferences = worldIn.getChunkAt(Minecraft.getInstance().player.getPosition()).getStructureReferences();
         Map<Structure<?>, StructureStart<?>> structureReferences = worldIn.getChunkAt(Minecraft.getInstance().player.getPosition()).getStructureStarts();
         if(structureReferences.size() != 0)

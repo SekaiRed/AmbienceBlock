@@ -1,5 +1,7 @@
 package com.sekai.ambienceblocks.ambience.compendium;
 
+import com.sekai.ambienceblocks.config.AmbienceConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,11 +15,16 @@ public class BaseCompendium {
     }
 
     public void addEntry(CompendiumEntry entry) {
-        entries.add(entry);
+        if(entries.size() < AmbienceConfig.maxAmountOfCompendiumEntries)
+            entries.add(entry);
     }
 
     public void addAllEntries(List<CompendiumEntry> entries) {
-        this.entries.addAll(entries);
+        if(this.entries.size() + entries.size() <= AmbienceConfig.maxAmountOfCompendiumEntries)
+            this.entries.addAll(entries);
+        else {
+            this.entries.addAll(entries.subList(0, AmbienceConfig.maxAmountOfCompendiumEntries - this.entries.size() - 1));
+        }
     }
 
     public void removeEntry(int index) {

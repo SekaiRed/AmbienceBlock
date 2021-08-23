@@ -176,7 +176,7 @@ public class RenderingEventHandler {
 
             float[] c = aTile.data.getColor();
             //TODO change render type with thicker lines when the block is playing! Do that by adding a new thicker RenderType of lines and put it in LINE_BUFFERS
-            float brightness = AmbienceController.instance.isTileEntityAlreadyPlaying(aTile) != null ? 1f : 0.75f;
+            float brightness = AmbienceController.instance.isSourceAlreadyPlaying(aTile) != null ? 1f : 0.75f;
             c[0] *= brightness;
             c[1] *= brightness;
             c[2] *= brightness;
