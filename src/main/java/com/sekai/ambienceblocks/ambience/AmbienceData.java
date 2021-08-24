@@ -51,6 +51,7 @@ public class AmbienceData {
     //bounds
     private AbstractBounds bounds = new SphereBounds(16D);
     private boolean isGlobal = false;
+    private boolean isLocatable = true;
 
     //offset
     private AmbienceWorldSpace space = AmbienceWorldSpace.RELATIVE;
@@ -98,6 +99,7 @@ public class AmbienceData {
         compound.put("bounds", BoundsUtil.toNBT(this.bounds));
         compound.put("offset", NBTHelper.writeVec3d(this.offset));
         compound.putBoolean("isGlobal", this.isGlobal);
+        compound.putBoolean("isLocatable", this.isLocatable);
 
         if(AmbienceType.AMBIENT.getName().equals(type)) {
             compound.putBoolean("useDelay", this.useDelay);
@@ -163,6 +165,7 @@ public class AmbienceData {
         this.bounds = BoundsUtil.fromNBT(compound.getCompound("bounds"));
         this.offset = NBTHelper.readVec3d(compound.getCompound("offset"));
         this.isGlobal = compound.getBoolean("isGlobal");
+        this.isLocatable = compound.getBoolean("isLocatable");
 
         if(AmbienceType.AMBIENT.getName().equals(type)) {
             this.useDelay = compound.getBoolean("useDelay");
@@ -209,16 +212,8 @@ public class AmbienceData {
         }
     }
 
-    /*private void conditionAddAll(List<AbstractCond> conditions) {
-        if(this.conditions.size() + conditions.size() <= AmbienceConfig.maxAmountOfConditions)
-            this.conditions.addAll(conditions);
-        else {
-            this.conditions.addAll(conditions.subList(0, AmbienceConfig.maxAmountOfConditions - this.conditions.size() - 1));
-        }
-    }*/
-
     private boolean isOldConditionFormat(CompoundNBT nbt) {
-        //if there is atleast a cond0 key it means it the old format
+        //if there is atleast a cond0 key it means it is the old format
         return nbt.contains("cond0");
     }
 
@@ -254,6 +249,7 @@ public class AmbienceData {
         buf.writeDouble(this.offset.y);
         buf.writeDouble(this.offset.z);
         buf.writeBoolean(this.isGlobal);
+        buf.writeBoolean(this.isLocatable);
 
         if(AmbienceType.AMBIENT.getName().equals(type)) {
             buf.writeBoolean(this.useDelay);
@@ -310,6 +306,7 @@ public class AmbienceData {
         this.bounds = BoundsUtil.fromBuff(buf);
         this.offset = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
         this.isGlobal = buf.readBoolean();
+        this.isLocatable = buf.readBoolean();
 
         if(AmbienceType.AMBIENT.getName().equals(type)) {
             this.useDelay = buf.readBoolean();
@@ -602,6 +599,14 @@ public class AmbienceData {
 
     public void setGlobal(boolean global) {
         isGlobal = global;
+    }
+
+    public boolean isLocatable() {
+        return isLocatable;
+    }
+
+    public void setLocatable(boolean locatable) {
+        isLocatable = locatable;
     }
 
     public boolean canPlayOverSelf() {

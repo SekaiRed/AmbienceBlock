@@ -29,6 +29,7 @@ public class BoundsTab extends AbstractTab {
         moveToNextBoundType();
     }));
     CheckboxWidget isGlobal = new CheckboxWidget(getNeighbourX(buttonBounds), getRowY(0), 20 + font.getStringWidth("Global"), 20, "Global", false);
+    CheckboxWidget isLocatable = new CheckboxWidget(getNeighbourX(buttonBounds), getRowY(0), 20 + font.getStringWidth("Global"), 20, "Locatable", false);
 
     TextInstance textSphereRadius = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.radius"), font);
     TextFieldWidget sphereRadius = new TextFieldWidget(font, getNeighbourX(textSphereRadius), getRowY(1), 40, 20, new StringTextComponent(""));
@@ -109,6 +110,7 @@ public class BoundsTab extends AbstractTab {
 
         addButton(buttonBounds);
         addWidget(isGlobal);
+        addWidget(isLocatable);
 
         sphereWidgets.add(textSphereRadius);
         sphereWidgets.add(sphereRadius);
@@ -183,6 +185,7 @@ public class BoundsTab extends AbstractTab {
         buttonBounds.x = getNeighbourX(textBounds); buttonBounds.y = getRowY(0) + getOffsetY(20);
 
         isGlobal.x = getNeighbourX(buttonBounds); isGlobal.y = getRowY(0);
+        isLocatable.x = getNeighbourX(isGlobal); isLocatable.y = getRowY(0);
 
         textSphereRadius.x = getBaseX(); textSphereRadius.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
         sphereRadius.x = getNeighbourX(textSphereRadius); sphereRadius.y = getRowY(1);
@@ -233,6 +236,7 @@ public class BoundsTab extends AbstractTab {
         textBounds.render(matrix, mouseX, mouseY);
         buttonBounds.render(matrix, mouseX, mouseY, partialTicks);
         isGlobal.render(matrix, mouseX, mouseY, partialTicks);
+        isLocatable.render(matrix, mouseX, mouseY, partialTicks);
 
         textSphereRadius.render(matrix, mouseX, mouseY);
         sphereRadius.render(matrix, mouseX, mouseY, partialTicks);
@@ -316,6 +320,12 @@ public class BoundsTab extends AbstractTab {
             drawHoveringText(matrix, list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
         }
 
+        if(isLocatable.isHovered()) {
+            list.add(TextFormatting.RED + "Locatable");
+            list.add("If locatable is checked the sound will play in a 3D space, otherwise it plays globally like menu sounds.");
+            drawHoveringText(matrix, list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+
         if(textOffset.isHovered()) {
             list.add(TextFormatting.RED + "Offset");
             list.add("Shifts the origin of the bounds to a certain position.");
@@ -340,6 +350,7 @@ public class BoundsTab extends AbstractTab {
     public void setFieldFromData(AmbienceData data) {
         //setCheckBoxChecked(isGlobal, data.isGlobal());
         isGlobal.setChecked(data.isGlobal());
+        isLocatable.setChecked(data.isLocatable());
 
         offsetPos = data.getSpace();
         offsetPosButton.setMessage(new StringTextComponent(offsetPos.getName()));
@@ -355,6 +366,7 @@ public class BoundsTab extends AbstractTab {
     @Override
     public void setDataFromField(AmbienceData data) {
         data.setGlobal(isGlobal.isChecked());
+        data.setLocatable(isLocatable.isChecked());
 
         data.setSpace(offsetPos);
 

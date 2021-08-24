@@ -5,6 +5,7 @@ import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.compendium.BaseCompendium;
 import com.sekai.ambienceblocks.ambience.compendium.CompendiumEntry;
 import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
+import com.sekai.ambienceblocks.ambience.sync.TargetSyncClient;
 import com.sekai.ambienceblocks.client.rendering.RenderingEventHandler;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.util.ParsingUtil;
@@ -32,8 +33,12 @@ public class AmbienceController {
     private IProfiler prf;
     public final SoundHandler handler;
     //public final ClientCompendium compendium;
-    public final BaseCompendium compendium;
     public static boolean debugMode = false;
+
+    //Sub-systems
+    //Client only systems that are easier to package with this general client only class
+    public final BaseCompendium compendium;
+    public final TargetSyncClient target;
 
     //System variables
     public AmbienceData clipboard;
@@ -48,6 +53,7 @@ public class AmbienceController {
         prf = mc.getProfiler();
         handler = Minecraft.getInstance().getSoundHandler();
         compendium = new BaseCompendium();
+        target = new TargetSyncClient();
     }
 
     @SubscribeEvent
@@ -73,9 +79,7 @@ public class AmbienceController {
         delayList.clear();
 
         //I can clear the client compendium, it gets refreshed by the server upon joining anyway.
-        compendium.clear();
-
-        //AmbienceCompendiumRegistry.instance.entries.clear();
+        //Removed! This made it so that reloading resource packs cleared all compendium entries and I would need to query them again from the server
         //compendium.clear();
 
         //Clear the events for debug logging from memory.
@@ -108,6 +112,7 @@ public class AmbienceController {
         prf.endSection();
 
         prf.startSection("tick");
+        target.tick();
         systemTick();
         prf.endSection();
 

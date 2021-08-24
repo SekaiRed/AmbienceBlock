@@ -19,6 +19,8 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO I could add other parameters like looking for specific sound/tag/volume (separate cond?)
+// I could even use that with a 'battle' tag to check if a battle music is already playing
 public class AmbienceSlotAmountCond extends AbstractCond {
     private AmbienceTest test;
     private int value;

@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks;
 
+import com.sekai.ambienceblocks.ambience.sync.TargetSyncServer;
 import com.sekai.ambienceblocks.client.ambience.AmbienceController;
 import com.sekai.ambienceblocks.ambience.compendium.ServerCompendium;
 import com.sekai.ambienceblocks.config.AmbienceConfig;
@@ -28,7 +29,7 @@ public class Main
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private TargetSyncHandler targetSyncHandler;
+    //private TargetSyncHandler targetSyncHandler;
     //private ServerCompendium serverCompendium;
 
     public Main() {
@@ -57,8 +58,9 @@ public class Main
 
     @SubscribeEvent
     public void onServerStart(FMLServerStartingEvent event) {
-        targetSyncHandler = new TargetSyncHandler();
-        MinecraftForge.EVENT_BUS.register(targetSyncHandler);
+        /*targetSyncHandler = new TargetSyncHandler();
+        MinecraftForge.EVENT_BUS.register(targetSyncHandler);*/
+        MinecraftForge.EVENT_BUS.register(new TargetSyncServer());
 
         //Register server compendium
         MinecraftForge.EVENT_BUS.register(new ServerCompendium(LOGGER));
@@ -66,12 +68,8 @@ public class Main
 
     @SubscribeEvent
     public void onServerStop(FMLServerStoppingEvent event) {
-        MinecraftForge.EVENT_BUS.unregister(targetSyncHandler);
-        targetSyncHandler = null;
-
-        //Unregister server compendium
-        //MinecraftForge.EVENT_BUS.unregister(serverCompendium);
-        //serverCompendium = null;
+        /*MinecraftForge.EVENT_BUS.unregister(targetSyncHandler);
+        targetSyncHandler = null;*/
     }
 
     public static final ItemGroup TAB = new ItemGroup("ambiencetab") {

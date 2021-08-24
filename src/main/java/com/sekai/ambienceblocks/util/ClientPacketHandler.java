@@ -3,6 +3,7 @@ package com.sekai.ambienceblocks.util;
 import com.sekai.ambienceblocks.client.ambience.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.ambience.CompendiumGUI;
 import com.sekai.ambienceblocks.packets.PacketCompendium;
+import com.sekai.ambienceblocks.packets.PacketNotTargeting;
 import com.sekai.ambienceblocks.packets.PacketTargeting;
 import com.sekai.ambienceblocks.packets.PacketUpdateAmbienceTE;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
@@ -34,10 +35,34 @@ public class ClientPacketHandler {
                 if(source instanceof MobEntity) {
                     MobEntity mob = (MobEntity) source;
 
-                    if(!pkt.removeTarget)
-                        mob.setAttackTarget(mc.player);
-                    else
-                        mob.setAttackTarget(null);
+                    AmbienceController.instance.target.updateTargeting(mob);
+                }
+            }
+        };
+    }
+
+    public static DistExecutor.SafeRunnable handlePacketNotTargeting(final PacketNotTargeting pkt) {
+        return new DistExecutor.SafeRunnable() {
+            @Override
+            public void run() {
+                Minecraft mc = Minecraft.getInstance();
+
+                if (mc.world == null)
+                    return;
+
+                //I know this is overkill but I'm scared
+                if (!mc.world.isRemote())
+                    return;
+
+                Entity source = mc.world.getEntityByID(pkt.source);
+
+                if (source == null)
+                    return;
+
+                if(source instanceof MobEntity) {
+                    MobEntity mob = (MobEntity) source;
+
+                    AmbienceController.instance.target.updateStopTargeting(mob);
                 }
             }
         };

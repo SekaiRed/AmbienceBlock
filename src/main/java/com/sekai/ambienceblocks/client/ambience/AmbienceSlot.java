@@ -75,9 +75,9 @@ public class AmbienceSlot {
             stateSnd = AmbienceSoundState.SINGLE;
 
         if(AmbienceSoundState.LOOP.equals(stateSnd) && !d.isUsingDelay())
-            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), getPitchInternal(d), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), getPitchInternal(d), true, d.isLocatable());//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
         else
-            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), getPitchInternal(d), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), getPitchInternal(d), false, d.isLocatable());//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
 
         handler.play(instance);
     }
@@ -99,7 +99,7 @@ public class AmbienceSlot {
             if(ParsingUtil.isValidSound(d.getOutroName())) {
                 ResourceLocation playingResource = new ResourceLocation(d.getOutroName());
                 handler.stop(instance);
-                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), d.getPitch(), false);
+                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), d.getPitch(), false, d.isLocatable());
                 handler.play(instance);
                 stateSnd = AmbienceSoundState.OUTRO;
             }
@@ -165,7 +165,7 @@ public class AmbienceSlot {
                 //System.out.println("end reached lol " + instance.canRepeat());
                 ResourceLocation playingResource = new ResourceLocation(d.getSoundName());
                 handler.stop(instance);
-                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), d.getPitch(), true);
+                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), d.getPitch(), true, d.isLocatable());
                 handler.play(instance);
                 stateSnd = AmbienceSoundState.LOOP;
             }
@@ -338,7 +338,7 @@ public class AmbienceSlot {
     @Override
     public String toString() {
         if(source instanceof AmbienceTileEntity)
-            return instance.getSoundLocation().toString() + ", " + ParsingUtil.customBlockPosToString(((AmbienceTileEntity) source).getPos()) + ", volume " + getVolume() + ", pitch " + getPitch() + " with Sound : " + stateSnd.toString() + " and Fade : " + stateFade.toString();
+            return instance.getSoundLocation().toString() + ", " + ParsingUtil.customBlockPosToString(((AmbienceTileEntity) source).getPos()) + ", volume " + getVolume() + ", pitch " + getPitch() + " (" + stateSnd.toString() + ", " + stateFade.toString() + ")";
         else
             return instance.getSoundLocation().toString() + ", volume " + getVolume() + ", pitch " + getPitch() + " with Sound : " + stateSnd.toString() + " and Fade : " + stateFade.toString();
     }

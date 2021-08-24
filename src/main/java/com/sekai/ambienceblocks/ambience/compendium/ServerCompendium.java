@@ -29,7 +29,7 @@ public class ServerCompendium extends BaseCompendium {
         System.out.println("load" + e.getWorld().isRemote());
     }*/
     //FMLServerStartedEvent
-    private Logger logger;
+    private final Logger logger;
 
     private final static Field fieldStorage;
     static {
@@ -107,7 +107,9 @@ public class ServerCompendium extends BaseCompendium {
     public void init(Path savePath) {
         File ambienceFolder = new File(savePath.toFile(), "ambience");
         if (!ambienceFolder.exists()){
-            ambienceFolder.mkdir();
+            //The folder doesn't exist, I don't need to load anything
+            return;
+            //ambienceFolder.mkdir();
         }
 
         File file = new File(ambienceFolder, "compendium.json");
@@ -132,7 +134,11 @@ public class ServerCompendium extends BaseCompendium {
     public void end(Path savePath) {
         File ambienceFolder = new File(savePath.toFile(), "ambience");
         if (!ambienceFolder.exists()){
-            ambienceFolder.mkdir();
+            //Only create the folder if we have data to save, otherwise quit this method because there is nothing to save
+            if(size() != 0)
+                ambienceFolder.mkdir();
+            else
+                return;
         }
 
         File file = new File(ambienceFolder, "compendium.json");
@@ -157,6 +163,11 @@ public class ServerCompendium extends BaseCompendium {
             System.exit(-1);*/
             logger.error("Failed IO.", e);
         }
+    }
+
+    public void updateAllCompendiums() {
+        //Update all connected clients
+        PacketHandler.NET.send(PacketDistributor.ALL.noArg(), new PacketCompendium(getAllEntries()));
     }
 
     @Override

@@ -53,7 +53,7 @@ public class TargetSyncHandler {
         if(event.getTarget() == null) {
             if(!entityLastTargetCountdown.containsKey(source) || !entityLastTargetCountdown.get(source).removeTarget) {
                 entityLastTargetCountdown.put(source, new EntityCountdown(maxTick, true));
-                PacketHandler.NET.send(PacketDistributor.TRACKING_ENTITY.with(event::getEntityLiving), new PacketTargeting(event.getEntityLiving().getEntityId(), true));
+                PacketHandler.NET.send(PacketDistributor.TRACKING_ENTITY.with(event::getEntityLiving), new PacketTargeting(event.getEntityLiving().getEntityId()));
             }
         }
     }

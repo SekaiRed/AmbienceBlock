@@ -112,8 +112,8 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
             minecraft.displayGuiScreen(prevScreen);*/
             collectData();
 
-            printConditionHash("confirm new", newCond);
-            printConditionHash("confirm old", oldCond);
+            //printConditionHash("confirm new", newCond);
+            //printConditionHash("confirm old", oldCond);
 
             condFetcher.fetch(newCond, oldCond);
 
@@ -202,7 +202,7 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
                 AmbienceWidgetCond wCond = (AmbienceWidgetCond) widget;
                 AmbienceWidgetHolder holder = new AmbienceWidgetHolder(widget.getKey(), new Button(0, 0, widget.getWidth(), 20, new StringTextComponent(wCond.getCond().getListDescription()), button -> {
                     //isFieldBeingEdited = true;
-                    printConditionHash("get cond", wCond.getCond());
+                    //printConditionHash("get cond", wCond.getCond());
                     Minecraft.getInstance().displayGuiScreen(new EditCondGUI(this, this, wCond.getCond()));
                 }));
                 addWidget(holder);
@@ -238,7 +238,7 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
     }
 
     private void updateCondWidgetPos() {
-        int indexX = offset;
+        int indexX = offset + separation;
         int indexY = offset + rowHeight + separation;
         for(AmbienceWidgetHolder element : condWidgets) {
             Widget widget = element.get();
@@ -365,7 +365,7 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
         }
     }
 
-    public static void printConditionHash(String comment, AbstractCond cond) {
+    /*public static void printConditionHash(String comment, AbstractCond cond) {
         if(comment.isEmpty())
             System.out.println(cond.hashCode() + " : " + cond.getListDescription());
         else
@@ -375,5 +375,5 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
     public static void printConditionHash(AbstractCond cond) {
         //System.out.println(cond.hashCode() + " : " + cond.getListDescription());
         printConditionHash("", cond);
-    }
+    }*/
 }

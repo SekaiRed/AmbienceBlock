@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks.ambience.compendium;
 
+import com.sekai.ambienceblocks.ambience.bounds.NoneBounds;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.ambience.IAmbienceSource;
@@ -13,6 +14,14 @@ public class CompendiumEntry implements IAmbienceSource {
 
     public CompendiumEntry(AmbienceData data) {
         this.data = data;
+        updateData(this.data);
+    }
+
+    private void updateData(AmbienceData data) {
+        //Should always be true by default
+        data.setBounds(new NoneBounds());
+        data.setGlobal(true);
+        data.setLocatable(false);
     }
 
     //I thought this would be way easier to pull off, what the fuck
@@ -27,6 +36,7 @@ public class CompendiumEntry implements IAmbienceSource {
 
     public void setData(AmbienceData data) {
         this.data = data;
+        updateData(this.data);
     }
 
     @Override

@@ -14,7 +14,7 @@ public class AmbienceInstance extends TickableSound {
     private float internalPitch;
     private Vector3d internalPos;
 
-    public AmbienceInstance(ResourceLocation soundId, SoundCategory categoryIn, Vector3d pos, float volume, float pitch, boolean repeat) {
+    public AmbienceInstance(ResourceLocation soundId, SoundCategory categoryIn, Vector3d pos, float volume, float pitch, boolean repeat, boolean global) {
         super(new SoundEvent(soundId), categoryIn);
         this.volume = volume;
         internalVolume = volume;
@@ -24,7 +24,7 @@ public class AmbienceInstance extends TickableSound {
         this.y = pos.getY();
         this.z = pos.getZ();
         internalPos = pos;
-        this.global = false;
+        this.global = global;
         //experiment
         this.repeat = repeat;
         this.repeatDelay = 0;

@@ -7,7 +7,6 @@ public class AmbienceWidgetCond extends AbstractAmbienceWidgetMessenger {
     AbstractCond cond;
 
     public AmbienceWidgetCond(String key, String label, int width, AbstractCond cond) {
-        EditCondGUI.printConditionHash("initial widget", cond);
         this.key = key;
         this.label = label;
         this.width = width;

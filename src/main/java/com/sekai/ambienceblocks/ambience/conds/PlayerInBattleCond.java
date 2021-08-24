@@ -8,6 +8,7 @@ import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
+import com.sekai.ambienceblocks.client.ambience.AmbienceController;
 import com.sekai.ambienceblocks.config.AmbienceConfig;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.StaticUtil;
@@ -28,21 +29,21 @@ public class PlayerInBattleCond extends AbstractCond {
 
     private AmbienceEquality equal;
     private String entity;
-    private double range;
+    private int time;
 
     private static final String EQUAL = "equal";
     private static final String ENTITY = "entity";
-    private static final String RANGE = "range";
+    private static final String TIME = "time";
 
-    public PlayerInBattleCond(AmbienceEquality equal, String entity, double range) {
+    public PlayerInBattleCond(AmbienceEquality equal, String entity, int time) {
         this.equal = equal;
         this.entity = entity;
-        this.range = range;
+        this.time = time;
     }
 
     @Override
     public AbstractCond clone() {
-        PlayerInBattleCond cond = new PlayerInBattleCond(equal, entity, range);
+        PlayerInBattleCond cond = new PlayerInBattleCond(equal, entity, time);
         return cond;
     }
 
@@ -53,22 +54,23 @@ public class PlayerInBattleCond extends AbstractCond {
 
     @Override
     public String getListDescription() {
-        return "[" + getName() + "] " + equal.getName() + " " + entity + " in " + range;
+        return "[" + getName() + "] " + equal.getName() + " " + entity + " for " + time;
     }
 
     @Override
     public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
-        //worldIn.getWorldInfo()
-        //worldIn.getChunkAt(Minecraft.getInstance().player.getPosition()).getStructureStarts()
-        double searchRange = Math.min(range, AmbienceConfig.maxEntitySearchRange);
-        List<MobEntity> mobs = worldIn.getEntitiesWithinAABB(MobEntity.class, AxisAlignedBB.fromVector(getPlayerPos(player)).grow(searchRange));
-        for (MobEntity mob : mobs) {
-            /*if (mob.getAttackTarget() != null && mob.getType().getRegistryName().toString().contains(entity))
-                return equal.testFor(true);*/
-            if (/*mob.getAttackTarget() != null*/ mob.getAttackTarget() == Minecraft.getInstance().player && stringValidation(mob.getType().getRegistryName().toString(), entity))
-                return equal.testFor(true);
+        int countdown = AmbienceController.instance.target.getEntityCountdown(entity);
+
+        //No result found
+        if(countdown == -1)
+            return equal.testFor(false);
+
+        return equal.testFor(countdown > AmbienceConfig.targetCountdownAmount - time);
+
+        /*if(countdown < AmbienceConfig.targetCountdownAmount - time) {
+            return equal.testFor(true);
         }
-        return equal.testFor(false);
+        return equal.testFor(false);*/
     }
 
     @Override
@@ -76,7 +78,7 @@ public class PlayerInBattleCond extends AbstractCond {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
         list.add(new AmbienceWidgetString(ENTITY, "Entity :", 160, entity));
-        list.add(new AmbienceWidgetString(RANGE, "Range :", 60, Double.toString(range), 8, ParsingUtil.negativeDecimalNumberFilter));
+        list.add(new AmbienceWidgetString(TIME, "Time :", 40, Integer.toString(time), 5, ParsingUtil.numberFilter));
         return list;
     }
 
@@ -87,8 +89,8 @@ public class PlayerInBattleCond extends AbstractCond {
                 equal = (AmbienceEquality) ((AmbienceWidgetEnum) widget).getValue();
             if(ENTITY.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
                 entity = ((AmbienceWidgetString) widget).getValue();
-            if (RANGE.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
-                range = ParsingUtil.tryParseDouble(((AmbienceWidgetString) widget).getValue());
+            if (TIME.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
+                time = ParsingUtil.tryParseInt(((AmbienceWidgetString) widget).getValue());
         }
     }
 
@@ -97,7 +99,7 @@ public class PlayerInBattleCond extends AbstractCond {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt(EQUAL, equal.ordinal());
         nbt.putString(ENTITY, entity);
-        nbt.putDouble(RANGE, range);
+        nbt.putInt(TIME, time);
         return nbt;
     }
 
@@ -105,34 +107,34 @@ public class PlayerInBattleCond extends AbstractCond {
     public void fromNBT(CompoundNBT nbt) {
         equal = StaticUtil.getEnumValue(nbt.getInt(EQUAL), AmbienceEquality.values());
         entity = nbt.getString(ENTITY);
-        range = nbt.getDouble(RANGE);
+        time = nbt.getInt(TIME);
     }
 
     @Override
     public void toBuff(PacketBuffer buf) {
         buf.writeInt(equal.ordinal());
         buf.writeString(entity, 50);
-        buf.writeDouble(range);
+        buf.writeInt(time);
     }
 
     @Override
     public void fromBuff(PacketBuffer buf) {
         this.equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
         this.entity = buf.readString(50);
-        this.range = buf.readDouble();
+        this.time = buf.readInt();
     }
 
     @Override
     public void toJson(JsonObject json) {
         json.addProperty(EQUAL, equal.name());
         json.addProperty(ENTITY, entity);
-        json.addProperty(RANGE, range);
+        json.addProperty(TIME, time);
     }
 
     @Override
     public void fromJson(JsonObject json) {
         equal = StaticUtil.getEnumValue(json.get(EQUAL).getAsString(), AmbienceEquality.values());
         entity = json.get(ENTITY).getAsString();
-        range = json.get(RANGE).getAsDouble();
+        time = json.get(TIME).getAsInt();
     }
 }

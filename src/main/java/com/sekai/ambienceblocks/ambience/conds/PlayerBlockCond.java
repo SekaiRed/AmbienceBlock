@@ -11,6 +11,7 @@ import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.NBTHelper;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.StaticUtil;
+import com.sekai.ambienceblocks.util.json.Hidden;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
@@ -40,7 +41,7 @@ public class PlayerBlockCond extends AbstractCond {
     private static final String POSITION = "pos";
 
     //internal reference
-    @Expose(serialize = false, deserialize = false)
+    @Hidden
     private BlockPos pos;
 
     public PlayerBlockCond(double x, double y, double z, AmbienceEquality equal, AmbienceWorldSpace space, String block) {
@@ -79,7 +80,6 @@ public class PlayerBlockCond extends AbstractCond {
     }
 
     private boolean doesBlockRegistryNameHasString(World world, BlockPos pos, String contain) {
-        //return world.getBlockState(pos).getBlock().getRegistryName().toString().contains(contain);
         return stringValidation(world.getBlockState(pos).getBlock().getRegistryName().toString(), contain);
     }
 

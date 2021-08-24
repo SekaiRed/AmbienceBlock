@@ -59,6 +59,7 @@ public class PacketCompendium {
 
                 ServerCompendium.instance.clear();
                 ServerCompendium.instance.addAllEntries(pkt.entries);
+                ServerCompendium.instance.updateAllCompendiums();
             }
         });
         ctx.get().setPacketHandled(true);
