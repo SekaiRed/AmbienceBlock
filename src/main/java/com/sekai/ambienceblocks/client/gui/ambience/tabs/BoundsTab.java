@@ -185,7 +185,7 @@ public class BoundsTab extends AbstractTab {
         buttonBounds.x = getNeighbourX(textBounds); buttonBounds.y = getRowY(0) + getOffsetY(20);
 
         isGlobal.x = getNeighbourX(buttonBounds); isGlobal.y = getRowY(0);
-        isLocatable.x = getNeighbourX(isGlobal); isLocatable.y = getRowY(0);
+        isLocatable.x = getNeighbourX(isGlobal) + horizontalSeparation; isLocatable.y = getRowY(0);
 
         textSphereRadius.x = getBaseX(); textSphereRadius.y = getRowY(1) + getOffsetY(font.FONT_HEIGHT);
         sphereRadius.x = getNeighbourX(textSphereRadius); sphereRadius.y = getRowY(1);

@@ -91,6 +91,9 @@ public class AmbienceController {
     // cost the most performance, a small price to pay for salvation
     // After trying for a while it's just too bothersome to try and do, especially if it's only to see how much time
     // my system wastes
+    // 8/24/2021 : I could instead use the good old System.getTime trick, I could even wrap it in a class to have
+    // the times be averaged and separated into sections without having to dump it all in a file, maybe
+    // that info could be shown on the debug screen in the bottom left corner?
     @SubscribeEvent
     public void tick(TickEvent.ClientTickEvent e) {
         prf.startSection("ambTick");

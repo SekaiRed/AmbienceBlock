@@ -80,7 +80,7 @@ public class CondsUtil {
         PLAYER_BIOME(109, new PlayerBiomeCond(AmbienceEquality.EQUAL_TO, Biomes.PLAINS.getLocation().toString())),
         PLAYER_DIMENSION(110, new PlayerDimensionCond(AmbienceEquality.EQUAL_TO, World.OVERWORLD.getLocation().toString())),
         //PLAYER_STRUCTURE(108, new PlayerStructureCond(AmbienceEquality.EQUAL_TO, Structure.VILLAGE.getStructureName())),
-        PLAYER_IN_BATTLE(111, new PlayerInBattleCond(AmbienceEquality.EQUAL_TO, "", 32D, 50)),
+        PLAYER_IN_BATTLE(111, new PlayerInBattleCond(AmbienceEquality.EQUAL_TO, "", 50)),
         PLAYER_ENTITY_IN_RANGE(112, new PlayerEntityInRangeCond(AmbienceEquality.EQUAL_TO, "", 8D)),
         PLAYER_UNDERWATER(113, new PlayerUnderwaterCond(AmbienceEquality.EQUAL_TO)),
         WORLD_WEATHER(200, new WorldWeatherCond(AmbienceEquality.EQUAL_TO, AmbienceWeather.CLEAR)),
@@ -89,7 +89,7 @@ public class CondsUtil {
         WORLD_REDSTONE(203, new WorldNeedRedstoneCond(AmbienceEquality.EQUAL_TO)),
         AMBIENCE_PRIORITY(300, new AmbiencePriorityCond(AmbienceTest.EQUAL_TO, 0, 0)),
         AMBIENCE_ISPLAYING(301, new AmbienceIsPlayingCond(AmbienceEquality.EQUAL_TO, "")),
-        AMBIENCE_AMOUNT(302, new AmbienceSlotAmountCond(AmbienceTest.GREATER_THAN, 0));
+        AMBIENCE_AMOUNT(302, new AmbienceSlotAmountCond(AmbienceTest.GREATER_THAN, 0, "", ""));
 
         //You can freely edit the meta value because it's only used on packet transfers
         // which should be the same independently from the version

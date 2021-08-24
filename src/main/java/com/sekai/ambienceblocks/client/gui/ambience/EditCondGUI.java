@@ -27,7 +27,6 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
 
     public static final int texWidth = 256;
     public static final int texHeight = 184;
-    private boolean initialized = false;
     public int xTopLeft, yTopLeft;
 
     protected static final int offset = 4;//8;
@@ -88,8 +87,6 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
     @Override
     protected void init() {
         super.init();
-
-        System.out.println("init");
 
         xTopLeft = (this.width - texWidth) / 2;
         yTopLeft = (this.height - texHeight) / 2;
@@ -171,8 +168,10 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
         for(int i = 0; i < widgets.size(); i++) {
             AbstractAmbienceWidgetMessenger widget = widgets.get(i);
 
-            AmbienceWidgetHolder label = new AmbienceWidgetHolder("", new TextInstance(0, (rowHeight - font.FONT_HEIGHT)/2, 0xFFFFFF, widget.getLabel(), font));
-            addWidget(label);
+            if(!widget.getLabel().isEmpty()) {
+                AmbienceWidgetHolder label = new AmbienceWidgetHolder("", new TextInstance(0, (rowHeight - font.FONT_HEIGHT) / 2, 0xFFFFFF, widget.getLabel(), font));
+                addWidget(label);
+            }
             //addWidget(new TextInstance(0, (rowHeight - font.FONT_HEIGHT)/2, 0xFFFFFF, widget.getLabel(), font));
 
             if(widget instanceof AmbienceWidgetString) {
@@ -349,14 +348,10 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
     @Override
     public void fetch(AbstractCond newCond, AbstractCond oldCond) {
         //Upon returning to this screen after "fetching" a condition, this happens
-        System.out.println("fetched " + newCond + " from old " + oldCond);
         for(AbstractAmbienceWidgetMessenger widget : widgetLink.keySet()) {
             if(widget instanceof AmbienceWidgetCond) {
                 AmbienceWidgetCond wc = (AmbienceWidgetCond) widget;
-                System.out.println(wc.getCond() + " is here " + oldCond + " / " + newCond + " " + (wc.getCond() == oldCond)/*wc.getCond().equals(oldCond)*/);
-                System.out.println("wc : " + wc.getCond().hashCode() + ", old : " + oldCond.hashCode() + ", new : " + newCond.hashCode());
                 if(wc.getCond() == oldCond/*wc.getCond().equals(oldCond)*/) {
-                    System.out.println("and reached " + wc);
                     wc.setCond(newCond);
                     widgetLink.get(widget).get().setMessage(new StringTextComponent(newCond.getListDescription()));
                     collectData();

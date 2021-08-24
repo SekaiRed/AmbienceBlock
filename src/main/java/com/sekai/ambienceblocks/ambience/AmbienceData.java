@@ -35,6 +35,7 @@ public class AmbienceData {
     private boolean shouldFuse = false;
     private String introName = "";
     private String outroName = "";
+    private String tag = "";
     //private boolean alwaysPlay = false;
 
     //sounds
@@ -77,6 +78,7 @@ public class AmbienceData {
         compound.putString("musicName", this.soundName);
         compound.putString("category", this.category);
         compound.putString("type", this.type);
+        compound.putString("tag", this.tag);
 
         if(AmbienceType.MUSIC.getName().equals(type)) {
             compound.putBoolean("shouldFuse", this.shouldFuse);
@@ -143,6 +145,7 @@ public class AmbienceData {
         this.soundName = compound.getString("musicName");
         this.category = compound.getString("category");
         this.type = compound.getString("type");
+        this.tag = compound.getString("tag");
 
         if(AmbienceType.MUSIC.getName().equals(type)) {
             this.shouldFuse = compound.getBoolean("shouldFuse");
@@ -223,6 +226,7 @@ public class AmbienceData {
         buf.writeString(this.soundName, 50);
         buf.writeString(this.category, 20);
         buf.writeString(this.type, 10);
+        buf.writeString(this.tag, 5);
         //buf.writeBoolean(this.alwaysPlay);
 
         if(AmbienceType.MUSIC.getName().equals(type)) {
@@ -281,6 +285,7 @@ public class AmbienceData {
         this.soundName = buf.readString(50);
         this.category = buf.readString(20);
         this.type = buf.readString(10);
+        this.tag = buf.readString(5);
         //this.alwaysPlay = buf.readBoolean();
 
         if(AmbienceType.MUSIC.getName().equals(type)) {
@@ -391,6 +396,14 @@ public class AmbienceData {
     public String getType() { return type; }
 
     public void setType(String type) { this.type = type; }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 
     public boolean shouldFuse() {
         return shouldFuse;
@@ -632,6 +645,7 @@ public class AmbienceData {
         return (int) ((max - min) * Math.random() + min);
     }
 
+    //TODO I could make this lazy..
     public float[] getColor() {
         float[] c = new float[4];
         int hue = 0;
