@@ -1,12 +1,11 @@
 package com.sekai.ambienceblocks;
 
+import com.sekai.ambienceblocks.ambience.compendium.ServerCompendium;
 import com.sekai.ambienceblocks.ambience.sync.TargetSyncServer;
 import com.sekai.ambienceblocks.client.ambience.AmbienceController;
-import com.sekai.ambienceblocks.ambience.compendium.ServerCompendium;
 import com.sekai.ambienceblocks.config.AmbienceConfig;
 import com.sekai.ambienceblocks.util.PacketHandler;
 import com.sekai.ambienceblocks.util.RegistryHandler;
-import com.sekai.ambienceblocks.util.TargetSyncHandler;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
