@@ -1,7 +1,7 @@
 package com.sekai.ambienceblocks.util;
 
-import com.sekai.ambienceblocks.tileentity.ambiencetilecond.*;
-import com.sekai.ambienceblocks.tileentity.util.*;
+import com.sekai.ambienceblocks.ambience.conds.*;
+import com.sekai.ambienceblocks.ambience.util.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.GameType;

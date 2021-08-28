@@ -1,8 +1,8 @@
 package com.sekai.ambienceblocks.packets.ambiencedata;
 
-import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
+import com.sekai.ambienceblocks.client.ambience.AmbienceController;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.util.PacketHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -19,12 +19,12 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class PacketAmbienceData implements IMessage {
     public BlockPos pos;
-    public AmbienceTileEntityData data;
+    public AmbienceData data;
 
     //needed
     public PacketAmbienceData() {}
 
-    public PacketAmbienceData(BlockPos pos, AmbienceTileEntityData data) {
+    public PacketAmbienceData(BlockPos pos, AmbienceData data) {
         this.pos = pos;
         this.data = data;
     }
@@ -33,7 +33,7 @@ public class PacketAmbienceData implements IMessage {
     public void fromBytes(ByteBuf buf) {
         PacketBuffer pkt = new PacketBuffer(buf);
         pos = pkt.readBlockPos();
-        data = new AmbienceTileEntityData();
+        data = new AmbienceData();
         data.readBuff(pkt);
     }
 

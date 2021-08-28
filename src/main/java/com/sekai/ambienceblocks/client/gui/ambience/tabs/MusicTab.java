@@ -5,7 +5,7 @@ import com.sekai.ambienceblocks.client.gui.ambience.ChooseSoundGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Button;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.TextField;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextComponentString;
@@ -139,13 +139,13 @@ public class MusicTab extends AbstractTab {
     }
 
     @Override
-    public void setFieldFromData(AmbienceTileEntityData data) {
+    public void setFieldFromData(AmbienceData data) {
         introName.setText(data.getIntroName());
         outroName.setText(data.getOutroName());
     }
 
     @Override
-    public void setDataFromField(AmbienceTileEntityData data) {
+    public void setDataFromField(AmbienceData data) {
         data.setIntroName(introName.getText());
         data.setOutroName(outroName.getText());
     }

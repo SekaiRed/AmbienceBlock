@@ -3,7 +3,7 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.TextField;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextComponentString;
@@ -89,13 +89,13 @@ public class PriorityTab extends AbstractTab {
     }
 
     @Override
-    public void setFieldFromData(AmbienceTileEntityData data) {
+    public void setFieldFromData(AmbienceData data) {
         priority.setText(String.valueOf(data.getPriority()));
         channel.setText(String.valueOf(data.getChannel()));
     }
 
     @Override
-    public void setDataFromField(AmbienceTileEntityData data) {
+    public void setDataFromField(AmbienceData data) {
         data.setPriority(ParsingUtil.tryParseInt(priority.getText()));
         data.setChannel(ParsingUtil.tryParseInt(channel.getText()));
     }

@@ -1,19 +1,17 @@
 package com.sekai.ambienceblocks.client.gui.ambience;
 
-import com.sekai.ambienceblocks.Main;
 import com.sekai.ambienceblocks.client.gui.ambience.tabs.*;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Button;
 import com.sekai.ambienceblocks.packets.ambiencedata.PacketAmbienceData;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
+import com.sekai.ambienceblocks.ambience.util.AmbienceType;
 import com.sekai.ambienceblocks.util.PacketHandler;
 import com.sekai.ambienceblocks.util.Unused;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 
 import java.io.IOException;
@@ -236,15 +234,15 @@ public class AmbienceGUI extends AmbienceScreen {
         //PacketHandler.NET.sendToServer(new PacketUpdateAmbienceTE(target.getPos(), getData()));
     }
 
-    public AmbienceTileEntityData getData() {
-        AmbienceTileEntityData data = new AmbienceTileEntityData();
+    public AmbienceData getData() {
+        AmbienceData data = new AmbienceData();
 
         for(AbstractTab tab : getActiveTabs()) tab.setDataFromField(data);
 
         return data;
     }
 
-    public void setData(AmbienceTileEntityData data) {
+    public void setData(AmbienceData data) {
         mainTab.setFieldFromData(data);
 
         for(AbstractTab tab : getActiveTabs()) if(!(tab instanceof MainTab)) tab.setFieldFromData(data);

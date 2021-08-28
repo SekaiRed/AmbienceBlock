@@ -2,7 +2,7 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Widget;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.fml.client.config.GuiUtils;
@@ -91,11 +91,11 @@ public abstract class AbstractTab {
     /**
      * @param data to pass into the gui from the tile.
      */
-    public abstract void setFieldFromData(AmbienceTileEntityData data);
+    public abstract void setFieldFromData(AmbienceData data);
     /**
      * @param data to pass into the tile from the gui.
      */
-    public abstract void setDataFromField(AmbienceTileEntityData data);
+    public abstract void setDataFromField(AmbienceData data);
 
     public void activate() {
         active = true;

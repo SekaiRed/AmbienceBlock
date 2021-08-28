@@ -1,7 +1,7 @@
 package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
 
 public class FuseTab extends AbstractTab {
     public FuseTab(AmbienceGUI guiRef) {
@@ -44,12 +44,12 @@ public class FuseTab extends AbstractTab {
     }
 
     @Override
-    public void setFieldFromData(AmbienceTileEntityData data) {
+    public void setFieldFromData(AmbienceData data) {
 
     }
 
     @Override
-    public void setDataFromField(AmbienceTileEntityData data) {
+    public void setDataFromField(AmbienceData data) {
 
     }
 

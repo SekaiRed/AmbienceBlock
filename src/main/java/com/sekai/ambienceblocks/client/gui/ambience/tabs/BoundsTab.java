@@ -6,10 +6,10 @@ import com.sekai.ambienceblocks.client.gui.widgets.ambience.Button;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Checkbox;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.TextField;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Widget;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.*;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceAxis;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceWorldSpace;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
+import com.sekai.ambienceblocks.ambience.bounds.*;
+import com.sekai.ambienceblocks.ambience.util.AmbienceAxis;
+import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.Vector3d;
@@ -366,7 +366,7 @@ public class BoundsTab extends AbstractTab {
     }
 
     @Override
-    public void setFieldFromData(AmbienceTileEntityData data) {
+    public void setFieldFromData(AmbienceData data) {
         //setCheckBoxChecked(isGlobal, data.isGlobal());
         isGlobal.setChecked(data.isGlobal());
 
@@ -382,7 +382,7 @@ public class BoundsTab extends AbstractTab {
     }
 
     @Override
-    public void setDataFromField(AmbienceTileEntityData data) {
+    public void setDataFromField(AmbienceData data) {
         data.setGlobal(isGlobal.isChecked());
 
         data.setSpace(offsetPos);
@@ -460,7 +460,7 @@ public class BoundsTab extends AbstractTab {
         }
     }
 
-    public void loadBoundType(AmbienceTileEntityData data) {
+    public void loadBoundType(AmbienceData data) {
         setBoundType(data.getBounds().getID());
         if(data.getBounds() instanceof SphereBounds) {
             SphereBounds bounds = (SphereBounds) data.getBounds();

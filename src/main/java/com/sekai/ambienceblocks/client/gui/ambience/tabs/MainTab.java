@@ -8,8 +8,8 @@ import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Button;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Checkbox;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.TextField;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
-import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
+import com.sekai.ambienceblocks.ambience.util.AmbienceType;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.client.Minecraft;
@@ -320,7 +320,7 @@ public class MainTab extends AbstractTab {
     }
 
     @Override
-    public void setFieldFromData(AmbienceTileEntityData data) {
+    public void setFieldFromData(AmbienceData data) {
         soundName.setText(data.getSoundName());
         listCategory.setSelectionByString(data.getCategory());
         listType.setSelectionByString(data.getType());
@@ -349,7 +349,7 @@ public class MainTab extends AbstractTab {
     }
 
     @Override
-    public void setDataFromField(AmbienceTileEntityData data) {
+    public void setDataFromField(AmbienceData data) {
         data.setSoundName(soundName.getText());
         //data.setCategory(SoundCategory.valueOf(listCategory.getSelectedString()).getName());
         data.setCategory(ParsingUtil.tryParseEnum(listCategory.getSelectedString().toUpperCase(), SoundCategory.MASTER).getName());

@@ -1,6 +1,6 @@
 package com.sekai.ambienceblocks.util;
 
-import com.sekai.ambienceblocks.tileentity.util.AmbienceType;
+import com.sekai.ambienceblocks.ambience.util.AmbienceType;
 import net.minecraft.util.SoundCategory;
 
 import java.util.ArrayList;

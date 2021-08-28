@@ -1,27 +1,19 @@
 package com.sekai.ambienceblocks.tileentity;
 
-import com.sekai.ambienceblocks.tileentity.util.AmbienceWorldSpace;
-import com.sekai.ambienceblocks.tileentity.util.capability.DataProvider;
-import com.sekai.ambienceblocks.util.RegistryHandler;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
+import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.util.Vector3d;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.common.capabilities.Capability;
 
-import javax.annotation.Nullable;
-
-public class AmbienceTileEntity extends TileEntity {
+public class AmbienceTileEntity extends TileEntity implements IAmbienceSource {
     //public AmbienceTileEntityData data;
-    public AmbienceTileEntityData data;
+    public AmbienceData data;
 
     public AmbienceTileEntity() {
-        data = new AmbienceTileEntityData();
+        data = new AmbienceData();
     }
 
     @Override
@@ -51,6 +43,11 @@ public class AmbienceTileEntity extends TileEntity {
     }
 
     //fancy
+    @Override
+    public AmbienceData getData() {
+        return data;
+    }
+
     public Vector3d getOrigin() {
         Vector3d oPos = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
         if(AmbienceWorldSpace.RELATIVE.equals(data.getSpace()))
@@ -59,13 +56,13 @@ public class AmbienceTileEntity extends TileEntity {
             return data.getOffset().add(new Vector3d(0.5, 0.5, 0.5));
     }
 
-    public boolean isWithinBounds(EntityPlayer player) {
+    /*public boolean isWithinBounds(EntityPlayer player) {
         return data.isWithinBounds(player, getOrigin());
     }
 
     public double distanceTo(EntityPlayer player) {
         return data.distanceFromCenter(player, getOrigin());
-    }
+    }*/
 
     /*@Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)

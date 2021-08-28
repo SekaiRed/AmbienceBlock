@@ -1,13 +1,12 @@
 package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
-import com.sekai.ambienceblocks.client.gui.ambience.AmbienceScreen;
 import com.sekai.ambienceblocks.client.gui.ambience.EditCondGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Button;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
-import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
-import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AlwaysTrueCond;
+import com.sekai.ambienceblocks.ambience.AmbienceData;
+import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
+import com.sekai.ambienceblocks.ambience.conds.AlwaysTrueCond;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextComponentString;
 
@@ -100,14 +99,14 @@ public class CondTab extends AbstractTab {
     }
 
     @Override
-    public void setFieldFromData(AmbienceTileEntityData data) {
+    public void setFieldFromData(AmbienceData data) {
         condList.clear();
         condList.addAll(data.getConditions());
         updateGuiCondList();
     }
 
     @Override
-    public void setDataFromField(AmbienceTileEntityData data) {
+    public void setDataFromField(AmbienceData data) {
         data.setConditions(condList);
     }
 

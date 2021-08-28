@@ -1,16 +1,6 @@
 package com.sekai.ambienceblocks.packets;
 
-import com.sekai.ambienceblocks.client.ambiencecontroller.AmbienceController;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntityData;
-import com.sekai.ambienceblocks.util.PacketHandler;
 import com.sekai.ambienceblocks.util.Unused;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-
-import java.util.function.Supplier;
 
 //just an artifact of 1.16.5
 @Unused(type = Unused.Type.REMOVE)

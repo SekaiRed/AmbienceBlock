@@ -1,6 +1,6 @@
 package com.sekai.ambienceblocks.util;
 
-import com.sekai.ambienceblocks.tileentity.ambiencetilebounds.*;
+import com.sekai.ambienceblocks.ambience.bounds.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 

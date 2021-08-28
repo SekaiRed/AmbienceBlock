@@ -2,8 +2,8 @@ package com.sekai.ambienceblocks.client.gui.ambience;
 
 import com.sekai.ambienceblocks.Main;
 import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
-import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AbstractCond;
-import com.sekai.ambienceblocks.tileentity.ambiencetilecond.AlwaysTrueCond;
+import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
+import com.sekai.ambienceblocks.ambience.conds.AlwaysTrueCond;
 import com.sekai.ambienceblocks.util.CondsUtil;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
