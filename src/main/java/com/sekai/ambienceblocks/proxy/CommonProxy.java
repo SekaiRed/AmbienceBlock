@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks.proxy;
 
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import net.minecraft.item.Item;
 
 public class CommonProxy {
@@ -19,4 +20,12 @@ public class CommonProxy {
     public void registerItemRenderer(Item item, int meta, String id) {}
 
     public void registerModelVariants() {}
+
+    public void openAmbienceGUI(IAmbienceSource source) {
+
+    }
+
+    public void openCompendiumGUI() {
+
+    }
 }

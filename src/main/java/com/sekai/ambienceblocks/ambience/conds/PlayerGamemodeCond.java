@@ -1,14 +1,15 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
+import com.google.gson.JsonObject;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
-import com.sekai.ambienceblocks.util.Vector3d;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 
@@ -44,7 +45,7 @@ public class PlayerGamemodeCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
+    public boolean isTrue(EntityPlayer player, World worldIn, IAmbienceSource sourceIn) {
         return equal.testFor(type.equals(Minecraft.getMinecraft().playerController.getCurrentGameType()));
     }
 
@@ -78,8 +79,8 @@ public class PlayerGamemodeCond extends AbstractCond {
 
     @Override
     public void fromNBT(NBTTagCompound nbt) {
-        equal = AmbienceEquality.values()[nbt.getInteger(EQUAL) < AmbienceEquality.values().length ? nbt.getInteger(EQUAL) : 0];
-        type = GameType.values()[nbt.getInteger(TYPE) < GameType.values().length ? nbt.getInteger(TYPE) : 0];
+        equal = StaticUtil.getEnumValue(nbt.getInteger(EQUAL), AmbienceEquality.values());
+        type = StaticUtil.getEnumValue(nbt.getInteger(TYPE), GameType.values());
     }
 
     @Override
@@ -90,7 +91,19 @@ public class PlayerGamemodeCond extends AbstractCond {
 
     @Override
     public void fromBuff(PacketBuffer buf) {
-        equal = AmbienceEquality.values()[buf.readInt()];
-        type = GameType.values()[buf.readInt()];
+        equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
+        type = StaticUtil.getEnumValue(buf.readInt(), GameType.values());
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(EQUAL, equal.name());
+        json.addProperty(TYPE, type.name());
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        equal = StaticUtil.getEnumValue(json.get(EQUAL).getAsString(), AmbienceEquality.values());
+        type = StaticUtil.getEnumValue(json.get(TYPE).getAsString(), GameType.values());
     }
 }

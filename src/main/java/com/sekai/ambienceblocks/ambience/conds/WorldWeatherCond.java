@@ -1,13 +1,14 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
+import com.google.gson.JsonObject;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.*;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
-import com.sekai.ambienceblocks.util.Vector3d;
+import com.sekai.ambienceblocks.util.StaticUtil;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
 
@@ -43,7 +44,7 @@ public class WorldWeatherCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
+    public boolean isTrue(EntityPlayer player, World worldIn, IAmbienceSource sourceIn) {
         WorldInfo info = worldIn.getWorldInfo();
         boolean verified = false;
         if(weather == AmbienceWeather.CLEAR)
@@ -54,27 +55,6 @@ public class WorldWeatherCond extends AbstractCond {
             verified = info.isThundering();
         return equal.testFor(verified);
     }
-
-    //gui
-
-    /*@Override
-    public List<AmbienceWidgetHolder> getWidgets() {
-        List<AmbienceWidgetHolder> list = new ArrayList<>();
-        list.add(new AmbienceWidgetHolder(getName() + "." + EQUAL, new Button(0, 0, 20, 20, new StringTextComponent(equal.getName()), button -> {
-            equal = equal.next();
-            button.setMessage(new StringTextComponent(equal.getName()));
-        })));
-        list.add(new AmbienceWidgetHolder(getName() + "." + WEATHER, new Button(0, 0, 50, 20, new StringTextComponent(weather.getName()), button -> {
-            weather = weather.next();
-            button.setMessage(new StringTextComponent(weather.getName()));
-        })));
-        return list;
-    }
-
-    @Override
-    public void getDataFromWidgets(List<AmbienceWidgetHolder> allWidgets) {
-
-    }*/
 
     @Override
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
@@ -116,7 +96,19 @@ public class WorldWeatherCond extends AbstractCond {
 
     @Override
     public void fromBuff(PacketBuffer buf) {
-        this.equal = AmbienceEquality.values()[buf.readInt()];
-        this.weather = AmbienceWeather.values()[buf.readInt()];
+        this.equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
+        this.weather = StaticUtil.getEnumValue(buf.readInt(), AmbienceWeather.values());
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(EQUAL, equal.name());
+        json.addProperty(WEATHER, weather.name());
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        equal = StaticUtil.getEnumValue(json.get(EQUAL).getAsString(), AmbienceEquality.values());
+        weather = StaticUtil.getEnumValue(json.get(WEATHER).getAsString(), AmbienceWeather.values());
     }
 }

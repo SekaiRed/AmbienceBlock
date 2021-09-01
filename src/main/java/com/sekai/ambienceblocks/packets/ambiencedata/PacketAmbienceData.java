@@ -46,7 +46,7 @@ public class PacketAmbienceData implements IMessage {
         data.writeBuff(buf);*/
     }
 
-    public static class Handler implements IMessageHandler<PacketAmbienceData, IMessage>
+    /*public static class Handler implements IMessageHandler<PacketAmbienceData, IMessage>
     {
         @Override
         public IMessage onMessage(final PacketAmbienceData msg, final MessageContext ctx)
@@ -107,31 +107,9 @@ public class PacketAmbienceData implements IMessage {
                     //PacketHandler.NETWORK.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> ctx.get().getSender()), new PacketUpdateAmbienceTE(finalTile.getPos(), finalTile.data));
                 });
             }
-            /*IThreadListener mainThread = Minecraft.getMinecraft();
-            mainThread.addScheduledTask(() -> {
-
-                /*EntityPlayer player = Minecraft.getMinecraft().player;
-                Stats stats = (Stats) player.getCapability(StatsProvider.STAT_CAP, null);
-
-                if (stats != null)
-                {
-                    stats.setMaxHP(message.maxHP);
-                    stats.setMaxSP(message.maxSP);
-                    stats.setHP(message.HP);
-                    stats.setSP(message.SP);
-
-                    stats.setLevel(message.level);
-
-                    for(int i = 0; i < StatsType.values().length; i++)
-                        stats.setStat(StatsType.values()[i], message.statArray[i]);
-
-                    for(int i = 0; i < message.skillsCount; i++)
-                        stats.addSkill(message.skills.get(i));
-                }
-            });*/
 
             //no return packet
             return null;
         }
-    }
+    }*/
 }

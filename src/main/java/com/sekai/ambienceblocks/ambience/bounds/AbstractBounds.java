@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks.ambience.bounds;
 
+import com.google.gson.JsonObject;
 import com.sekai.ambienceblocks.ambience.util.AmbienceAxis;
 import com.sekai.ambienceblocks.util.Vector3d;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,6 +30,9 @@ public abstract class AbstractBounds {
 
     public abstract void toBuff(PacketBuffer buf);
     public abstract void fromBuff(PacketBuffer buf);
+
+    public abstract void toJson(JsonObject json);
+    public abstract void fromJson(JsonObject json);
 
     //util
     public double getPlayerPosByAxis(EntityPlayer player, AmbienceAxis axis) {

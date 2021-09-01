@@ -59,12 +59,14 @@ public class MainTab extends AbstractTab {
     public TextInstance textFadeOut = new TextInstance(0, 0, 0xFFFFFF, "Fade Out :", font);
     public TextField soundFadeOut = new TextField(font, 0, 0, 40, 20, new TextComponentString(""));
 
+    public TextInstance textTag = new TextInstance(0, 0, 0xFFFFFF, "Tag :", font);
+    public TextField tag = new TextField(font, getBaseX(), getRowY(2), 40, 20, new TextComponentString(""));
     //public Checkbox needRedstone = new Checkbox(getBaseX(), getRowY(3), 20 + font.getStringWidth("Needs redstone") + checkboxOffset, 20, "Needs redstone", false);
-    public Checkbox usePriority = new Checkbox(0, getRowY(2), 20 + font.getStringWidth("Using priority") + checkboxOffset, 20, new TextComponentString("Using priority"), false);
-    public Checkbox useCondition = new Checkbox(getNeighbourX(usePriority), getRowY(2), 20 + font.getStringWidth("Using condition") + checkboxOffset, 20, new TextComponentString("Using condition"), false);
+    public Checkbox usePriority = new Checkbox(0, getRowY(2), 20 + font.getStringWidth("Priority") + checkboxOffset, 20, new TextComponentString("Priority"), false);
+    public Checkbox useCondition = new Checkbox(getNeighbourX(usePriority), getRowY(2), 20 + font.getStringWidth("Condition") + checkboxOffset, 20, new TextComponentString("Condition"), false);
     //public Checkbox alwaysPlay = new Checkbox(getNeighbourX(useCondition), getRowY(2), 20 + font.getStringWidth("Always play") + checkboxOffset, 20, "Always play", false);
-    public Checkbox shouldFuse = new Checkbox(getBaseX(), getRowY(2), 20 + font.getStringWidth("Should fuse") + checkboxOffset, 20, new TextComponentString("Should fuse"), false);
-    public Checkbox useDelay = new Checkbox(getBaseX(), getRowY(3), 20 + font.getStringWidth("Using delay") + checkboxOffset, 20, new TextComponentString("Using delay"), false);
+    public Checkbox shouldFuse = new Checkbox(getBaseX(), getRowY(2), 20 + font.getStringWidth("Fuse") + checkboxOffset, 20, new TextComponentString("Fuse"), false);
+    public Checkbox useDelay = new Checkbox(getBaseX(), getRowY(3), 20 + font.getStringWidth("Delay") + checkboxOffset, 20, new TextComponentString("Delay"), false);
 
     public MainTab(AmbienceGUI guiRef) {
         super(guiRef);
@@ -114,6 +116,10 @@ public class MainTab extends AbstractTab {
         addWidget(soundFadeOut);
         soundFadeOut.setValidator(ParsingUtil.numberFilter);
         soundFadeOut.setMaxStringLength(6);
+
+        addWidget(textTag);
+        addWidget(tag);
+        tag.setMaxStringLength(5);
 
         addWidget(shouldFuse);
         addWidget(usePriority);
@@ -175,8 +181,11 @@ public class MainTab extends AbstractTab {
         soundFadeOut.forceUpdatePosition();
 
         //needRedstone.x = getBaseX(); needRedstone.y = getRowY(3);
+        textTag.x = getBaseX(); textTag.y = getRowY(4) + getOffsetY(font.FONT_HEIGHT);
+        tag.x = getNeighbourX(textTag); tag.y = getRowY(4);
+        tag.forceUpdatePosition();
 
-        usePriority.x = getBaseX(); usePriority.y = getRowY(4);
+        usePriority.x = getNeighbourX(tag); usePriority.y = getRowY(4);
         useCondition.x = getNeighbourX(usePriority); useCondition.y = getRowY(4);
         //alwaysPlay.x = getBaseX(); alwaysPlay.y = getRowY(5);
         shouldFuse.x = getBaseX(); shouldFuse.y = getRowY(5);
@@ -186,8 +195,6 @@ public class MainTab extends AbstractTab {
 
     @Override
     public void render(int mouseX, int mouseY) {
-        AmbienceScreen.Layer layer = AmbienceScreen.Layer.LOWEST;
-
         boolean isMusic = AmbienceType.MUSIC.equals(getType());
         shouldFuse.active = isMusic;
         shouldFuse.setVisible(isMusic);
@@ -195,35 +202,6 @@ public class MainTab extends AbstractTab {
         useDelay.active = !isMusic;
         useDelay.setVisible(!isMusic);
         //useDelay.visible = !isMusic;
-
-        /* TODO do I need to remove render or tick?
-
-        textSoundName.render(mouseX, mouseY, layer);
-        soundName.render(mouseX, mouseY, layer);
-        soundButton.render(mouseX, mouseY, layer);
-
-        textVolume.render(mouseX, mouseY, layer);
-        soundVolume.render(mouseX, mouseY, layer);
-
-        textPitch.render(mouseX, mouseY, layer);
-        soundPitch.render(mouseX, mouseY, layer);
-
-        textFadeIn.render(mouseX, mouseY, layer);
-        soundFadeIn.render(mouseX, mouseY, layer);
-        textFadeOut.render(mouseX, mouseY, layer);
-        soundFadeOut.render(mouseX, mouseY, layer);
-
-        //needRedstone.render(mouseX, mouseY);
-        shouldFuse.render(mouseX, mouseY, layer);
-        useDelay.render(mouseX, mouseY, layer);
-        usePriority.render(mouseX, mouseY, layer);
-        useCondition.render(mouseX, mouseY, layer);
-        //alwaysPlay.render(mouseX, mouseY);
-
-        textCategory.render(mouseX, mouseY, layer);
-        listCategory.render(mouseX, mouseY, layer);
-        textType.render(mouseX, mouseY, layer);
-        listType.render(mouseX, mouseY, layer);*/
     }
 
     @Override
@@ -271,6 +249,11 @@ public class MainTab extends AbstractTab {
         if(textFadeOut.isHovered()) {
             list.add(TextFormatting.RED + "Fade Out Time");
             list.add(TextFormatting.GRAY + "How long should it take for this sound to reach min volume when it stops?");
+            drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
+        if(textTag.isHovered()) {
+            list.add(TextFormatting.RED + "Tag");
+            list.add(TextFormatting.GRAY + "Can identify one or multiple blocks with conditions.");
             drawHoveringText(list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
         }
 
@@ -338,6 +321,8 @@ public class MainTab extends AbstractTab {
         soundFadeIn.setText(String.valueOf(data.getFadeIn()));
         soundFadeOut.setText(String.valueOf(data.getFadeOut()));
 
+        tag.setText(data.getTag());
+
         //needRedstone.setChecked(data.needsRedstone());
         if(AmbienceType.MUSIC.equals(getType()))
             shouldFuse.setChecked(data.shouldFuse());
@@ -359,6 +344,8 @@ public class MainTab extends AbstractTab {
         data.setPitch(ParsingUtil.tryParseFloat(soundPitch.getText()));
         data.setFadeIn(ParsingUtil.tryParseInt(soundFadeIn.getText()));
         data.setFadeOut(ParsingUtil.tryParseInt(soundFadeOut.getText()));
+
+        data.setTag(tag.getText());
 
         //data.setNeedRedstone(needRedstone.isChecked());
         if(AmbienceType.MUSIC.equals(getType()))

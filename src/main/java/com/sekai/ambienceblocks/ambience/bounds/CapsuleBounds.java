@@ -1,6 +1,8 @@
 package com.sekai.ambienceblocks.ambience.bounds;
 
+import com.google.gson.JsonObject;
 import com.sekai.ambienceblocks.ambience.util.AmbienceAxis;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import com.sekai.ambienceblocks.util.Vector3d;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -229,6 +231,20 @@ public class CapsuleBounds extends AbstractBounds {
         this.radius = buf.readDouble();
         this.length = buf.readDouble();
         this.axis = AmbienceAxis.getAxisFromInt(buf.readInt());
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty("radius", radius);
+        json.addProperty("length", length);
+        json.addProperty("axis", axis.name());
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        radius = json.get("radius").getAsDouble();
+        length = json.get("length").getAsDouble();
+        axis = StaticUtil.getEnumValue(json.get("axis").getAsString(), AmbienceAxis.values());
     }
 
     @Override

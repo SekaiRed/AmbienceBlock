@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +35,36 @@ public class AmbienceScreen extends GuiScreen {
     //unified widget list, the only special case is textfields for now (TODO could be changed with an optional keyHandling method in Widget)
     public final List<Widget> widgets = new ArrayList<>();
 
+    @Nullable
+    private AmbienceScreen previousScreen = null;
+
     public AmbienceScreen() {
         this.mc = Minecraft.getMinecraft();
         this.font = mc.fontRenderer;
+    }
+
+    //Optional : append a previous screen to this one
+    public AmbienceScreen(AmbienceScreen previousScreen) {
+        this.mc = Minecraft.getMinecraft();
+        this.font = mc.fontRenderer;
+        this.previousScreen = previousScreen;
+    }
+
+    @Nullable
+    public AmbienceScreen getPreviousScreen() {
+        return previousScreen;
+    }
+
+    public void setPreviousScreen(@Nullable AmbienceScreen screen) {
+        previousScreen = screen;
+    }
+
+    public boolean hasPreviousScreen() {
+        return previousScreen != null;
+    }
+
+    public void quitFromScreen() {
+        mc.displayGuiScreen(previousScreen);
     }
 
     @Override
@@ -97,6 +125,7 @@ public class AmbienceScreen extends GuiScreen {
     {
         //System.out.println("keycode : " + keyCode);
         //esc was pressed
+        //TODO I could also make it return you to the previous screen
         if(keyCode == 1)
             Minecraft.getMinecraft().displayGuiScreen(null);
 
@@ -119,6 +148,10 @@ public class AmbienceScreen extends GuiScreen {
     protected void removeWidget(Widget widget) {
         widgets.remove(widget);
     }
+
+    /*public void quit(Minecraft mc) {
+        mc.displayGuiScreen(previousScreen);
+    }*/
 
     public enum Layer {
         LOWEST(0f),

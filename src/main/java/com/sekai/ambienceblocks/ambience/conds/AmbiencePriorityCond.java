@@ -1,16 +1,17 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
+import com.google.gson.JsonObject;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.client.ambience.AmbienceController;
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.ParsingUtil;
-import com.sekai.ambienceblocks.util.Vector3d;
+import com.sekai.ambienceblocks.util.StaticUtil;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -48,34 +49,9 @@ public class AmbiencePriorityCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
+    public boolean isTrue(EntityPlayer player, World worldIn, IAmbienceSource sourceIn) {
         return test.testForInt(priority, AmbienceController.instance.getHighestPriorityByChannel(channel));
-        //float val = Minecraft.getInstance().player.getHealth();
-        //return test.testForDouble(val, value);
     }
-
-    //gui
-
-    /*@Override
-    public List<AmbienceWidgetHolder> getWidgets() {
-        List<AmbienceWidgetHolder> list = new ArrayList<>();
-        list.add(new AmbienceWidgetHolder(getName() + "." + TEST, new Button(0, 0, 20, 20, new StringTextComponent(test.getName()), button -> {
-            test = test.next();
-            button.setMessage(new StringTextComponent(test.getName()));
-        })));
-        list.add(new AmbienceWidgetHolder(getName() + "." + VALUE, new CustomTextField(0, 0, 50, 20, "")));
-        ((CustomTextField) list.get(list.size() - 1).get()).setText(Double.toString(value));
-        return list;
-    }
-
-    @Override
-    public void getDataFromWidgets(List<AmbienceWidgetHolder> allWidgets) {
-        for(AmbienceWidgetHolder widgetHolder : allWidgets) {
-            if(widgetHolder.isKey(getName() + "." + VALUE) && widgetHolder.get() instanceof CustomTextField) {
-                value = ParsingUtil.tryParseDouble(((CustomTextField) widgetHolder.get()).getText());
-            }
-        }
-    }*/
 
     @Override
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
@@ -109,7 +85,7 @@ public class AmbiencePriorityCond extends AbstractCond {
 
     @Override
     public void fromNBT(NBTTagCompound nbt) {
-        test = AmbienceTest.values()[nbt.getInteger(TEST) < AmbienceTest.values().length ? nbt.getInteger(TEST) : 0];
+        test = StaticUtil.getEnumValue(nbt.getInteger(TEST), AmbienceTest.values());
         priority = nbt.getInteger(PRIORITY);
         channel = nbt.getInteger(CHANNEL);
     }
@@ -123,8 +99,22 @@ public class AmbiencePriorityCond extends AbstractCond {
 
     @Override
     public void fromBuff(PacketBuffer buf) {
-        this.test = AmbienceTest.values()[buf.readInt()];
+        this.test = StaticUtil.getEnumValue(buf.readInt(), AmbienceTest.values());
         this.priority = buf.readInt();
         this.channel = buf.readInt();
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(TEST, test.name());
+        json.addProperty(PRIORITY, priority);
+        json.addProperty(CHANNEL, channel);
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        test = StaticUtil.getEnumValue(json.get(TEST).getAsString(), AmbienceTest.values());
+        priority = json.get(PRIORITY).getAsInt();
+        channel = json.get(CHANNEL).getAsInt();
     }
 }

@@ -27,8 +27,8 @@ public class ChooseSoundGUI extends AmbienceScreen implements StringListWidget.I
     public static final int texHeight = 184;
     public int xTopLeft, yTopLeft;
 
-    private AmbienceScreen prevScreen;
-    private TextField targetField;
+    //private AmbienceScreen prevScreen;
+    private final TextField targetField;
     public FontRenderer font;
 
     protected static final int yOffset = 8;
@@ -52,8 +52,9 @@ public class ChooseSoundGUI extends AmbienceScreen implements StringListWidget.I
     public SoundRegistry soundRegistry;
 
     public ChooseSoundGUI(AmbienceScreen prevScreen, TextField targetField) {
+        super(prevScreen);
         this.font = mc.fontRenderer;
-        this.prevScreen = prevScreen;
+        //this.prevScreen = prevScreen;
         this.targetField = targetField;
 
         soundRegistryField = ObfuscationReflectionHelper.findField(SoundHandler.class, "field_147697_e");
@@ -124,6 +125,11 @@ public class ChooseSoundGUI extends AmbienceScreen implements StringListWidget.I
 
         xTopLeft = (this.width - texWidth) / 2;
         yTopLeft = (this.height - texHeight) / 2;
+
+        Button cancel = new Button(xTopLeft + texWidth - 80 - 4, yTopLeft + texHeight + 4, 80, 20, new TextComponentString("Cancel"), button -> {
+            quitFromScreen();
+        });
+        addWidget(cancel);
 
         play = new Button(xTopLeft + separation/4, yTopLeft + texHeight + separation/4, 60, 20, new TextComponentString("Play"), button -> {
             playSoundPreview();
@@ -246,14 +252,14 @@ public class ChooseSoundGUI extends AmbienceScreen implements StringListWidget.I
         stop.render(matrix, p_render_1_, p_render_2_, p_render_3_);*/
     }
 
-    @Override
+    /*@Override
     public void onGuiClosed() {
         mc.getSoundHandler().stopSound(previewSound);
         if(!closing) {
             closing = true;
             mc.displayGuiScreen(prevScreen);
         }
-    }
+    }*/
 
     @Override
     public void updateScreen() {
@@ -268,12 +274,14 @@ public class ChooseSoundGUI extends AmbienceScreen implements StringListWidget.I
     public void onDoubleClick(StringListWidget list, int index, String name) {
         targetField.setText(name);
         mc.getSoundHandler().stopSound(previewSound);
-        mc.displayGuiScreen(prevScreen);
+        //mc.displayGuiScreen(prevScreen);
+        quitFromScreen();
     }
 
     public void onConfirm() {
         targetField.setText(selectedDomain + ":" + selected);
-        mc.displayGuiScreen(prevScreen);
+        //mc.displayGuiScreen(prevScreen);
+        quitFromScreen();
         mc.getSoundHandler().stopSound(previewSound);
         //targetField.setText(list.getElementString());
         targetField.setText(selectedDomain + ":" + selected);

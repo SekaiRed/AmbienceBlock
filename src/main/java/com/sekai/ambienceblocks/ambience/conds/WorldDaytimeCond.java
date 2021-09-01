@@ -1,15 +1,16 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
+import com.google.gson.JsonObject;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.ParsingUtil;
-import com.sekai.ambienceblocks.util.Vector3d;
+import com.sekai.ambienceblocks.util.StaticUtil;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
 
@@ -45,7 +46,7 @@ public class WorldDaytimeCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
+    public boolean isTrue(EntityPlayer player, World worldIn, IAmbienceSource sourceIn) {
         WorldInfo info = worldIn.getWorldInfo();
         //System.out.println(info.getWorldTime());
         return test.testForLong(info.getWorldTime()%24000, value);
@@ -79,7 +80,7 @@ public class WorldDaytimeCond extends AbstractCond {
 
     @Override
     public void fromNBT(NBTTagCompound nbt) {
-        test = AmbienceTest.values()[nbt.getInteger(TEST) < AmbienceTest.values().length ? nbt.getInteger(TEST) : 0];
+        test = StaticUtil.getEnumValue(nbt.getInteger(TEST), AmbienceTest.values());
         value = nbt.getLong(VALUE);
     }
 
@@ -91,7 +92,19 @@ public class WorldDaytimeCond extends AbstractCond {
 
     @Override
     public void fromBuff(PacketBuffer buf) {
-        this.test = AmbienceTest.values()[buf.readInt()];
+        this.test = StaticUtil.getEnumValue(buf.readInt(), AmbienceTest.values());
         this.value = buf.readLong();
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(TEST, test.name());
+        json.addProperty(VALUE, value);
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        test = StaticUtil.getEnumValue(json.get(TEST).getAsString(), AmbienceTest.values());
+        value = json.get(VALUE).getAsLong();
     }
 }

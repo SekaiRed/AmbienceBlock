@@ -1,6 +1,7 @@
 package com.sekai.ambienceblocks.client.gui.ambience;
 
 import com.sekai.ambienceblocks.Main;
+import com.sekai.ambienceblocks.ambience.util.messenger.*;
 import com.sekai.ambienceblocks.client.gui.ambience.tabs.CondTab;
 import com.sekai.ambienceblocks.client.gui.widgets.ScrollListWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
@@ -9,10 +10,6 @@ import com.sekai.ambienceblocks.client.gui.widgets.ambience.TextField;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Widget;
 import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWidgetHolder;
-import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
-import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
-import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetSound;
-import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -23,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class EditCondGUI extends AmbienceScreen {
+public class EditCondGUI extends AmbienceScreen implements IFetchCond {
     private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(Main.MODID, "textures/gui/ambience_gui.png");
 
     public static final int texWidth = 256;
@@ -35,10 +32,11 @@ public class EditCondGUI extends AmbienceScreen {
     protected static final int separation = 8;//16;
     protected static final int rowHeight = 20;
 
-    private AmbienceGUI prevScreen;
-    private CondTab tab;
-    private AbstractCond cond;
-    private int index;
+    //private AmbienceGUI prevScreen;
+    private AmbienceScreen prevScreen;
+    private IFetchCond condFetcher;
+    private AbstractCond oldCond;
+    private AbstractCond newCond;
 
     //private boolean offToEditSoundLol = false;
 
@@ -60,11 +58,12 @@ public class EditCondGUI extends AmbienceScreen {
 
     private int counter;
 
-    public EditCondGUI(AmbienceGUI prevScreen, CondTab tab, AbstractCond cond, int index) {
-        this.prevScreen = prevScreen;
-        this.tab = tab;
-        this.cond = cond;
-        this.index = index;
+    public EditCondGUI(AmbienceScreen prevScreen, IFetchCond condFetcher, AbstractCond oldCond) {
+        super(prevScreen);
+        //this.prevScreen = prevScreen;
+        this.condFetcher = condFetcher;
+        this.oldCond = oldCond;
+        this.newCond = oldCond.copy();
     }
 
     @Override
@@ -91,21 +90,30 @@ public class EditCondGUI extends AmbienceScreen {
         addWidget(editCond);
 
         confirm = new Button(xTopLeft + 4, yTopLeft + texHeight + 4, 100, 20, new TextComponentString("Confirm"), button -> {
-            collectData();
+            /*collectData();
             tab.replaceCond(index, cond);
-            mc.displayGuiScreen(prevScreen);
+            //mc.displayGuiScreen(prevScreen);
+            quitFromScreen();*/
+
+            collectData();
+            condFetcher.fetch(newCond, oldCond);
+            quitFromScreen();
         });
         addWidget(confirm);
 
         back = new Button(xTopLeft + texWidth - 4 - 100, yTopLeft + texHeight + 4, 100, 20, new TextComponentString("Back"), button -> {
-            prevScreen.forceUpdateCondList();
-            mc.displayGuiScreen(prevScreen);
+            //prevScreen.forceUpdateCondList();
+            //mc.displayGuiScreen(prevScreen);
+            /*if(getPreviousScreen() instanceof AmbienceGUI)
+                ((AmbienceGUI) getPreviousScreen()).forceUpdateCondList();*/
+
+            quitFromScreen();
         });
         addWidget(back);
 
         condWidgets.clear();
 
-        addCondWidgets(cond.getWidgets());
+        addCondWidgets(newCond.getWidgets());
         updateCondWidgetPos();
 
         /*if(!condInit) {
@@ -137,7 +145,7 @@ public class EditCondGUI extends AmbienceScreen {
             }
             data.add(messenger);
         }
-        cond.getDataFromWidgets(data);
+        newCond.getDataFromWidgets(data);
     }
 
     //this is the part of the code that interprets AmbienceWidgetMessenger to create the widgets
@@ -146,9 +154,12 @@ public class EditCondGUI extends AmbienceScreen {
         for(int i = 0; i < widgets.size(); i++) {
             AbstractAmbienceWidgetMessenger widget = widgets.get(i);
 
-            AmbienceWidgetHolder label = new AmbienceWidgetHolder("", new TextInstance(0, (rowHeight - font.FONT_HEIGHT)/2, 0xFFFFFF, widget.getLabel(), font));
-            addWidget(label);
-            //addWidget(new TextInstance(0, (rowHeight - font.FONT_HEIGHT)/2, 0xFFFFFF, widget.getLabel(), font));
+            //AmbienceWidgetHolder label = new AmbienceWidgetHolder("", new TextInstance(0, (rowHeight - font.FONT_HEIGHT)/2, 0xFFFFFF, widget.getLabel(), font));
+            //addWidget(label);
+            if(!widget.getLabel().isEmpty()) {
+                AmbienceWidgetHolder label = new AmbienceWidgetHolder("", new TextInstance(0, (rowHeight - font.FONT_HEIGHT) / 2, 0xFFFFFF, widget.getLabel(), font));
+                addWidget(label);
+            }
 
             if(widget instanceof AmbienceWidgetString) {
                 AmbienceWidgetHolder holder = new AmbienceWidgetHolder(widget.getKey(), new TextField(font, 0, 0, widget.getWidth(), 20, new TextComponentString("")));
@@ -169,6 +180,16 @@ public class EditCondGUI extends AmbienceScreen {
                     //button.setMessage(new StringTextComponent(test.getName()));
                     wEnum.next();
                     button.setMessage(new TextComponentString(ParsingUtil.getCachedEnumName(wEnum.getValue())));
+                }));
+                addWidget(holder);
+                widgetLink.put(widget, holder);
+            }
+            if(widget instanceof AmbienceWidgetCond) {
+                AmbienceWidgetCond wCond = (AmbienceWidgetCond) widget;
+                AmbienceWidgetHolder holder = new AmbienceWidgetHolder(widget.getKey(), new Button(0, 0, widget.getWidth(), 20, new TextComponentString(wCond.getCond().getListDescription()), button -> {
+                    //isFieldBeingEdited = true;
+                    //printConditionHash("get cond", wCond.getCond());
+                    mc.displayGuiScreen(new EditCondGUI(this, this, wCond.getCond()));
                 }));
                 addWidget(holder);
                 widgetLink.put(widget, holder);
@@ -203,18 +224,20 @@ public class EditCondGUI extends AmbienceScreen {
     }
 
     private void updateCondWidgetPos() {
-        int indexX = offset;
+        int indexX = offset + separation;
         int indexY = offset + rowHeight + separation;
         for(AmbienceWidgetHolder element : condWidgets) {
             Widget widget = element.get();
-            if(indexX > texWidth - offset) {
-                indexX = offset;
+            if(indexX + widget.width + separation > texWidth - offset) {
+                indexX = offset + separation;
                 indexY += rowHeight + separation;
             }
             widget.x = xTopLeft + indexX;
             widget.y = yTopLeft + indexY + (rowHeight - widget.height)/2;
             //widget.y = yTopLeft + offset + rowHeight + separation;
             indexX += widget.width + separation;
+
+            //TODO to what lengths will you go just to avoid putting in a setPos method in widgets
             if(widget instanceof ScrollListWidget) ((ScrollListWidget)widget).updateWidgetPosition();
         }
     }
@@ -223,33 +246,9 @@ public class EditCondGUI extends AmbienceScreen {
     public void drawScreen(int p_render_1_, int p_render_2_, float p_render_3_) {
         drawMainBackground();
 
-        /*for(AmbienceWidgetHolder widget : condWidgets) {
-            widget.get().render(matrix, p_render_1_, p_render_2_, p_render_3_);
-
-            if(widget.get() instanceof ScrollListWidget) ((ScrollListWidget)widget.get()).render(matrix, p_render_1_, p_render_2_);
-        }
-
-        editCond.render(matrix, p_render_1_, p_render_2_, p_render_3_);*/
-
-        drawString(font, cond.getName(), editCond.x + editCond.width + separation, editCond.y + 6, 0xFFFFFF);
+        drawString(font, newCond.getName(), editCond.x + editCond.width + separation, editCond.y + 6, 0xFFFFFF);
 
         super.drawScreen(p_render_1_, p_render_2_, p_render_3_);
-    }
-
-    @Override
-    public void onGuiClosed() {
-        if(!closing) {
-            closing = true;
-            mc.displayGuiScreen(prevScreen);
-        }
-    }
-
-    public void onConfirm() {
-        prevScreen.forceUpdateCondList();
-        if(!closing) {
-            closing = true;
-            mc.displayGuiScreen(prevScreen);
-        }
     }
 
     @Override
@@ -264,7 +263,7 @@ public class EditCondGUI extends AmbienceScreen {
     }
 
     public void setCond(AbstractCond cond) {
-        this.cond = cond;
+        this.newCond = cond;
     }
 
     /*private void addWidget(AmbienceWidgetHolder widget) {
@@ -324,5 +323,20 @@ public class EditCondGUI extends AmbienceScreen {
         this.mc.getTextureManager().bindTexture(BACKGROUND_TEXTURE);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         drawTexturedModalRect(xTopLeft, yTopLeft, 0, 0, texWidth, texHeight);
+    }
+
+    @Override
+    public void fetch(AbstractCond newCond, AbstractCond oldCond) {
+        //Upon returning to this screen after "fetching" a condition, this happens
+        for(AbstractAmbienceWidgetMessenger widget : widgetLink.keySet()) {
+            if(widget instanceof AmbienceWidgetCond) {
+                AmbienceWidgetCond wc = (AmbienceWidgetCond) widget;
+                if(wc.getCond() == oldCond/*wc.getCond().equals(oldCond)*/) {
+                    wc.setCond(newCond);
+                    widgetLink.get(widget).get().setMessage(new TextComponentString(newCond.getListDescription()));
+                    collectData();
+                }
+            }
+        }
     }
 }

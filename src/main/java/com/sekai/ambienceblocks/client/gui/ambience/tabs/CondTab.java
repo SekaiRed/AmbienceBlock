@@ -2,6 +2,7 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.ambience.EditCondGUI;
+import com.sekai.ambienceblocks.client.gui.ambience.IFetchCond;
 import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Button;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CondTab extends AbstractTab {
+public class CondTab extends AbstractTab implements IFetchCond {
     List<AbstractCond> condList = new ArrayList<>();
 
     //widgets
@@ -122,7 +123,7 @@ public class CondTab extends AbstractTab {
 
     private void buttonEdit() {
         if(condGuiList.getSelectionIndex() < condGuiList.getAmountOfElements() && condGuiList.getSelectionIndex() >= 0) {
-            Minecraft.getMinecraft().displayGuiScreen(new EditCondGUI(this.screen, this, condList.get(condGuiList.getSelectionIndex()).clone(), condGuiList.getSelectionIndex()));
+            Minecraft.getMinecraft().displayGuiScreen(new EditCondGUI(this.screen, this, condList.get(condGuiList.getSelectionIndex())));
         }
     }
 
@@ -183,5 +184,16 @@ public class CondTab extends AbstractTab {
             condGuiList.addElement(cond.getListDescription());
         }
         //condGuiList.addElement("[player.test.axis] < Y 120");
+    }
+
+    @Override
+    public void fetch(AbstractCond newCond, AbstractCond oldCond) {
+        for (int i = 0; i < condList.size(); i++) {
+            AbstractCond cond = condList.get(i);
+            if (cond.equals(oldCond)) {
+                replaceCond(i, newCond.copy());
+                return;
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks.client.ambience;
 
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.ambience.util.AmbienceType;
@@ -13,13 +14,10 @@ import net.minecraft.util.SoundCategory;
 public class AmbienceSlot {
     private final SoundHandler handler;
     private AmbienceInstance instance;
-    private AmbienceTileEntity owner;
+    private IAmbienceSource source;
 
     private AmbienceSoundState stateSnd;
     private AmbienceFadeState stateFade;
-
-    //this sound should not repeat
-    private boolean isSingle = false;
 
     private boolean hasCachedVolume = false;
     private float cachedVolume = 0f;
@@ -39,13 +37,13 @@ public class AmbienceSlot {
 
     private boolean markForDeletion = false;
 
-    public AmbienceSlot(SoundHandler handler, AmbienceTileEntity owner) {
+    public AmbienceSlot(SoundHandler handler, IAmbienceSource source) {
         this.handler = handler;
-        this.owner = owner;
+        this.source = source;
     }
 
     public void play() {
-        AmbienceData d = owner.data;
+        AmbienceData d = source.getData();
 
         if(d.getFadeIn() > 0)
             setFadeState(AmbienceFadeState.FADE_IN);
@@ -54,15 +52,15 @@ public class AmbienceSlot {
 
         ResourceLocation playingResource;
         if(d.getType().equals(AmbienceType.MUSIC.getName())) {
-            if(AmbienceController.isValidSound(owner.data.getIntroName())) {
-                playingResource = new ResourceLocation(owner.data.getIntroName());
+            if(AmbienceController.isValidSound(source.getData().getIntroName())) {
+                playingResource = new ResourceLocation(source.getData().getIntroName());
                 stateSnd = AmbienceSoundState.INTRO;
             } else {
-                playingResource = new ResourceLocation(owner.data.getSoundName());
+                playingResource = new ResourceLocation(source.getData().getSoundName());
                 stateSnd = AmbienceSoundState.LOOP;
             }
         } else {
-            playingResource = new ResourceLocation(owner.data.getSoundName());
+            playingResource = new ResourceLocation(source.getData().getSoundName());
             stateSnd = AmbienceSoundState.LOOP;
         }
 
@@ -70,15 +68,19 @@ public class AmbienceSlot {
             stateSnd = AmbienceSoundState.SINGLE;
 
         if(AmbienceSoundState.LOOP.equals(stateSnd) && !d.isUsingDelay())
-            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), getPitchInternal(d), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), getPitchInternal(d), true);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
         else
-            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), getPitchInternal(d), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
+            instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), getPitchInternal(d), false);//AmbienceInstance(playingResource, SoundCategory.AMBIENT, tile.getPos(), tile.isGlobal()?1.0f:0.01f);
 
         handler.playSound(instance);
     }
 
+    public boolean isStopping() {
+        return AmbienceSoundState.OUTRO.equals(stateSnd) || AmbienceFadeState.FADE_OUT.equals(stateFade);
+    }
+
     public void stop() {
-        AmbienceData d = owner.data;
+        AmbienceData d = source.getData();
 
         //don't apply stop logic if we're already in the outro or fade out state
         if(AmbienceSoundState.OUTRO.equals(stateSnd) || AmbienceFadeState.FADE_OUT.equals(stateFade))
@@ -90,7 +92,7 @@ public class AmbienceSlot {
             if(AmbienceController.isValidSound(d.getOutroName())) {
                 ResourceLocation playingResource = new ResourceLocation(d.getOutroName());
                 handler.stopSound(instance);
-                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), d.getPitch(), false);
+                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), d.getPitch(), false);
                 handler.playSound(instance);
                 stateSnd = AmbienceSoundState.OUTRO;
             }
@@ -134,7 +136,7 @@ public class AmbienceSlot {
     }
 
     public void tick() {
-        AmbienceData d = owner.data;
+        AmbienceData d = source.getData();
 
         if(AmbienceSoundState.SINGLE.equals(stateSnd)) {
             if(!isPlaying(instance)) /*if(!handler.isPlaying(instance))*/ {
@@ -150,7 +152,7 @@ public class AmbienceSlot {
                 //System.out.println("end reached lol " + instance.canRepeat());
                 ResourceLocation playingResource = new ResourceLocation(d.getSoundName());
                 handler.stopSound(instance);
-                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), owner.getOrigin(), getVolumeInternal(d), d.getPitch(), true);
+                instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), d.getPitch(), true);
                 handler.playSound(instance);
                 stateSnd = AmbienceSoundState.LOOP;
             }
@@ -187,7 +189,7 @@ public class AmbienceSlot {
     }
 
     public void forceVolumeAndPitchUpdate() {
-        AmbienceData d = owner.data;
+        AmbienceData d = source.getData();
         setVolume(getVolumeInternal(d));
         setPitch(getPitchInternal(d));
     }
@@ -205,7 +207,7 @@ public class AmbienceSlot {
             if (d.isGlobal())
                 return multVolume * volume;
             else
-                return (float) (multVolume * volume * d.getPercentageHowCloseIsPlayer(Minecraft.getMinecraft().player, owner.getOrigin()));
+                return (float) (multVolume * volume * d.getPercentageHowCloseIsPlayer(Minecraft.getMinecraft().player, source.getOrigin()));
         }
     }
 
@@ -225,12 +227,12 @@ public class AmbienceSlot {
 
     public String getMusicString() { return instance.getSoundLocation().toString(); }
     public AmbienceInstance getMusicInstance() { return instance; }
-    public AmbienceTileEntity getOwner() { return owner; }
-    public AmbienceData getData() { return owner.data; }
+    public IAmbienceSource getSource() { return source; }
+    public AmbienceData getData() { return source.getData(); }
 
-    public void setOwner(AmbienceTileEntity owner) {
-        this.owner = owner;
-        getMusicInstance().setBlockPos(owner.getOrigin());
+    public void setSource(IAmbienceSource source) {
+        this.source = source;
+        getMusicInstance().setBlockPos(source.getOrigin());
     }
 
     public boolean isMarkedForDeletion() {
@@ -328,13 +330,10 @@ public class AmbienceSlot {
 
     @Override
     public String toString() {
-        return instance.getSoundLocation().toString() + ", " +
-                getOwner().getPos() + ", volume " + getVolume() + ", pitch " + getPitch() + ", priority " + getOwner().data.getPriority()
-                + ", channel " + getOwner().data.getChannel() + " with Sound : " + stateSnd.toString() + " and Fade : " + stateFade.toString() + " (" + isMarkedForDeletion() + ")";
-    }
-
-    public void setIsSingle() {
-        isSingle = true;
+        if(source instanceof AmbienceTileEntity)
+            return instance.getSoundLocation().toString() + ", " + ParsingUtil.customBlockPosToString(((AmbienceTileEntity) source).getPos()) + ", volume " + getVolume() + ", pitch " + getPitch() + " (" + stateSnd.toString() + ", " + stateFade.toString() + ")";
+        else
+            return instance.getSoundLocation().toString() + ", volume " + getVolume() + ", pitch " + getPitch() + " (" + stateSnd.toString() + ", " + stateFade.toString() + ")";
     }
 
     private enum AmbienceSoundState {

@@ -45,4 +45,8 @@ public class BoundsUtil {
 
         return new SphereBounds();
     }
+
+    public static AbstractBounds getDefault() {
+        return new SphereBounds(16D);
+    }
 }

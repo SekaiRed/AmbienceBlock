@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks.ambience.bounds;
 
+import com.google.gson.JsonObject;
 import com.sekai.ambienceblocks.util.Vector3d;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -95,6 +96,20 @@ public class CubicBounds extends AbstractBounds {
         xSize = buf.readDouble();
         ySize = buf.readDouble();
         zSize = buf.readDouble();
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty("xSize", xSize);
+        json.addProperty("ySize", ySize);
+        json.addProperty("zSize", zSize);
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        xSize = json.get("xSize").getAsDouble();
+        ySize = json.get("ySize").getAsDouble();
+        zSize = json.get("zSize").getAsDouble();
     }
 
     @Override

@@ -1,21 +1,23 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
+import com.google.gson.JsonObject;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.ParsingUtil;
-import com.sekai.ambienceblocks.util.Vector3d;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO maybe i should change
 public class PlayerHungerCond extends AbstractCond {
     private AmbienceTest test;
     private double value;
@@ -50,8 +52,8 @@ public class PlayerHungerCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
-        float val = Minecraft.getMinecraft().player.getFoodStats().getFoodLevel();
+    public boolean isTrue(EntityPlayer player, World worldIn, IAmbienceSource sourceIn) {
+        float val = player.getFoodStats().getFoodLevel();
         return test.testForDouble(val, value);
     }
 
@@ -61,7 +63,7 @@ public class PlayerHungerCond extends AbstractCond {
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(TEST, "", 20, test));
-        list.add(new AmbienceWidgetString(VALUE, "Hunger :", 50, Double.toString(value), 8, ParsingUtil.decimalNumberFilter));
+        list.add(new AmbienceWidgetString(VALUE, "Hunger :", 50, Double.toString(value), 8, ParsingUtil.numberFilter));
         return list;
     }
 
@@ -75,27 +77,6 @@ public class PlayerHungerCond extends AbstractCond {
         }
     }
 
-    /*@Override
-    public List<AmbienceWidgetHolder> getWidgets() {
-        List<AmbienceWidgetHolder> list = new ArrayList<>();
-        list.add(new AmbienceWidgetHolder(getName() + "." + TEST, new Button(0, 0, 20, 20, new StringTextComponent(test.getName()), button -> {
-            test = test.next();
-            button.setMessage(new StringTextComponent(test.getName()));
-        })));
-        list.add(new AmbienceWidgetHolder(getName() + "." + VALUE, new CustomTextField(0, 0, 50, 20, "")));
-        ((CustomTextField) list.get(list.size() - 1).get()).setText(Double.toString(value));
-        return list;
-    }
-
-    @Override
-    public void getDataFromWidgets(List<AmbienceWidgetHolder> allWidgets) {
-        for(AmbienceWidgetHolder widgetHolder : allWidgets) {
-            if(widgetHolder.isKey(getName() + "." + VALUE) && widgetHolder.get() instanceof CustomTextField) {
-                value = ParsingUtil.tryParseDouble(((CustomTextField) widgetHolder.get()).getText());
-            }
-        }
-    }*/
-
     @Override
     public NBTTagCompound toNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
@@ -106,7 +87,7 @@ public class PlayerHungerCond extends AbstractCond {
 
     @Override
     public void fromNBT(NBTTagCompound nbt) {
-        test = AmbienceTest.values()[nbt.getInteger(TEST) < AmbienceTest.values().length ? nbt.getInteger(TEST) : 0];
+        test = StaticUtil.getEnumValue(nbt.getInteger(TEST), AmbienceTest.values());
         value = nbt.getDouble(VALUE);
     }
 
@@ -118,7 +99,19 @@ public class PlayerHungerCond extends AbstractCond {
 
     @Override
     public void fromBuff(PacketBuffer buf) {
-        this.test = AmbienceTest.values()[buf.readInt()];
+        this.test = StaticUtil.getEnumValue(buf.readInt(), AmbienceTest.values());
         this.value = buf.readDouble();
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(TEST, test.name());
+        json.addProperty(VALUE, value);
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        test = StaticUtil.getEnumValue(json.get(TEST).getAsString(), AmbienceTest.values());
+        value = json.get(VALUE).getAsDouble();
     }
 }

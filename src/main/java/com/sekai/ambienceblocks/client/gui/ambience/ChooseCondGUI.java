@@ -4,9 +4,11 @@ import com.sekai.ambienceblocks.Main;
 import com.sekai.ambienceblocks.client.gui.widgets.StringListWidget;
 import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
 import com.sekai.ambienceblocks.ambience.conds.AlwaysTrueCond;
+import com.sekai.ambienceblocks.client.gui.widgets.ambience.Button;
 import com.sekai.ambienceblocks.util.CondsUtil;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentString;
 
 public class ChooseCondGUI extends AmbienceScreen {
     private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(Main.MODID, "textures/gui/ambience_gui.png");
@@ -18,16 +20,15 @@ public class ChooseCondGUI extends AmbienceScreen {
     protected static final int yOffset = 8;
     protected static final int separation = 16;
 
-    private final EditCondGUI prevScreen;
-    //private TextFieldWidget targetField;
-    //public FontRenderer font;
-
     private StringListWidget list;
+
+    private Button cancel;
 
     boolean closing = false;
 
     public ChooseCondGUI(EditCondGUI prevScreen) {
-        this.prevScreen = prevScreen;
+        super(prevScreen);
+        //this.prevScreen = prevScreen;
     }
 
     @Override
@@ -37,11 +38,6 @@ public class ChooseCondGUI extends AmbienceScreen {
         drawCenteredString(font, "Choose a condition", xTopLeft + texWidth/2, yTopLeft + separation / 2, 0xFFFFFF);
 
         super.drawScreen(mouseX, mouseY, partialTicks);
-
-        //list.render(matrix, p_render_1_, p_render_2_);
-
-        //play.render(p_render_1_, p_render_2_, p_render_3_);
-        //stop.render(p_render_1_, p_render_2_, p_render_3_);
     }
 
     @Override
@@ -53,9 +49,6 @@ public class ChooseCondGUI extends AmbienceScreen {
         this.mc.getTextureManager().bindTexture(BACKGROUND_TEXTURE);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         drawTexturedModalRect(xTopLeft, yTopLeft, 0, 0, texWidth, texHeight);
-        /*RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        this.minecraft.getTextureManager().bindTexture(BACKGROUND_TEXTURE);
-        this.blit(matrix, xTopLeft, yTopLeft, 0, 0, texWidth, texHeight);*/
     }
 
     @Override
@@ -76,40 +69,30 @@ public class ChooseCondGUI extends AmbienceScreen {
                 AbstractCond returnCond = new AlwaysTrueCond();
                 CondsUtil.CondList[] conds = CondsUtil.CondList.values();
                 for (CondsUtil.CondList cond : conds) {
-                    if(cond.getDefault().getName().contains(name)) returnCond = cond.getDefault();
+                    if(cond.getDefault().getName().equals(name)) returnCond = cond.getDefault();
                 }
-                prevScreen.setCond(returnCond);
-                displayOriginalScreen();
+                if(getPreviousScreen() instanceof EditCondGUI)
+                    ((EditCondGUI) getPreviousScreen()).setCond(returnCond);
+                //prevScreen.setCond(returnCond);
+                //displayOriginalScreen();
+                quitFromScreen();
             }
         });
         addWidget(list);
-        //this.children.add(list);
 
         CondsUtil.CondList[] conds = CondsUtil.CondList.values();
         for (CondsUtil.CondList cond : conds) {
             list.addElement(cond.getDefault().getName());
         }
+
+        cancel = new Button(xTopLeft + texWidth - 80 - 4, yTopLeft + texHeight + 4, 80, 20, new TextComponentString("Cancel"), button -> {
+            quitFromScreen();
+        });
+        addWidget(cancel);
     }
 
     @Override
     public boolean doesGuiPauseGame() {
         return false;
     }
-
-    @Override
-    public void onGuiClosed() {
-        if(!closing) {
-            closing = true;
-            displayOriginalScreen();
-        }
-    }
-
-    private void displayOriginalScreen() {
-        if(!closing) {
-            closing = true;
-            mc.displayGuiScreen(prevScreen);
-        }
-    }
-
-
 }

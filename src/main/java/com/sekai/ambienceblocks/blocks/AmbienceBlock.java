@@ -70,7 +70,8 @@ public class AmbienceBlock extends Block implements IHasModel, ITileEntityProvid
         if(!(Minecraft.getMinecraft().world.getTileEntity(pos) instanceof AmbienceTileEntity))
             return true;
 
-        Minecraft.getMinecraft().displayGuiScreen(new AmbienceGUI((AmbienceTileEntity) Minecraft.getMinecraft().world.getTileEntity(pos)));
+        //Minecraft.getMinecraft().displayGuiScreen(new AmbienceGUI((AmbienceTileEntity) Minecraft.getMinecraft().world.getTileEntity(pos)));
+        Main.proxy.openAmbienceGUI((AmbienceTileEntity) Minecraft.getMinecraft().world.getTileEntity(pos));
 
         return true;
         //return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);

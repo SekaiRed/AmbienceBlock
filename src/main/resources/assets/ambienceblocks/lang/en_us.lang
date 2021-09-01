@@ -1,5 +1,6 @@
 //Items
 item.ambience_block_finder.name=Ambience Block Finder
+item.ambience_compendium.name=Ambience Compendium
 
 //Blocks
 tile.ambience_block.name=Ambience Block

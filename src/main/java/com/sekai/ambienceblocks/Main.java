@@ -1,29 +1,40 @@
 package com.sekai.ambienceblocks;
 
+import com.sekai.ambienceblocks.ambience.compendium.ServerCompendium;
+import com.sekai.ambienceblocks.ambience.sync.target.TargetSyncServer;
 import com.sekai.ambienceblocks.client.ambience.AmbienceController;
 import com.sekai.ambienceblocks.init.ModTab;
 import com.sekai.ambienceblocks.proxy.CommonProxy;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.util.PacketHandler;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.server.FMLServerHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
 public class Main
 {
     public static final String MODID = "ambienceblocks";
     public static final String NAME = "Ambience Blocks";
-    public static final String VERSION = "1.3.0";
+    public static final String VERSION = "1.3.1";
     public static final String CLIENT_PROXY_CLASS = "com.sekai.ambienceblocks.proxy.ClientProxy";
     public static final String COMMON_PROXY_CLASS = "com.sekai.ambienceblocks.proxy.CommonProxy";
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final ModTab MYTAB = new ModTab();
 
@@ -65,9 +76,33 @@ public class Main
         MinecraftForge.EVENT_BUS.register(new AmbienceController());
     }
 
+    /*@Mod.EventHandler
+    public void onServerStart(FMLServerStartingEvent event) {
+        //MinecraftForge.EVENT_BUS.register(new TargetSyncServer());
+
+        //Register server compendium
+        MinecraftForge.EVENT_BUS.register(new ServerCompendium(LOGGER));
+        //FMLCommonHandler.instance().getMinecraftServerInstance()
+        //System.out.println(((File) ObfuscationReflectionHelper.getPrivateValue(MinecraftServer.class, FMLCommonHandler.instance().getMinecraftServerInstance(), "field_71308_o")).getAbsolutePath());
+        //System.out.println(FMLServerHandler.instance().getSavesDirectory());
+    }*/
+
     @Mod.EventHandler
-    public static void Postinit(FMLPostInitializationEvent event)
-    {
-        //MinecraftForge.EVENT_BUS.register(new GuiOverlay());
+    public void worldLoad(FMLServerStartedEvent e) {
+        MinecraftForge.EVENT_BUS.register(new ServerCompendium(LOGGER));
+        ServerCompendium.instance.init();
+
+        MinecraftForge.EVENT_BUS.register(new TargetSyncServer());
+    }
+
+    //@SubscribeEvent
+    @Mod.EventHandler
+    public void worldSave(FMLServerStoppingEvent e) {
+        ServerCompendium.instance.end();
+        MinecraftForge.EVENT_BUS.unregister(ServerCompendium.instance);
+        ServerCompendium.instance = null;
+
+        MinecraftForge.EVENT_BUS.unregister(TargetSyncServer.instance);
+        TargetSyncServer.instance = null;
     }
 }

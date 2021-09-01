@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks.ambience.bounds;
 
+import com.google.gson.JsonObject;
 import com.sekai.ambienceblocks.util.Vector3d;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -54,6 +55,16 @@ public class NoneBounds extends AbstractBounds {
 
     @Override
     public void fromBuff(PacketBuffer buf) {
+
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
 
     }
 

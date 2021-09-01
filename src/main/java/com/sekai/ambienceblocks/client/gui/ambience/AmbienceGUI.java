@@ -1,13 +1,14 @@
 package com.sekai.ambienceblocks.client.gui.ambience;
 
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.client.gui.ambience.tabs.*;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Button;
+import com.sekai.ambienceblocks.packets.PacketUpdateAmbienceTE;
 import com.sekai.ambienceblocks.packets.ambiencedata.PacketAmbienceData;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.ambience.util.AmbienceType;
 import com.sekai.ambienceblocks.util.PacketHandler;
-import com.sekai.ambienceblocks.util.Unused;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.renderer.GlStateManager;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AmbienceGUI extends AmbienceScreen {
-    private final AmbienceTileEntity target;
+    private final IAmbienceSource source;
 
     public static final int texWidth = 256;
     public static final int texHeight = 184;
@@ -42,11 +43,13 @@ public class AmbienceGUI extends AmbienceScreen {
     private Button confirmChanges = new Button(xTopLeft + 8, yTopLeft + texHeight + 8, 100, 20, new TextComponentString("Confirm Changes"), button -> {
         saveDataToTile();
 
-        mc.displayGuiScreen(null);
+        quitFromScreen();
+        //mc.displayGuiScreen(null);
     });
     //private Button cancel;
     private Button cancel = new Button(xTopLeft + texWidth - 80 - 8, yTopLeft + texHeight + 8, 80, 20, new TextComponentString("Cancel"), button -> {
-        mc.displayGuiScreen(null);
+        //mc.displayGuiScreen(null);
+        quitFromScreen();
     });
 
     private boolean help;
@@ -55,9 +58,9 @@ public class AmbienceGUI extends AmbienceScreen {
 
     private boolean initialized = false;
 
-    public AmbienceGUI(AmbienceTileEntity target) {
+    public AmbienceGUI(IAmbienceSource source) {
         super();
-        this.target = target;
+        this.source = source;
     }
 
     @Override
@@ -82,65 +85,6 @@ public class AmbienceGUI extends AmbienceScreen {
             highlightedTab.renderToolTip(mouseX, mouseY);
 
         //drawDebug();
-    }
-
-    //Moved to AmbienceScreen
-    @Unused(type = Unused.Type.REMOVE)
-    private void drawDebug() {
-        /*for(Widget widget : highlightedTab.buttons) {
-            float left = widget.x;
-            float top = widget.y;
-            float right = widget.x + widget.width;
-            float bottom = widget.y + widget.height;
-
-            RenderSystem.disableTexture();
-            RenderSystem.enableBlend();
-            RenderSystem.disableAlphaTest();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.shadeModel(GL11.GL_SMOOTH);
-
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
-            GL11.glColor4f(0.0f, 1.0f, 1.0f, 0.2f);
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-            buffer.pos(left, bottom, 0).endVertex();
-            buffer.pos(right, bottom, 0).endVertex();
-            buffer.pos(right, top, 0).endVertex();
-            buffer.pos(left, top, 0).endVertex();
-            tessellator.draw();
-
-            RenderSystem.shadeModel(GL11.GL_FLAT);
-            RenderSystem.disableBlend();
-            RenderSystem.enableAlphaTest();
-            RenderSystem.enableTexture();
-        }
-        for(Widget widget : highlightedTab.widgets) {
-            float left = widget.x;
-            float top = widget.y;
-            float right = widget.x + widget.getWidth();
-            float bottom = widget.y + widget.getHeightRealms();
-
-            RenderSystem.disableTexture();
-            RenderSystem.enableBlend();
-            RenderSystem.disableAlphaTest();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.shadeModel(GL11.GL_SMOOTH);
-
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
-            GL11.glColor4f(1.0f, 0.0f, 1.0f, 0.2f);
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-            buffer.pos(left, bottom, 0).endVertex();
-            buffer.pos(right, bottom, 0).endVertex();
-            buffer.pos(right, top, 0).endVertex();
-            buffer.pos(left, top, 0).endVertex();
-            tessellator.draw();
-
-            RenderSystem.shadeModel(GL11.GL_FLAT);
-            RenderSystem.disableBlend();
-            RenderSystem.enableAlphaTest();
-            RenderSystem.enableTexture();
-        }*/
     }
 
     @Override
@@ -221,7 +165,7 @@ public class AmbienceGUI extends AmbienceScreen {
         /*mainTab.setFieldFromData(target.data);
 
         for(AbstractTab tab : getActiveTabs()) if(!(tab instanceof MainTab)) tab.setFieldFromData(target.data);*/
-        setData(target.data);
+        setData(source.getData());
     }
 
     private void saveDataToTile() {
@@ -230,8 +174,24 @@ public class AmbienceGUI extends AmbienceScreen {
         for(AbstractTab tab : getActiveTabs()) tab.setDataFromField(data);
 
         PacketHandler.NET.sendToServer(new PacketUpdateAmbienceTE(target.getPos(), data));*/
-        PacketHandler.NETWORK.sendToServer(new PacketAmbienceData(target.getPos(), getData()));
         //PacketHandler.NET.sendToServer(new PacketUpdateAmbienceTE(target.getPos(), getData()));
+
+        //PacketHandler.NETWORK.sendToServer(new PacketAmbienceData(source.getPos(), getData()));
+
+
+        if(isSourceTypeTileEntity())
+            PacketHandler.NETWORK.sendToServer(new PacketAmbienceData(((AmbienceTileEntity) source).getPos(), getData()));
+        else {
+            //quit(minecraft);
+            if(getPreviousScreen() instanceof CompendiumGUI) {
+                CompendiumGUI gui = (CompendiumGUI) getPreviousScreen();
+                gui.applyData(getData());
+            }
+        }
+    }
+
+    public boolean isSourceTypeTileEntity() {
+        return source instanceof AmbienceTileEntity;
     }
 
     public AmbienceData getData() {
@@ -332,8 +292,9 @@ public class AmbienceGUI extends AmbienceScreen {
             e.printStackTrace();
         }
 
-
-        list.add(boundsTab);
+        if(isSourceTypeTileEntity()) {
+            list.add(boundsTab);
+        }
 
         //if(mainTab.shouldFuse.isChecked())
         //    list.add(fuseTab);

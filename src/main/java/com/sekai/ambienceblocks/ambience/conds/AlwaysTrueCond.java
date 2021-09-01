@@ -1,11 +1,11 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
+import com.google.gson.JsonObject;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
-import com.sekai.ambienceblocks.util.Vector3d;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class AlwaysTrueCond extends AbstractCond  {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
+    public boolean isTrue(EntityPlayer player, World worldIn, IAmbienceSource sourceIn) {
         return true;
     }
 
@@ -63,6 +63,16 @@ public class AlwaysTrueCond extends AbstractCond  {
 
     @Override
     public void fromBuff(PacketBuffer buf) {
+
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
 
     }
 }

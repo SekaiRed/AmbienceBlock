@@ -1,6 +1,7 @@
 package com.sekai.ambienceblocks.ambience.conds;
 
-import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
+import com.google.gson.JsonObject;
+import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.util.AmbienceAxis;
 import com.sekai.ambienceblocks.ambience.util.AmbienceTest;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
@@ -8,10 +9,11 @@ import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMe
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.ParsingUtil;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import com.sekai.ambienceblocks.util.Vector3d;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -57,16 +59,17 @@ public class PlayerPosAxisCond extends AbstractCond {
     }
 
     @Override
-    public boolean isTrue(Vector3d playerPos, BlockPos blockPos, World worldIn, AmbienceTileEntity tileIn) {
+    public boolean isTrue(EntityPlayer player, World worldIn, IAmbienceSource sourceIn) {
         double playerValue = 0.0D;
+        Vector3d playerPos = getPlayerPos(player);
         if(AmbienceWorldSpace.ABSOLUTE.equals(space)) {
             if (axis == AmbienceAxis.X) playerValue = playerPos.x;
             if (axis == AmbienceAxis.Y) playerValue = playerPos.y;
             if (axis == AmbienceAxis.Z) playerValue = playerPos.z;
         } else {
-            if (axis == AmbienceAxis.X) playerValue = playerPos.x - tileIn.getOrigin().x;
-            if (axis == AmbienceAxis.Y) playerValue = playerPos.y - tileIn.getOrigin().y;
-            if (axis == AmbienceAxis.Z) playerValue = playerPos.z - tileIn.getOrigin().z;
+            if (axis == AmbienceAxis.X) playerValue = playerPos.x - sourceIn.getOrigin().x;
+            if (axis == AmbienceAxis.Y) playerValue = playerPos.y - sourceIn.getOrigin().y;
+            if (axis == AmbienceAxis.Z) playerValue = playerPos.z - sourceIn.getOrigin().z;
         }
         return test.testForDouble(playerValue, value);
     }
@@ -109,9 +112,9 @@ public class PlayerPosAxisCond extends AbstractCond {
 
     @Override
     public void fromNBT(NBTTagCompound nbt) {
-        test = AmbienceTest.values()[nbt.getInteger(TEST) < AmbienceTest.values().length ? nbt.getInteger(TEST) : 0];
-        space = AmbienceWorldSpace.values()[nbt.getInteger(SPACE) < AmbienceWorldSpace.values().length ? nbt.getInteger(SPACE) : 0];
-        axis = AmbienceAxis.values()[nbt.getInteger(AXIS) < AmbienceAxis.values().length ? nbt.getInteger(AXIS) : 0];
+        test = StaticUtil.getEnumValue(nbt.getInteger(TEST), AmbienceTest.values());
+        space = StaticUtil.getEnumValue(nbt.getInteger(SPACE), AmbienceWorldSpace.values());
+        axis = StaticUtil.getEnumValue(nbt.getInteger(AXIS), AmbienceAxis.values());
         value = nbt.getDouble(VALUE);
     }
 
@@ -125,10 +128,26 @@ public class PlayerPosAxisCond extends AbstractCond {
 
     @Override
     public void fromBuff(PacketBuffer buf) {
-        this.test = AmbienceTest.values()[buf.readInt()];
-        this.space = AmbienceWorldSpace.values()[buf.readInt()];
-        this.axis = AmbienceAxis.values()[buf.readInt()];
+        this.test = StaticUtil.getEnumValue(buf.readInt(), AmbienceTest.values());
+        this.space = StaticUtil.getEnumValue(buf.readInt(), AmbienceWorldSpace.values());
+        this.axis = StaticUtil.getEnumValue(buf.readInt(), AmbienceAxis.values());
         this.value = buf.readDouble();
+    }
+
+    @Override
+    public void toJson(JsonObject json) {
+        json.addProperty(TEST, test.name());
+        json.addProperty(SPACE, space.name());
+        json.addProperty(AXIS, axis.name());
+        json.addProperty(VALUE, value);
+    }
+
+    @Override
+    public void fromJson(JsonObject json) {
+        test = StaticUtil.getEnumValue(json.get(TEST).getAsString(), AmbienceTest.values());
+        space = StaticUtil.getEnumValue(json.get(SPACE).getAsString(), AmbienceWorldSpace.values());
+        axis = StaticUtil.getEnumValue(json.get(AXIS).getAsString(), AmbienceAxis.values());
+        value = json.get(VALUE).getAsDouble();
     }
 
     /*@Override
