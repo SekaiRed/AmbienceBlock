@@ -29,7 +29,7 @@ public class BoundsTab extends AbstractTab {
         moveToNextBoundType();
     }));
     CheckboxWidget isGlobal = new CheckboxWidget(getNeighbourX(buttonBounds), getRowY(0), 20 + font.getStringWidth("Global"), 20, "Global", false);
-    CheckboxWidget isLocatable = new CheckboxWidget(getNeighbourX(buttonBounds), getRowY(0), 20 + font.getStringWidth("Global"), 20, "Locatable", false);
+    CheckboxWidget isLocatable = new CheckboxWidget(getNeighbourX(buttonBounds), getRowY(0), 20 + font.getStringWidth("Locatable"), 20, "Locatable", false);
 
     TextInstance textSphereRadius = new TextInstance(getBaseX(), getRowY(1) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.radius"), font);
     TextFieldWidget sphereRadius = new TextFieldWidget(font, getNeighbourX(textSphereRadius), getRowY(1), 40, 20, new StringTextComponent(""));

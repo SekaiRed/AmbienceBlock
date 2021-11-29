@@ -58,27 +58,6 @@ public class WorldWeatherCond extends AbstractCond {
         return equal.testFor(verified);
     }
 
-    //gui
-
-    /*@Override
-    public List<AmbienceWidgetHolder> getWidgets() {
-        List<AmbienceWidgetHolder> list = new ArrayList<>();
-        list.add(new AmbienceWidgetHolder(getName() + "." + EQUAL, new Button(0, 0, 20, 20, new StringTextComponent(equal.getName()), button -> {
-            equal = equal.next();
-            button.setMessage(new StringTextComponent(equal.getName()));
-        })));
-        list.add(new AmbienceWidgetHolder(getName() + "." + WEATHER, new Button(0, 0, 50, 20, new StringTextComponent(weather.getName()), button -> {
-            weather = weather.next();
-            button.setMessage(new StringTextComponent(weather.getName()));
-        })));
-        return list;
-    }
-
-    @Override
-    public void getDataFromWidgets(List<AmbienceWidgetHolder> allWidgets) {
-
-    }*/
-
     @Override
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();

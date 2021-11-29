@@ -27,6 +27,12 @@ public class BaseCompendium {
         }
     }
 
+    public void cloneAllEntries(List<CompendiumEntry> entries) {
+        for(int i = 0; i < entries.size() && i < AmbienceConfig.maxAmountOfCompendiumEntries; i++) {
+            this.entries.add(entries.get(i).copy());
+        }
+    }
+
     public void removeEntry(int index) {
         entries.remove(index);
     }
@@ -42,7 +48,7 @@ public class BaseCompendium {
     //This compendium's entries are flushed to adopt the parent's registry, pretty much clone but I'm scared of default functions
     public void adopt(BaseCompendium compendium) {
         clear();
-        addAllEntries(compendium.getAllEntries());
+        cloneAllEntries(compendium.getAllEntries());
     }
 
     public int size() {

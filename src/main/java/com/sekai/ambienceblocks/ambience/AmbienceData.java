@@ -168,7 +168,11 @@ public class AmbienceData {
         this.bounds = BoundsUtil.fromNBT(compound.getCompound("bounds"));
         this.offset = NBTHelper.readVec3d(compound.getCompound("offset"));
         this.isGlobal = compound.getBoolean("isGlobal");
-        this.isLocatable = compound.getBoolean("isLocatable");
+        //TODO why would you do that
+        if(compound.contains("isLocatable"))
+            this.isLocatable = compound.getBoolean("isLocatable");
+        else
+            this.isLocatable = true;
 
         if(AmbienceType.AMBIENT.getName().equals(type)) {
             this.useDelay = compound.getBoolean("useDelay");
@@ -510,6 +514,22 @@ public class AmbienceData {
 
     public void setBounds(AbstractBounds bounds) { this.bounds = bounds; }
 
+    public boolean isGlobal() {
+        return isGlobal;
+    }
+
+    public void setGlobal(boolean global) {
+        isGlobal = global;
+    }
+
+    public boolean isLocatable() {
+        return isLocatable;
+    }
+
+    public void setLocatable(boolean locatable) {
+        isLocatable = locatable;
+    }
+
     public AmbienceWorldSpace getSpace() {
         return space;
     }
@@ -606,22 +626,6 @@ public class AmbienceData {
         return getPitch() + maxRandPitch;
     }
 
-    public boolean isGlobal() {
-        return isGlobal;
-    }
-
-    public void setGlobal(boolean global) {
-        isGlobal = global;
-    }
-
-    public boolean isLocatable() {
-        return isLocatable;
-    }
-
-    public void setLocatable(boolean locatable) {
-        isLocatable = locatable;
-    }
-
     public boolean canPlayOverSelf() {
         return canPlayOverSelf;
     }
@@ -641,7 +645,7 @@ public class AmbienceData {
     //utility
     public int getDelay() {
         int min = getMinDelay(), max = getMaxDelay();
-        if(min > max || min == max) return max;
+        if(min >= max) return max;
         return (int) ((max - min) * Math.random() + min);
     }
 

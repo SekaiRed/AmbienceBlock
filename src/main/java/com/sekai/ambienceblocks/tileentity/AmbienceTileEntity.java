@@ -62,6 +62,7 @@ public class AmbienceTileEntity extends TileEntity implements IAmbienceSource {
         return data;
     }
 
+    @Override
     public Vector3d getOrigin() {
         Vector3d oPos = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
         if(AmbienceWorldSpace.RELATIVE.equals(data.getSpace()))

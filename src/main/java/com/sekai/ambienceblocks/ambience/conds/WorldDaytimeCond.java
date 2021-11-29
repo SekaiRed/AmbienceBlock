@@ -21,12 +21,12 @@ import java.util.List;
 
 public class WorldDaytimeCond extends AbstractCond {
     private AmbienceTest test;
-    private double value;
+    private long value;
 
     private static final String TEST = "test";
     private static final String VALUE = "value";
 
-    public WorldDaytimeCond(AmbienceTest test, double value) {
+    public WorldDaytimeCond(AmbienceTest test, long value) {
         this.test = test;
         this.value = value;
     }
@@ -58,7 +58,7 @@ public class WorldDaytimeCond extends AbstractCond {
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(TEST, "", 20, test));
-        list.add(new AmbienceWidgetString(VALUE, "Daytime :", 50, Double.toString(value), 10, ParsingUtil.numberFilter));
+        list.add(new AmbienceWidgetString(VALUE, "Daytime :", 50, Long.toString(value), 10, ParsingUtil.numberFilter));
         return list;
     }
 
@@ -68,7 +68,7 @@ public class WorldDaytimeCond extends AbstractCond {
             if(TEST.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
                 test = (AmbienceTest) ((AmbienceWidgetEnum) widget).getValue();
             if(VALUE.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
-                value = ParsingUtil.tryParseDouble(((AmbienceWidgetString) widget).getValue());
+                value = ParsingUtil.tryParseLong(((AmbienceWidgetString) widget).getValue());
         }
     }
 
@@ -76,26 +76,26 @@ public class WorldDaytimeCond extends AbstractCond {
     public CompoundNBT toNBT() {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt(TEST, test.ordinal());
-        nbt.putDouble(VALUE, value);
+        nbt.putLong(VALUE, value);
         return nbt;
     }
 
     @Override
     public void fromNBT(CompoundNBT nbt) {
         test = StaticUtil.getEnumValue(nbt.getInt(TEST), AmbienceTest.values()); //AmbienceTest.values()[nbt.getInt(TEST) < AmbienceTest.values().length ? nbt.getInt(TEST) : 0];
-        value = nbt.getDouble(VALUE);
+        value = nbt.getLong(VALUE);
     }
 
     @Override
     public void toBuff(PacketBuffer buf) {
         buf.writeInt(test.ordinal());
-        buf.writeDouble(value);
+        buf.writeLong(value);
     }
 
     @Override
     public void fromBuff(PacketBuffer buf) {
         this.test = StaticUtil.getEnumValue(buf.readInt(), AmbienceTest.values()); //AmbienceTest.values()[buf.readInt()];
-        this.value = buf.readDouble();
+        this.value = buf.readLong();
     }
 
     @Override
@@ -107,6 +107,6 @@ public class WorldDaytimeCond extends AbstractCond {
     @Override
     public void fromJson(JsonObject json) {
         test = StaticUtil.getEnumValue(json.get(TEST).getAsString(), AmbienceTest.values());
-        value = json.get(VALUE).getAsDouble();
+        value = json.get(VALUE).getAsLong();
     }
 }

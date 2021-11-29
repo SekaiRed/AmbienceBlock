@@ -25,7 +25,6 @@ public class AmbienceScreen extends Screen {
     }
 
     public void quit(Minecraft mc) {
-        //System.out.println(previousScreen);
         mc.displayGuiScreen(previousScreen);
     }
 }

@@ -64,7 +64,7 @@ public class PlayerHungerCond extends AbstractCond {
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(TEST, "", 20, test));
-        list.add(new AmbienceWidgetString(VALUE, "Hunger :", 50, Double.toString(value), 8, ParsingUtil.decimalNumberFilter));
+        list.add(new AmbienceWidgetString(VALUE, "Hunger :", 50, Double.toString(value), 8, ParsingUtil.numberFilter));
         return list;
     }
 
@@ -77,27 +77,6 @@ public class PlayerHungerCond extends AbstractCond {
                 value = ParsingUtil.tryParseDouble(((AmbienceWidgetString) widget).getValue());
         }
     }
-
-    /*@Override
-    public List<AmbienceWidgetHolder> getWidgets() {
-        List<AmbienceWidgetHolder> list = new ArrayList<>();
-        list.add(new AmbienceWidgetHolder(getName() + "." + TEST, new Button(0, 0, 20, 20, new StringTextComponent(test.getName()), button -> {
-            test = test.next();
-            button.setMessage(new StringTextComponent(test.getName()));
-        })));
-        list.add(new AmbienceWidgetHolder(getName() + "." + VALUE, new CustomTextField(0, 0, 50, 20, "")));
-        ((CustomTextField) list.get(list.size() - 1).get()).setText(Double.toString(value));
-        return list;
-    }
-
-    @Override
-    public void getDataFromWidgets(List<AmbienceWidgetHolder> allWidgets) {
-        for(AmbienceWidgetHolder widgetHolder : allWidgets) {
-            if(widgetHolder.isKey(getName() + "." + VALUE) && widgetHolder.get() instanceof CustomTextField) {
-                value = ParsingUtil.tryParseDouble(((CustomTextField) widgetHolder.get()).getText());
-            }
-        }
-    }*/
 
     @Override
     public CompoundNBT toNBT() {

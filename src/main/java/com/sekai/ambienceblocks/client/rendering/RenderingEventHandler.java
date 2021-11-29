@@ -86,15 +86,6 @@ public class RenderingEventHandler {
             fontrenderer.drawString(mStack, e.src, left, top, e.color);
             top += fontrenderer.FONT_HEIGHT;
         }
-        /*for (String msg : listR)
-        {
-            if (msg == null) continue;
-            int w = fontrenderer.getStringWidth(msg);
-            int left = (int) (width * scale - 2 - w);
-            AbstractGui.fill(mStack, left - 1, top - 1, left + w + 1, top + fontrenderer.FONT_HEIGHT - 1, -1873784752);
-            fontrenderer.drawString(mStack, msg, left, top, cWhite);
-            top += fontrenderer.FONT_HEIGHT;
-        }*/
 
         mStack.pop();
     }

@@ -54,10 +54,6 @@ public class AmbienceGUI extends AmbienceScreen {
     private Button confirmChanges;
     private Button cancel;
 
-    private Button jsonTest;
-
-    private Button addToCompendium;
-
     private boolean help;
     private Button bHelp;
 
@@ -165,8 +161,10 @@ public class AmbienceGUI extends AmbienceScreen {
                 //if(tab instanceof MainTab) setHighlightedTab(tab);
                 //else tab.deactivate();
                 tab.deactivate();
-                if(tab instanceof MainTab) setHighlightedTab(tab);
+                //if(tab instanceof MainTab) setHighlightedTab(tab);
             }
+
+            setHighlightedTab(mainTab);
 
             loadDataFromTile();
 
@@ -196,7 +194,7 @@ public class AmbienceGUI extends AmbienceScreen {
         help = false;
         bHelp = addButton(new Button(xTopLeft + texWidth - 16 - 8, yTopLeft + texHeight - 16 - 8, 16, 16, new StringTextComponent(""), button -> { clickHelp(); }));
 
-        jsonTest = addButton(new Button(xTopLeft - 4 - 40, yTopLeft + texHeight + 4, 40, 20, new StringTextComponent("test"), button -> {
+        /*jsonTest = addButton(new Button(xTopLeft - 4 - 40, yTopLeft + texHeight + 4, 40, 20, new StringTextComponent("test"), button -> {
             //saveDataToTile();
 
             //JsonObject json = Json
@@ -204,8 +202,6 @@ public class AmbienceGUI extends AmbienceScreen {
             //Gson gson = new GsonBuilder().setPrettyPrinting().create();
             //String output = gson.toJson(getData());
             String output = JsonUtil.toJson(getData());
-            /*CompoundNBT nbt = new CompoundNBT();
-            String output = JsonUtil.toJson(getData().toNBT(nbt));*/
             System.out.println(output);
             AmbienceData data = JsonUtil.GSON.fromJson(output, AmbienceData.class);
             //PacketHandler.NET.sendToServer(new PacketUpdateAmbienceTE(source.getPos(), data));
@@ -215,7 +211,7 @@ public class AmbienceGUI extends AmbienceScreen {
         addToCompendium = addButton(new Button(xTopLeft - 4 - 60, yTopLeft + texHeight - 20, 60, 20, new StringTextComponent("compendium"), button -> {
             //AmbienceController.instance.compendium.addEntry(new CompendiumEntry(getData()));
             AmbienceController.instance.compendium.clear();
-        }));
+        }));*/
         /*
         JsonObject
         */
@@ -272,7 +268,7 @@ public class AmbienceGUI extends AmbienceScreen {
         for(AbstractTab tab : getActiveTabs()) if(!(tab instanceof MainTab)) tab.setFieldFromData(data);
     }
 
-    @Override
+    /*@Override
     public void quit(Minecraft mc) {
         //mc.displayGuiScreen(previousScreen);
 
@@ -280,7 +276,7 @@ public class AmbienceGUI extends AmbienceScreen {
         //TODO Add an instance of CompendiumScreen
 
         super.quit(mc);
-    }
+    }*/
 
     /*@Override
     public void onClose() {

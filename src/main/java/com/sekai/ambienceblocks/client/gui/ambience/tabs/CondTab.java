@@ -204,7 +204,6 @@ public class CondTab extends AbstractTab implements IFetchCond {
 
     @Override
     public void fetch(AbstractCond newCond, AbstractCond oldCond) {
-        System.out.println("new : " + newCond + ", old : " + oldCond);
         for (int i = 0; i < condList.size(); i++) {
             AbstractCond cond = condList.get(i);
             if (cond.equals(oldCond)) {

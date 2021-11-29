@@ -68,6 +68,8 @@ public class AmbienceController {
 
     @SubscribeEvent
     public void leaveWorld(ClientPlayerNetworkEvent.LoggedOutEvent e) {
+        //Only clear the compendium when leaving the world
+        compendium.clear();
         clear();
     }
 
@@ -152,15 +154,15 @@ public class AmbienceController {
                 double totalBias = 0;
                 //List<TileEntity> tileEntityList = mc.world.loadedTileEntityList;
                 //tileEntityList.removeIf(lambda -> !(lambda instanceof AmbienceTileEntity));
-                List<AmbienceTileEntity> ambienceTileEntityList = getListOfLoadedAmbienceTiles();
+                List<IAmbienceSource> sourceList = getListOfAmbienceSources();
                 //only keep tiles that can fuse, possess the same music and is able to play right now
-                ambienceTileEntityList.removeIf(tile -> !tile.data.shouldFuse() || !hasSameMusics(slot.getSource().getData(), tile.data) || !canTilePlay(tile));
-                for (AmbienceTileEntity tile : ambienceTileEntityList) {
-                    volume += getVolumeFromTileEntity(tile);
-                    totalBias += tile.getPercentageHowCloseIsPlayer(mc.player);
+                sourceList.removeIf(tile -> !tile.getData().shouldFuse() || !hasSameMusics(slot.getSource().getData(), tile.getData()) || !canTilePlay(tile));
+                for (IAmbienceSource source : sourceList) {
+                    volume += getVolumeFromTileEntity(source);
+                    totalBias += source.getPercentageHowCloseIsPlayer(mc.player);
                 }
-                for (AmbienceTileEntity tile : ambienceTileEntityList) {
-                    pitch += tile.data.getPitch() * (tile.getPercentageHowCloseIsPlayer(mc.player) / totalBias);
+                for (IAmbienceSource source : sourceList) {
+                    pitch += source.getData().getPitch() * (source.getPercentageHowCloseIsPlayer(mc.player) / totalBias);
                 }
 
                 //bruteforce a custom volume/pitch in there

@@ -22,6 +22,7 @@ public class TargetSyncClient {
         if(!entityLastTargetCountdown.containsKey(mob)) {
             //Doesn't have an entry yet, create it
             entityLastTargetCountdown.put(mob, new Countdown(getConfigTickTime()));
+            entityLastTargetCountdown.get(mob).deactivate();
         } else {
             //Already exists, reset countdown
             entityLastTargetCountdown.get(mob).deactivate();

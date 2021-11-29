@@ -93,13 +93,6 @@ public class PlayerBlockDensityCond extends AbstractCond {
 
         System.out.println(stopTime - startTime);*/
 
-        /*Vector3d offset = new Vector3d(0.0D, 0.0D, 0.0D);
-
-        if(AmbienceWorldSpace.RELATIVE.equals(space))
-            offset = getPlayerPos(player);//sourceIn.getOrigin();
-
-        boundingBox = new AxisAlignedBB(getSize().add(offset), getOffset().add(offset));*/
-
         Vector3d offset = getOffset();
 
         if(AmbienceWorldSpace.RELATIVE.equals(space))
@@ -107,14 +100,7 @@ public class PlayerBlockDensityCond extends AbstractCond {
 
         boundingBox = new AxisAlignedBB(offset.add(getSize().scale(-0.5D)), offset.add(getSize().scale(0.5D)));
 
-        /*boundingBox = AxisAlignedBB.fromVector(offset);
-        //boundingBox = boundingBox.contract(-1, -1, -1);
-        boundingBox = boundingBox.expand(getSize().scale(0.5D));
-        boundingBox = boundingBox.expand(getSize().scale(-0.5D));*/
-
-        //System.out.println(boundingBox);
-
-        return test.testForInt(count, countBlocksWithinAABB(boundingBox, worldIn));
+        return test.testForInt(countBlocksWithinAABB(boundingBox, worldIn), count);
     }
 
     @Override

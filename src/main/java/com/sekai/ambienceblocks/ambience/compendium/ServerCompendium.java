@@ -86,6 +86,7 @@ public class ServerCompendium extends BaseCompendium {
             //illegalAccessException.printStackTrace();
             logger.error("Couldn't access the world's data.", illegalAccessException);
         }
+        instance = null;
         MinecraftForge.EVENT_BUS.unregister(this);
     }
 

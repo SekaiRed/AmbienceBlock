@@ -73,7 +73,7 @@ public class CondsUtil {
         PLAYER_POS_WITHIN_RADIUS(102, new PlayerPosWithinRadiusCond(0, 0, 0, 16, AmbienceTest.LESSER_THAN, AmbienceWorldSpace.RELATIVE)),
         PLAYER_MOTION_AXIS(103, new PlayerMotionAxisCond(AmbienceTest.EQUAL_TO, AmbienceAxis.Y, 0)),
         PLAYER_BLOCK(104, new PlayerBlockCond(0, 0, 0, AmbienceEquality.EQUAL_TO, AmbienceWorldSpace.RELATIVE, "")),
-        PLAYER_BLOCK_DENSITY(105, new PlayerBlockDensityCond(1, 1, 1, -1, -1, -1, AmbienceWorldSpace.RELATIVE, AmbienceTest.GREATER_THAN, 0, "")),
+        PLAYER_BLOCK_DENSITY(105, new PlayerBlockDensityCond(1, 1, 1, 0, 0, 0, AmbienceWorldSpace.RELATIVE, AmbienceTest.GREATER_THAN, 0, "")),
         PLAYER_HEALTH(106, new PlayerHealthCond(AmbienceTest.GREATER_THAN, 10)),
         PLAYER_HUNGER(107, new PlayerHungerCond(AmbienceTest.GREATER_THAN, 10)),
         PLAYER_GAMEMODE(108, new PlayerGamemodeCond(AmbienceEquality.EQUAL_TO, GameType.SURVIVAL)),

@@ -48,6 +48,18 @@ public class ParsingUtil {
         return tryParseInt(value, 0);
     }
 
+    public static long tryParseLong(String value, long defaultVal) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return defaultVal;
+        }
+    }
+
+    public static long tryParseLong(String value) {
+        return tryParseLong(value, 0);
+    }
+
     public static float tryParseFloat(String value, float defaultVal) {
         try {
             return Float.parseFloat(value);
@@ -198,7 +210,7 @@ public class ParsingUtil {
         return false;
     }
 
-    public static boolean validateString(String original, String compared) {
+    /*public static boolean validateString(String original, String compared) {
         //Length of 0, always returns true
         if(compared.length() == 0)
             return true;
@@ -209,6 +221,50 @@ public class ParsingUtil {
         } else {
             //No special case, check if original contains compared
             return original.contains(compared);
+        }
+    }*/
+
+    public static boolean validateString(String original, String compared) {
+        if(compared.isEmpty())
+            return true;
+
+        String[] ors = compared.split("!");
+        labelOr:for (String or : ors) {
+            //boolean isTrue = false;
+            String[] ands = or.split("/");
+            for (String and : ands) {
+                //Atleast one and returned false, go to the next or iteration
+                if(!validateSingleString(original, and))
+                    continue labelOr;
+            }
+            //all and conditions returned true, let's go
+            return true;
+            //if(isTrue)
+            //    return true;
+        }
+
+        return false;
+    }
+
+    public static boolean validateSingleString(String original, String s) {
+        if(s.charAt(0) == '#') {
+            //Starts with '#' which means this is an absolute comparision
+
+            //If it follows up with a - sign then invert the output
+            if(s.charAt(1) != '-') {
+                return original.equals(s.substring(1));
+            } else {
+                return !original.equals(s.substring(2));
+            }
+        } else {
+            //No special case, check if original contains compared
+
+            //If it follows up with a - sign then invert the output
+            if(s.charAt(0) != '-') {
+                return original.contains(s);
+            } else {
+                return !original.contains(s.substring(1));
+            }
         }
     }
 }
