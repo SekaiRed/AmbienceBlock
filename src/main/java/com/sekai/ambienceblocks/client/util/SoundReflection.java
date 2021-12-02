@@ -10,34 +10,31 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 public class SoundReflection {
-    private final SoundHandler handler;
-
     //Reflection
     public static final Field sndManager = ObfuscationReflectionHelper.findField(SoundHandler.class, "field_147694_f");
-    public static final Field playingSoundsStopTime = ObfuscationReflectionHelper.findField(SoundEngine.class, "field_148624_n");
+    //public static final Field playingSoundsStopTime = ObfuscationReflectionHelper.findField(SoundEngine.class, "field_148624_n");
     public static final Field playingSoundsChannel = ObfuscationReflectionHelper.findField(SoundEngine.class, "field_217942_m");
-    public static final Field soundTicks = ObfuscationReflectionHelper.findField(SoundEngine.class, "field_148618_g");
-    public static final Field soundInit = ObfuscationReflectionHelper.findField(SoundEngine.class, "field_148617_f");
+    /*public static final Field soundTicks = ObfuscationReflectionHelper.findField(SoundEngine.class, "field_148618_g");
+    public static final Field soundInit = ObfuscationReflectionHelper.findField(SoundEngine.class, "field_148617_f");*/
 
     //Complex
     private SoundEngine sndEngine;
-    private Map<ISound, Integer> engineSoundStopTime;
+    //private Map<ISound, Integer> engineSoundStopTime;
     private Map<ISound, ChannelManager.Entry> engineSoundChannel;
-    private int engineTick;
-    private boolean engineInit;
+    /*private int engineTick;
+    private boolean engineInit;*/
 
     public SoundReflection(SoundHandler handler) {
-        this.handler = handler;
-        sndManager.setAccessible(true);
-        playingSoundsStopTime.setAccessible(true);
-        soundTicks.setAccessible(true);
-        soundInit.setAccessible(true);
+        //sndManager.setAccessible(true);
+        //playingSoundsStopTime.setAccessible(true);
+        /*soundTicks.setAccessible(true);
+        soundInit.setAccessible(true);*/
         try {
             sndEngine = (SoundEngine) sndManager.get(handler);
-            engineSoundStopTime = (Map<ISound, Integer>) playingSoundsStopTime.get(sndEngine);
+            //engineSoundStopTime = (Map<ISound, Integer>) playingSoundsStopTime.get(sndEngine);
             engineSoundChannel = (Map<ISound, ChannelManager.Entry>) playingSoundsChannel.get(sndEngine);
-            engineTick = soundTicks.getInt(sndEngine);
-            engineInit = soundInit.getBoolean(sndEngine);
+            /*engineTick = soundTicks.getInt(sndEngine);
+            engineInit = soundInit.getBoolean(sndEngine);*/
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -45,22 +42,22 @@ public class SoundReflection {
 
     public void fetchReflection() {
         try {
-            engineSoundStopTime = (Map<ISound, Integer>) playingSoundsStopTime.get(sndEngine);
+            //engineSoundStopTime = (Map<ISound, Integer>) playingSoundsStopTime.get(sndEngine);
             engineSoundChannel = (Map<ISound, ChannelManager.Entry>) playingSoundsChannel.get(sndEngine);
-            engineTick = soundTicks.getInt(sndEngine);
-            engineInit = soundInit.getBoolean(sndEngine);
+            /*engineTick = soundTicks.getInt(sndEngine);
+            engineInit = soundInit.getBoolean(sndEngine);*/
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
 
     //TODO : now make a fix for intros
-    public boolean isIntroOver(ISound sound) {
+    /*public boolean isIntroOver(ISound sound) {
         fetchReflection();
         if(this.engineSoundStopTime.containsKey(sound))
             System.out.println(this.engineSoundStopTime.get(sound) + " at " + this.engineSoundStopTime.get(sound) + " <= " + this.engineTick);
         return this.engineSoundStopTime.containsKey(sound) && ((this.engineSoundStopTime.get(sound) - 18) <= this.engineTick);
-    }
+    }*/
 
     public boolean isPlaying(String sound) {
         //return true;
@@ -70,13 +67,4 @@ public class SoundReflection {
         }
         return false;
     }
-
-    /*public void bruh() {
-        fetchReflection();
-        System.out.println(engineTick);
-        System.out.println("engineSoundStopTime");
-        engineSoundStopTime.forEach(((sound, integer) -> System.out.println("For " + sound.getSoundLocation().toString() + " at " + integer)));
-        System.out.println("engineSoundChannel");
-        engineSoundChannel.forEach(((sound, entry) -> System.out.println("For " + sound.getSoundLocation().toString() + " at " + entry.toString())));
-    }*/
 }
