@@ -4,6 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sekai.ambienceblocks.Main;
 import com.sekai.ambienceblocks.ambience.util.messenger.*;
+import com.sekai.ambienceblocks.client.gui.widgets.CheckboxWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.ScrollListWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.client.gui.widgets.presets.textfield.CustomTextField;
@@ -159,6 +160,11 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
                 AmbienceWidgetSound widget = (AmbienceWidgetSound) messenger;
                 widget.setValue(value);
             }
+            if(messenger instanceof AmbienceWidgetCheckbox) {
+                boolean value = ((CheckboxWidget) widgetLink.get(messenger).get()).isChecked();
+                AmbienceWidgetCheckbox widget = (AmbienceWidgetCheckbox) messenger;
+                widget.setValue(value);
+            }
             data.add(messenger);
         }
         newCond.getDataFromWidgets(data);
@@ -251,6 +257,14 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
                 }));
                 ScrollListWidget scrollListWidget = (ScrollListWidget) holder.get();
                 scrollListWidget.setSelectionByString(wScroll.getValue());
+                addWidget(holder);
+                widgetLink.put(widget, holder);
+            }
+            if(widget instanceof AmbienceWidgetCheckbox) {
+                AmbienceWidgetCheckbox wCheck = (AmbienceWidgetCheckbox) widget;
+                AmbienceWidgetHolder holder = new AmbienceWidgetHolder(widget.getKey(), new CheckboxWidget(0, 0, widget.getWidth(), 20, "", wCheck.getValue()));
+                /*ScrollListWidget scrollListWidget = (ScrollListWidget) holder.get();
+                scrollListWidget.setSelectionByString(wScroll.getValue());*/
                 addWidget(holder);
                 widgetLink.put(widget, holder);
             }

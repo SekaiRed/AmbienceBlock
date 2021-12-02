@@ -137,9 +137,9 @@ public class ClientPacketHandler {
             public void run() {
                 //Minecraft mc = Minecraft.getInstance();
                 if(pkt.result)
-                    AmbienceController.instance.structure.playerIsInStructure(pkt.source);
+                    AmbienceController.instance.structure.playerIsInStructure(pkt.structure, pkt.range, pkt.full);
                 else
-                    AmbienceController.instance.structure.playerIsntInStructure(pkt.source);
+                    AmbienceController.instance.structure.playerIsntInStructure(pkt.structure, pkt.range, pkt.full);
             }
         };
     }

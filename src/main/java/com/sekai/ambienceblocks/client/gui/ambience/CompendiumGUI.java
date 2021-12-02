@@ -82,6 +82,9 @@ public class CompendiumGUI extends AmbienceScreen {
         }));
 
         editEntry = addButton(new Button(xTopLeft + outerOffset, getGenericButtonY(1), buttonWidth, buttonHeight, new StringTextComponent("Edit"), button -> {
+            if(internalCompendium.getAllEntries().size() == 0)
+                return;
+
             forceIndexUpdate();
             AmbienceGUI gui = new AmbienceGUI(internalCompendium.getAllEntries().get(index));
             gui.setPreviousScreen(this);
@@ -172,6 +175,8 @@ public class CompendiumGUI extends AmbienceScreen {
     }
 
     private void cloneCompendiumEntry() {
+        if(index >= internalCompendium.size() || index < 0) return;
+
         List<CompendiumEntry> entries = internalCompendium.getAllEntries();
         entries.add(index + 1, entries.get(index).copy());
         entriesList.setSelectionIndex(entriesList.getSelectionIndex() + 1);

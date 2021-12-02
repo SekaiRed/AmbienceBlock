@@ -10,11 +10,15 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public class PacketItIsInStructure {
-    public String source;
+    public String structure;
+    public double range;
+    public boolean full;
     public boolean result;
 
-    public PacketItIsInStructure(String source, boolean result) {
-        this.source = source;
+    public PacketItIsInStructure(String structure, double range, boolean full, boolean result) {
+        this.structure = structure;
+        this.range = range;
+        this.full = full;
         this.result = result;
     }
 
@@ -23,12 +27,16 @@ public class PacketItIsInStructure {
         UUID target = buf.readUniqueId();
         return new PacketTargeting(source, target);*/
         String source = buf.readString(30);
+        double range = buf.readDouble();
+        boolean full = buf.readBoolean();
         boolean result = buf.readBoolean();
-        return new PacketItIsInStructure(source, result);
+        return new PacketItIsInStructure(source, range, full, result);
     }
 
     public static void encode(PacketItIsInStructure msg, PacketBuffer buf) {
-        buf.writeString(msg.source);
+        buf.writeString(msg.structure);
+        buf.writeDouble(msg.range);
+        buf.writeBoolean(msg.full);
         buf.writeBoolean(msg.result);
     }
 

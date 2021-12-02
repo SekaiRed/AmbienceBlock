@@ -1,18 +1,16 @@
 package com.sekai.ambienceblocks.packets;
 
-import com.sekai.ambienceblocks.util.ClientPacketHandler;
 import com.sekai.ambienceblocks.util.PacketHandler;
-import net.minecraft.command.Commands;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructurePiece;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -20,18 +18,27 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import java.util.function.Supplier;
 
 public class PacketIsItInStructure {
-    public String source;
+    public String structure;
+    public double range;
+    public boolean full;
 
-    public PacketIsItInStructure(String source) {
-        this.source = source;
+    public PacketIsItInStructure(String structure, double range, boolean full) {
+        this.structure = structure;
+        this.range = range;
+        this.full = full;
     }
 
     public static PacketIsItInStructure decode(PacketBuffer buf) {
-        return new PacketIsItInStructure(buf.readString(30));
+        String structure = buf.readString(30);
+        double range = buf.readDouble();
+        boolean full = buf.readBoolean();
+        return new PacketIsItInStructure(structure, range, full);
     }
 
     public static void encode(PacketIsItInStructure msg, PacketBuffer buf) {
-        buf.writeString(msg.source);
+        buf.writeString(msg.structure);
+        buf.writeDouble(msg.range);
+        buf.writeBoolean(msg.full);
     }
 
     public static void handle(final PacketIsItInStructure pkt, Supplier<NetworkEvent.Context> ctx) {
@@ -39,27 +46,38 @@ public class PacketIsItInStructure {
             if(ctx.get().getDirection().equals(NetworkDirection.PLAY_TO_SERVER)) {
                 ServerPlayerEntity player = ctx.get().getSender();
                 ServerWorld world = ctx.get().getSender().getServerWorld();
-                Structure<?> nmsType = getStructureType(pkt.source);
-                BlockPos pos = world.func_241117_a_(getStructureType(pkt.source), player.getPosition(), 100, false); // (location, radius, findUnexplored)
+                Structure<?> nmsType = getStructureType(pkt.structure);
+                BlockPos pos = world.func_241117_a_(getStructureType(pkt.structure), player.getPosition(), 100, false); // (location, radius, findUnexplored)
                 boolean isIn = false;
+
+                MutableBoundingBox playerBB = new MutableBoundingBox(player.getPosition(), player.getPosition().add(1, 1, 1));
+                if(pkt.range != 0)
+                    playerBB = StaticUtil.growBoundingBox(playerBB, pkt.range);
 
                 if(pos != null) {
                     Chunk chunk = world.getChunkAt(pos);
                     if (chunk.func_230342_a_(nmsType) != null) { //Checking if this chunk is the starting point of the structure
-                        for (StructurePiece piece : chunk.func_230342_a_(nmsType).getComponents()) { //Iterating through every piece of the structure
-                            if (piece.getBoundingBox().isVecInside(player.getPosition())) { //Getting the piece's bounding box and then checking if the player is inside
+                        if(pkt.full) {
+                            if(chunk.func_230342_a_(nmsType).getBoundingBox().intersectsWith(playerBB))
                                 isIn = true;
-                                 //If all this is true, then the player is standing inside the structure
+                        } else {
+                            for (StructurePiece piece : chunk.func_230342_a_(nmsType).getComponents()) { //Iterating through every piece of the structure
+                                if (piece.getBoundingBox().intersectsWith(playerBB)) { //Getting the piece's bounding box and then checking if the player is inside
+                                    isIn = true;
+                                    //If all this is true, then the player is standing inside the structure
+                                }
                             }
                         }
                     }
                 }
 
-                if(isIn) {
-                    PacketHandler.NET.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> ctx.get().getSender()), new PacketItIsInStructure(pkt.source, true));
+                PacketHandler.NET.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> ctx.get().getSender()), new PacketItIsInStructure(pkt.structure, pkt.range, pkt.full, isIn));
+
+                /*if(isIn) {
+                    PacketHandler.NET.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> ctx.get().getSender()), new PacketItIsInStructure(pkt.structure, pkt.range, pkt.full, true));
                 } else {
-                    PacketHandler.NET.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> ctx.get().getSender()), new PacketItIsInStructure(pkt.source, false));
-                }
+                    PacketHandler.NET.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> ctx.get().getSender()), new PacketItIsInStructure(pkt.structure, pkt.range, pkt.full, false));
+                }*/
 
                 /*for (StructurePiece piece : ctx.get().getSender().getServerWorld().func_241112_a_().getStructureStart().getComponents()) {
                     piece.getBoundingBox().isVecInside(ctx.get().getSender().getPosition());

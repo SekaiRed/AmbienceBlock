@@ -4,6 +4,7 @@ import com.sekai.ambienceblocks.ambience.util.AmbienceEnumName;
 import com.sekai.ambienceblocks.ambience.util.AmbienceType;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
@@ -56,5 +57,16 @@ public class StaticUtil {
         ArrayList<String> list = new ArrayList<>();
         ForgeRegistries.STRUCTURE_FEATURES.getKeys().forEach(resource -> list.add(resource.toString()));
         return list;
+    }
+
+    public static MutableBoundingBox growBoundingBox(MutableBoundingBox playerBB, double range) {
+        MutableBoundingBox bb = new MutableBoundingBox(playerBB);
+        bb.maxX += range/2;
+        bb.maxY += range/2;
+        bb.maxZ += range/2;
+        bb.minX -= range/2;
+        bb.minY -= range/2;
+        bb.minZ -= range/2;
+        return bb;
     }
 }

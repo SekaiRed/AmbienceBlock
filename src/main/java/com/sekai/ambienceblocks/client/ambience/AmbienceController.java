@@ -125,7 +125,6 @@ public class AmbienceController {
         prf.startSection("tick");
         target.tick();
         structure.tick();
-        reflection.bruh();
         systemTick();
         prf.endSection();
 

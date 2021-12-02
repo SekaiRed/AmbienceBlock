@@ -10,8 +10,8 @@ import java.util.HashMap;
 public class StructureSyncClient {
     public static StructureSyncClient instance;
 
-    private final HashMap<String, Countdown> sentRequest = new HashMap<>(); // To not spam the server
-    private final HashMap<String, Countdown> isInStructureTimer = new HashMap<>();
+    private final HashMap<StructureRequestType, Countdown> sentRequest = new HashMap<>(); // To not spam the server
+    private final HashMap<StructureRequestType, Countdown> isInStructureTimer = new HashMap<>();
 
     public StructureSyncClient() {
         instance = this;
@@ -23,33 +23,37 @@ public class StructureSyncClient {
         sentRequest.entrySet().removeIf(entry -> entry.getValue().tick());
     }
 
-    public boolean isPlayerInStructure(String structure) {
-        sendRequestForStructureInfo(structure);
-        if(isInStructureTimer.containsKey(structure)) {
+    public boolean isPlayerInStructure(String structure, double range, boolean full) {
+        StructureRequestType request = new StructureRequestType(structure, range, full);
+        sendRequestForStructureInfo(request);
+        return isInStructureTimer.containsKey(request);
+        /*if(isInStructureTimer.containsKey(structure)) {
             return true; // I have a corresponding key, the player is in the structure
         } else {
             //sendRequestForStructureInfo(structure);
             return false;
-        }
+        }*/
         //return false;
     }
 
-    private void sendRequestForStructureInfo(String structure) {
-        if(!sentRequest.containsKey(structure)) {
-            sentRequest.put(structure, new Countdown(getRequestSentTickTime()));
-            PacketHandler.NET.sendToServer(new PacketIsItInStructure(structure));
+    private void sendRequestForStructureInfo(StructureRequestType request) {
+        if(!sentRequest.containsKey(request)) {
+            sentRequest.put(request, new Countdown(getRequestSentTickTime()));
+            PacketHandler.NET.sendToServer(new PacketIsItInStructure(request.getStructure(), request.getRange(), request.isFull()));
         }
     }
 
-    public void playerIsInStructure(String structure) {
-        if(isInStructureTimer.containsKey(structure))
-            isInStructureTimer.get(structure).setTime(getRequestApprovedTickTime());
+    public void playerIsInStructure(String structure, double range, boolean full) {
+        StructureRequestType request = new StructureRequestType(structure, range, full);
+        if(isInStructureTimer.containsKey(request))
+            isInStructureTimer.get(request).setTime(getRequestApprovedTickTime());
         else
-            isInStructureTimer.put(structure, new Countdown(getRequestApprovedTickTime()));
+            isInStructureTimer.put(request, new Countdown(getRequestApprovedTickTime()));
     }
 
-    public void playerIsntInStructure(String structure) {
-        isInStructureTimer.remove(structure);
+    public void playerIsntInStructure(String structure, double range, boolean full) {
+        StructureRequestType request = new StructureRequestType(structure, range, full);
+        isInStructureTimer.remove(request);
     }
 
     private int getRequestSentTickTime() {
@@ -58,6 +62,56 @@ public class StructureSyncClient {
 
     private int getRequestApprovedTickTime() {
         return AmbienceConfig.structureCountdownAmount * 2;
+    }
+
+    public static class StructureRequestType {
+        String structure;
+        double range;
+        boolean full;
+
+        public StructureRequestType(String structure, double range, boolean full) {
+            this.structure = structure;
+            this.range = range;
+            this.full = full;
+        }
+
+        public String getStructure() {
+            return structure;
+        }
+
+        public double getRange() {
+            return range;
+        }
+
+        public void setRange(double range) {
+            this.range = range;
+        }
+
+        public boolean isFull() {
+            return full;
+        }
+
+        public void setFull(boolean full) {
+            this.full = full;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(!(obj instanceof StructureRequestType))
+                return false;
+
+            StructureRequestType that = (StructureRequestType) obj;
+            return this.getStructure().equals(that.getStructure()) && this.getRange() == that.getRange() && this.isFull() == that.isFull();
+        }
+
+        @Override
+        public int hashCode() {
+            int hashCode = 1;
+            hashCode = 31 * hashCode + getStructure().hashCode();
+            hashCode = 31 * hashCode + Double.hashCode(getRange());
+            hashCode = 31 * hashCode + Boolean.hashCode(isFull());
+            return hashCode;
+        }
     }
 
     /*public boolean isInStructure(String structure) {

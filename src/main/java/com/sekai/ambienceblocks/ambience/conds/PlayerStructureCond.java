@@ -4,10 +4,8 @@ import com.google.gson.JsonObject;
 import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.sync.structure.StructureSyncClient;
 import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
-import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
-import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
-import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetScroll;
-import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
+import com.sekai.ambienceblocks.ambience.util.messenger.*;
+import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.StaticUtil;
 import com.sekai.ambienceblocks.util.Unused;
 import net.minecraft.client.Minecraft;
@@ -28,18 +26,24 @@ import java.util.Map;
 public class PlayerStructureCond extends AbstractCond {
     private AmbienceEquality equal;
     private String structure;
+    private double range;
+    private boolean full;
 
     private static final String EQUAL = "equal";
     private static final String STRUCTURE = "structure";
+    private static final String RANGE = "range";
+    private static final String FULL = "full";
 
-    public PlayerStructureCond(AmbienceEquality equal, String structure) {
+    public PlayerStructureCond(AmbienceEquality equal, String structure, double range, boolean full) {
         this.equal = equal;
         this.structure = structure;
+        this.range = range;
+        this.full = full;
     }
 
     @Override
     public AbstractCond clone() {
-        PlayerStructureCond cond = new PlayerStructureCond(equal, structure);
+        PlayerStructureCond cond = new PlayerStructureCond(equal, structure, range, full);
         return cond;
     }
 
@@ -55,24 +59,16 @@ public class PlayerStructureCond extends AbstractCond {
 
     @Override
     public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
-        return equal.testFor(StructureSyncClient.instance.isPlayerInStructure(structure));
-        //Map<Structure<?>, LongSet> structureReferences = worldIn.getChunkAt(Minecraft.getInstance().player.getPosition()).getStructureReferences();
-        /*Map<Structure<?>, StructureStart<?>> structureReferences = worldIn.getChunkAt(Minecraft.getInstance().player.getPosition()).getStructureStarts();
-        if(structureReferences.size() != 0)
-            System.out.println("==================");
-        structureReferences.entrySet().forEach(entry -> {
-            System.out.println(entry.getKey().toString() + " : " + entry.getValue().toString());
-        });
-        return true;*/
-        //return equal.testFor(worldIn.getBiome(new BlockPos(playerPos)).getRegistryName().toString().contains(structure));
+        return equal.testFor(StructureSyncClient.instance.isPlayerInStructure(structure, range, full));
     }
 
     @Override
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
-        //ForgeRegistries.STRUCTURE_FEATURES
-        list.add(new AmbienceWidgetScroll(STRUCTURE, "Structure :", 160, StaticUtil.getListOfStructureTypes(), structure));
+        list.add(new AmbienceWidgetString(RANGE, "Range :", 60, Double.toString(range), 10, ParsingUtil.negativeDecimalNumberFilter));
+        list.add(new AmbienceWidgetCheckbox(FULL, "Full? :", 20, full));
+        list.add(new AmbienceWidgetScroll(STRUCTURE, "Structure :", 170, StaticUtil.getListOfStructureTypes(), structure));
         return list;
     }
 
@@ -83,6 +79,10 @@ public class PlayerStructureCond extends AbstractCond {
                 equal = (AmbienceEquality) ((AmbienceWidgetEnum) widget).getValue();
             if(STRUCTURE.equals(widget.getKey()) && widget instanceof AmbienceWidgetScroll)
                 structure = ((AmbienceWidgetScroll) widget).getValue();
+            if (RANGE.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
+                range = ParsingUtil.tryParseDouble(((AmbienceWidgetString) widget).getValue());
+            if (FULL.equals(widget.getKey()) && widget instanceof AmbienceWidgetCheckbox)
+                full = ((AmbienceWidgetCheckbox) widget).getValue();
         }
     }
 
@@ -91,6 +91,8 @@ public class PlayerStructureCond extends AbstractCond {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt(EQUAL, equal.ordinal());
         nbt.putString(STRUCTURE, structure);
+        nbt.putDouble(RANGE, range);
+        nbt.putBoolean(FULL, full);
         return nbt;
     }
 
@@ -98,29 +100,39 @@ public class PlayerStructureCond extends AbstractCond {
     public void fromNBT(CompoundNBT nbt) {
         equal = StaticUtil.getEnumValue(nbt.getInt(EQUAL), AmbienceEquality.values());
         structure = nbt.getString(STRUCTURE);
+        range = nbt.getDouble(RANGE);
+        full = nbt.getBoolean(FULL);
     }
 
     @Override
     public void toBuff(PacketBuffer buf) {
         buf.writeInt(equal.ordinal());
         buf.writeString(structure, 50);
+        buf.writeDouble(range);
+        buf.writeBoolean(full);
     }
 
     @Override
     public void fromBuff(PacketBuffer buf) {
         this.equal = AmbienceEquality.values()[buf.readInt()];
         this.structure = buf.readString(50);
+        this.range = buf.readDouble();
+        this.full = buf.readBoolean();
     }
 
     @Override
     public void toJson(JsonObject json) {
         json.addProperty(EQUAL, equal.name());
         json.addProperty(STRUCTURE, structure);
+        json.addProperty(RANGE, range);
+        json.addProperty(FULL, full);
     }
 
     @Override
     public void fromJson(JsonObject json) {
         equal = StaticUtil.getEnumValue(json.get(EQUAL).getAsString(), AmbienceEquality.values());
         structure = json.get(STRUCTURE).getAsString();
+        range = json.get(RANGE).getAsDouble();
+        full = json.get(FULL).getAsBoolean();
     }
 }
