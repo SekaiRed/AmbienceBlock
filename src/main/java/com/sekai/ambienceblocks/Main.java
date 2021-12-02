@@ -1,7 +1,7 @@
 package com.sekai.ambienceblocks;
 
 import com.sekai.ambienceblocks.ambience.compendium.ServerCompendium;
-import com.sekai.ambienceblocks.ambience.sync.TargetSyncServer;
+import com.sekai.ambienceblocks.ambience.sync.target.TargetSyncServer;
 import com.sekai.ambienceblocks.client.ambience.AmbienceController;
 import com.sekai.ambienceblocks.config.AmbienceConfig;
 import com.sekai.ambienceblocks.util.PacketHandler;

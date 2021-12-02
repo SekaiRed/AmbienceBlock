@@ -22,5 +22,7 @@ public class PacketHandler {
         NET.registerMessage(2, PacketNotTargeting.class, PacketNotTargeting::encode, PacketNotTargeting::decode, PacketNotTargeting::handle);
         NET.registerMessage(3, PacketCompendium.class, PacketCompendium::encode, PacketCompendium::decode, PacketCompendium::handle);
         NET.registerMessage(4, PacketAskCompendiumGui.class, PacketAskCompendiumGui::encode, PacketAskCompendiumGui::decode, PacketAskCompendiumGui::handle);
+        NET.registerMessage(5, PacketIsItInStructure.class, PacketIsItInStructure::encode, PacketIsItInStructure::decode, PacketIsItInStructure::handle);
+        NET.registerMessage(6, PacketItIsInStructure.class, PacketItIsInStructure::encode, PacketItIsInStructure::decode, PacketItIsInStructure::handle);
     }
 }

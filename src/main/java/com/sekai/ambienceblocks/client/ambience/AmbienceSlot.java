@@ -1,5 +1,6 @@
 package com.sekai.ambienceblocks.client.ambience;
 
+import com.sekai.ambienceblocks.client.util.SoundReflection;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.ambience.IAmbienceSource;
@@ -122,6 +123,15 @@ public class AmbienceSlot {
             forceStop();
     }
 
+    //The sound hasn't ended yet, you can still resume if you enter it's zone again
+    public void resume() {
+        if(AmbienceFadeState.FADE_OUT.equals(stateFade) && source.getData().getFadeIn() != 0) {
+            float cacheVolumeMult = multVolume;
+            setFadeState(AmbienceFadeState.FADE_IN);
+            fadeCounter = (int) ((cacheVolumeMult) * source.getData().getFadeIn());
+        }
+    }
+
     //TODO forces the AmbienceSlot to adopt a specific sound instead of having it's own instance
     // mostly used by always playing and linked ambience
     public void bindSound(AmbienceInstance instance) {
@@ -161,11 +171,12 @@ public class AmbienceSlot {
 
         //intro/outro logic
         if(AmbienceSoundState.INTRO.equals(stateSnd)) {
-            if(!isPlaying(instance)) /*if(!handler.isPlaying(instance))*/ {
+            /*if(!AmbienceController.instance.reflection.isIntroOver(instance))*/ if(!isPlaying(instance)) {
                 //System.out.println("end reached lol " + instance.canRepeat());
                 ResourceLocation playingResource = new ResourceLocation(d.getSoundName());
                 handler.stop(instance);
                 instance = new AmbienceInstance(playingResource, ParsingUtil.tryParseEnum(d.getCategory().toUpperCase(), SoundCategory.MASTER), source.getOrigin(), getVolumeInternal(d), d.getPitch(), true, !d.isLocatable());
+                System.out.println("impilse");
                 handler.play(instance);
                 stateSnd = AmbienceSoundState.LOOP;
             }

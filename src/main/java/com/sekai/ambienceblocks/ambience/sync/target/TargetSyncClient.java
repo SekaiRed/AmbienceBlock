@@ -1,5 +1,6 @@
-package com.sekai.ambienceblocks.ambience.sync;
+package com.sekai.ambienceblocks.ambience.sync.target;
 
+import com.sekai.ambienceblocks.ambience.sync.Countdown;
 import com.sekai.ambienceblocks.config.AmbienceConfig;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.Minecraft;

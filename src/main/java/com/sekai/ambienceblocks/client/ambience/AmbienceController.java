@@ -5,8 +5,10 @@ import com.sekai.ambienceblocks.ambience.IAmbienceSource;
 import com.sekai.ambienceblocks.ambience.compendium.BaseCompendium;
 import com.sekai.ambienceblocks.ambience.compendium.CompendiumEntry;
 import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
-import com.sekai.ambienceblocks.ambience.sync.TargetSyncClient;
+import com.sekai.ambienceblocks.ambience.sync.structure.StructureSyncClient;
+import com.sekai.ambienceblocks.ambience.sync.target.TargetSyncClient;
 import com.sekai.ambienceblocks.client.rendering.RenderingEventHandler;
+import com.sekai.ambienceblocks.client.util.SoundReflection;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import com.sekai.ambienceblocks.util.RegistryHandler;
@@ -37,8 +39,10 @@ public class AmbienceController {
 
     //Sub-systems
     //Client only systems that are easier to package with this general client only class
+    public final SoundReflection reflection;
     public final BaseCompendium compendium;
     public final TargetSyncClient target;
+    public final StructureSyncClient structure;
 
     //System variables
     public AmbienceData clipboard;
@@ -52,8 +56,10 @@ public class AmbienceController {
         mc = Minecraft.getInstance();
         prf = mc.getProfiler();
         handler = Minecraft.getInstance().getSoundHandler();
+        reflection = new SoundReflection(handler);
         compendium = new BaseCompendium();
         target = new TargetSyncClient();
+        structure = new StructureSyncClient();
     }
 
     @SubscribeEvent
@@ -118,6 +124,8 @@ public class AmbienceController {
 
         prf.startSection("tick");
         target.tick();
+        structure.tick();
+        reflection.bruh();
         systemTick();
         prf.endSection();
 
@@ -230,7 +238,7 @@ public class AmbienceController {
             }
 
             //this tile is already in the ambience list, please don't play it again it hurts my ears
-            if (isSourceAlreadyPlaying(source) != null)
+            if (isSourceAlreadyPlaying(source) != null && !isSourceAlreadyPlaying(source).isStopping())
                 continue;
 
             //if the music is already playing and can be fused, check if you can't replace it with the new tile
@@ -340,13 +348,33 @@ public class AmbienceController {
     }
 
     public void playMusic(IAmbienceSource source, EventContext ctx) {
-        if(debugMode)
-            RenderingEventHandler.addEvent("playing " + source.getData().getSoundName() + " at " + getAmbienceSourceName(source), ctx);
-            //RenderingEventHandler.addEvent("playing " + source.getData().getSoundName() + " at " + getAmbienceSourceName(source), reason, RenderingEventHandler.cBlue);
+        /*if(debugMode)
+            RenderingEventHandler.addEvent("playing " + source.getData().getSoundName() + " at " + getAmbienceSourceName(source), ctx);*/
 
-        AmbienceSlot slot = new AmbienceSlot(handler, source);
+        AmbienceSlot slot = null;
+
+        for (AmbienceSlot sound : soundsList) {
+            if (sound.getSource().equals(source) && sound.isStopping())
+                slot = sound;
+        }
+
+        if(slot == null) {
+            slot = new AmbienceSlot(handler, source);
+            slot.play();
+            soundsList.add(slot);
+
+            if(debugMode)
+                RenderingEventHandler.addEvent("playing " + source.getData().getSoundName() + " at " + getAmbienceSourceName(source), ctx);
+        } else {
+            slot.resume();
+
+            if(debugMode)
+                RenderingEventHandler.addEvent("resuming " + source.getData().getSoundName() + " at " + getAmbienceSourceName(source), ctx);
+        }
+
+        /*AmbienceSlot slot = new AmbienceSlot(handler, source);
         slot.play();
-        soundsList.add(slot);
+        soundsList.add(slot);*/
     }
 
     public void playMusicNoRepeat(IAmbienceSource source, EventContext ctx) {

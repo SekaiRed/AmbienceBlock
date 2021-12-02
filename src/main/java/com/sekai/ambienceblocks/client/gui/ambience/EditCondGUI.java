@@ -10,6 +10,7 @@ import com.sekai.ambienceblocks.client.gui.widgets.presets.textfield.CustomTextF
 import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWidgetHolder;
 import com.sekai.ambienceblocks.util.ParsingUtil;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
@@ -17,6 +18,7 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -231,6 +233,25 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
                 addWidget(holder);
                 addWidget(button);
                 //addButton(button.get());
+                widgetLink.put(widget, holder);
+            }
+            if(widget instanceof AmbienceWidgetScroll) {
+                AmbienceWidgetScroll wScroll = (AmbienceWidgetScroll) widget;
+                /*AmbienceWidgetHolder holder = new AmbienceWidgetHolder(widget.getKey(), new Button(0, 0, widget.getWidth(), 20, new StringTextComponent(ParsingUtil.getCachedEnumName(wScroll.getValue())), button -> {
+                    //test = test.next();
+                    //button.setMessage(new StringTextComponent(test.getName()));
+                    wScroll.next();
+                    button.setMessage(new StringTextComponent(ParsingUtil.getCachedEnumName(wScroll.getValue())));
+                }));*/
+                AmbienceWidgetHolder holder = new AmbienceWidgetHolder(widget.getKey(), new ScrollListWidget(0, 0, widget.getWidth(), 20, 4, 16, 5, wScroll.getValues(), font, new ScrollListWidget.IPressable() {
+                    @Override
+                    public void onChange(ScrollListWidget list, int index, String name) {
+                        wScroll.setValue(name);
+                    }
+                }));
+                ScrollListWidget scrollListWidget = (ScrollListWidget) holder.get();
+                scrollListWidget.setSelectionByString(wScroll.getValue());
+                addWidget(holder);
                 widgetLink.put(widget, holder);
             }
         }

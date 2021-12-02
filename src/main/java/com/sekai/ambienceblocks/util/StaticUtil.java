@@ -4,6 +4,7 @@ import com.sekai.ambienceblocks.ambience.util.AmbienceEnumName;
 import com.sekai.ambienceblocks.ambience.util.AmbienceType;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import net.minecraft.util.SoundCategory;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 
@@ -48,6 +49,12 @@ public class StaticUtil {
         ArrayList<String> list = new ArrayList<String>();
         for(SoundCategory value : SoundCategory.values())
             list.add(value.getName());
+        return list;
+    }
+
+    public static ArrayList<String> getListOfStructureTypes() {
+        ArrayList<String> list = new ArrayList<>();
+        ForgeRegistries.STRUCTURE_FEATURES.getKeys().forEach(resource -> list.add(resource.toString()));
         return list;
     }
 }

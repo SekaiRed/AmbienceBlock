@@ -1,6 +1,6 @@
 package com.sekai.ambienceblocks.ambience.sync;
 
-class Countdown {
+public class Countdown {
     int countdown;
     boolean active = true;
 

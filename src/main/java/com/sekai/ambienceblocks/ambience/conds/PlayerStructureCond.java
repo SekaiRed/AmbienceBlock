@@ -2,9 +2,11 @@ package com.sekai.ambienceblocks.ambience.conds;
 
 import com.google.gson.JsonObject;
 import com.sekai.ambienceblocks.ambience.IAmbienceSource;
+import com.sekai.ambienceblocks.ambience.sync.structure.StructureSyncClient;
 import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
 import com.sekai.ambienceblocks.ambience.util.messenger.AbstractAmbienceWidgetMessenger;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetEnum;
+import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetScroll;
 import com.sekai.ambienceblocks.ambience.util.messenger.AmbienceWidgetString;
 import com.sekai.ambienceblocks.util.StaticUtil;
 import com.sekai.ambienceblocks.util.Unused;
@@ -53,14 +55,15 @@ public class PlayerStructureCond extends AbstractCond {
 
     @Override
     public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
+        return equal.testFor(StructureSyncClient.instance.isPlayerInStructure(structure));
         //Map<Structure<?>, LongSet> structureReferences = worldIn.getChunkAt(Minecraft.getInstance().player.getPosition()).getStructureReferences();
-        Map<Structure<?>, StructureStart<?>> structureReferences = worldIn.getChunkAt(Minecraft.getInstance().player.getPosition()).getStructureStarts();
+        /*Map<Structure<?>, StructureStart<?>> structureReferences = worldIn.getChunkAt(Minecraft.getInstance().player.getPosition()).getStructureStarts();
         if(structureReferences.size() != 0)
             System.out.println("==================");
         structureReferences.entrySet().forEach(entry -> {
             System.out.println(entry.getKey().toString() + " : " + entry.getValue().toString());
         });
-        return true;
+        return true;*/
         //return equal.testFor(worldIn.getBiome(new BlockPos(playerPos)).getRegistryName().toString().contains(structure));
     }
 
@@ -68,7 +71,8 @@ public class PlayerStructureCond extends AbstractCond {
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
-        list.add(new AmbienceWidgetString(STRUCTURE, "Biome :", 160, structure));
+        //ForgeRegistries.STRUCTURE_FEATURES
+        list.add(new AmbienceWidgetScroll(STRUCTURE, "Structure :", 160, StaticUtil.getListOfStructureTypes(), structure));
         return list;
     }
 
@@ -77,8 +81,8 @@ public class PlayerStructureCond extends AbstractCond {
         for(AbstractAmbienceWidgetMessenger widget : allWidgets) {
             if(EQUAL.equals(widget.getKey()) && widget instanceof AmbienceWidgetEnum)
                 equal = (AmbienceEquality) ((AmbienceWidgetEnum) widget).getValue();
-            if(STRUCTURE.equals(widget.getKey()) && widget instanceof AmbienceWidgetString)
-                structure = ((AmbienceWidgetString) widget).getValue();
+            if(STRUCTURE.equals(widget.getKey()) && widget instanceof AmbienceWidgetScroll)
+                structure = ((AmbienceWidgetScroll) widget).getValue();
         }
     }
 

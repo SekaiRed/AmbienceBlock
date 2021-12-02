@@ -2,10 +2,7 @@ package com.sekai.ambienceblocks.util;
 
 import com.sekai.ambienceblocks.client.ambience.AmbienceController;
 import com.sekai.ambienceblocks.client.gui.ambience.CompendiumGUI;
-import com.sekai.ambienceblocks.packets.PacketCompendium;
-import com.sekai.ambienceblocks.packets.PacketNotTargeting;
-import com.sekai.ambienceblocks.packets.PacketTargeting;
-import com.sekai.ambienceblocks.packets.PacketUpdateAmbienceTE;
+import com.sekai.ambienceblocks.packets.*;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -130,6 +127,19 @@ public class ClientPacketHandler {
                     return;
 
                 mc.displayGuiScreen(new CompendiumGUI());
+            }
+        };
+    }
+
+    public static DistExecutor.SafeRunnable handlePacketItIsInStructure(PacketItIsInStructure pkt) {
+        return new DistExecutor.SafeRunnable() {
+            @Override
+            public void run() {
+                //Minecraft mc = Minecraft.getInstance();
+                if(pkt.result)
+                    AmbienceController.instance.structure.playerIsInStructure(pkt.source);
+                else
+                    AmbienceController.instance.structure.playerIsntInStructure(pkt.source);
             }
         };
     }

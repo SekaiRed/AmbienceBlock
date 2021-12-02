@@ -24,6 +24,7 @@ public class AmbienceConfig {
     public static double maxBlockSearchRange;
     public static boolean shouldTrackBattles;
     public static int targetCountdownAmount;
+    public static int structureCountdownAmount;
     //public static boolean shouldTrackStructures;
 
     public static void bakeConfig() {
@@ -34,6 +35,7 @@ public class AmbienceConfig {
         maxBlockSearchRange = COMMON.maxBlockSearchRange.get();
         shouldTrackBattles = COMMON.shouldTrackBattles.get();
         targetCountdownAmount = COMMON.targetCountdownAmount.get();
+        structureCountdownAmount = COMMON.structureCountdownAmount.get();
     }
 
     public static class CommonConfig {
@@ -43,6 +45,7 @@ public class AmbienceConfig {
         public final ForgeConfigSpec.DoubleValue maxBlockSearchRange;
         public final ForgeConfigSpec.BooleanValue shouldTrackBattles;
         public final ForgeConfigSpec.IntValue targetCountdownAmount;
+        public final ForgeConfigSpec.IntValue structureCountdownAmount;
 
         public CommonConfig(ForgeConfigSpec.Builder builder) {
             builder.comment("Warning : If you lower the maximum then some conditions/entries may get truncated out of the game, so take caution when changing those values.");
@@ -77,6 +80,10 @@ public class AmbienceConfig {
                             "As such, the parameter in the condition shouldn't exceed this value.")
                     .translation(Main.MODID + ".config." + "targetCountdownAmount")
                     .defineInRange("targetCountdownAmount", 400, 0, Integer.MAX_VALUE);
+            structureCountdownAmount = builder
+                    .comment("The maximal amount of ticks the client will keep track of whether or not you're within a structure.")
+                    .translation(Main.MODID + ".config." + "structureCountdownAmount")
+                    .defineInRange("structureCountdownAmount", 20, 0, Integer.MAX_VALUE);
             builder.pop();
         }
     }
