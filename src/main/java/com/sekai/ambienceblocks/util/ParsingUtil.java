@@ -126,6 +126,10 @@ public class ParsingUtil {
         return new Vector3d(pos.getX(), pos.getY(), pos.getZ());
     }
 
+    public static BlockPos vec3DtoBlockpos(Vector3d pos) {
+        return new BlockPos(pos.getX(), pos.getY(), pos.getZ());
+    }
+
     public static String customBlockPosToString(BlockPos pos) {
         return "(" + pos.getX() + "," + pos.getY() + "," + pos.getZ() + ")";
     }

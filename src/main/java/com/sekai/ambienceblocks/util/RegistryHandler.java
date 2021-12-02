@@ -4,6 +4,7 @@ import com.sekai.ambienceblocks.Main;
 import com.sekai.ambienceblocks.blocks.AmbienceBlock;
 import com.sekai.ambienceblocks.blocks.BlockItemBase;
 import com.sekai.ambienceblocks.blocks.InvisibleAmbienceBlock;
+import com.sekai.ambienceblocks.blocks.WoodenAmbienceBlock;
 import com.sekai.ambienceblocks.items.ItemCompendium;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import net.minecraft.block.Block;
@@ -33,10 +34,12 @@ public class RegistryHandler {
     //Blocks
     public static final RegistryObject<Block> AMBIENCE_BLOCK = BLOCKS.register("ambience_block", AmbienceBlock::new);
     public static final RegistryObject<Block> INVISIBLE_AMBIENCE_BLOCK = BLOCKS.register("invisible_ambience_block", InvisibleAmbienceBlock::new);
+    public static final RegistryObject<Block> WOODEN_AMBIENCE_BLOCK = BLOCKS.register("wooden_ambience_block", WoodenAmbienceBlock::new);
 
     //Block Items
     public static final RegistryObject<Item> AMBIENCE_BLOCK_ITEM = ITEMS.register("ambience_block", () -> new BlockItemBase(AMBIENCE_BLOCK.get()));
     public static final RegistryObject<Item> INVISIBLE_AMBIENCE_BLOCK_ITEM = ITEMS.register("invisible_ambience_block", () -> new BlockItemBase(INVISIBLE_AMBIENCE_BLOCK.get()));
+    public static final RegistryObject<Item> WOODEN_AMBIENCE_BLOCK_ITEM = ITEMS.register("wooden_ambience_block", () -> new BlockItemBase(WOODEN_AMBIENCE_BLOCK.get()));
 
     //Items
     public static final RegistryObject<Item> AMBIENCE_BLOCK_FINDER = ITEMS.register("ambience_block_finder", () -> new Item(new Item.Properties().group(Main.TAB)));
@@ -49,6 +52,8 @@ public class RegistryHandler {
             TILE_ENTITY_TYPE.register("ambience_block", () -> TileEntityType.Builder.create(AmbienceTileEntity::new, AMBIENCE_BLOCK.get()).build(null));
     public static final RegistryObject<TileEntityType<?>> INVISIBLE_AMBIENCE_TILE_ENTITY =
             TILE_ENTITY_TYPE.register("invisible_ambience_block", () -> TileEntityType.Builder.create(AmbienceTileEntity::new, INVISIBLE_AMBIENCE_BLOCK.get()).build(null));
+    public static final RegistryObject<TileEntityType<?>> WOODEN_AMBIENCE_TILE_ENTITY =
+            TILE_ENTITY_TYPE.register("wooden_ambience_block", () -> TileEntityType.Builder.create(AmbienceTileEntity::new, WOODEN_AMBIENCE_BLOCK.get()).build(null));
 
     //Particles
     public static final RegistryObject<BasicParticleType> PARTICLE_SPEAKER =

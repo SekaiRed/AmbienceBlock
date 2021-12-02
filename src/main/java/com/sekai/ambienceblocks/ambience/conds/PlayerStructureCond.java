@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-//TODO add something similar to the InBattle sync system with more delay and a config option, it'd need a query packet too to ask for info on structures
-@Unused(type = Unused.Type.TO_FIX)
 public class PlayerStructureCond extends AbstractCond {
     private AmbienceEquality equal;
     private String structure;
@@ -54,7 +52,7 @@ public class PlayerStructureCond extends AbstractCond {
 
     @Override
     public String getListDescription() {
-        return "[" + getName() + "] " + equal.getName() + " " + structure;
+        return "[" + getName() + "] " + equal.getName() + " " + structure + " from " + range + " with full " + full;
     }
 
     @Override
@@ -68,7 +66,7 @@ public class PlayerStructureCond extends AbstractCond {
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
         list.add(new AmbienceWidgetString(RANGE, "Range :", 60, Double.toString(range), 10, ParsingUtil.negativeDecimalNumberFilter));
         list.add(new AmbienceWidgetCheckbox(FULL, "Full? :", 20, full));
-        list.add(new AmbienceWidgetScroll(STRUCTURE, "Structure :", 170, StaticUtil.getListOfStructureTypes(), structure));
+        list.add(new AmbienceWidgetScroll(STRUCTURE, "Struct :", 180, StaticUtil.getListOfStructureTypes(), structure));
         return list;
     }
 

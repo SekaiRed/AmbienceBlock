@@ -84,6 +84,7 @@ public class CondsUtil {
         PLAYER_IN_BATTLE(112, new PlayerInBattleCond(AmbienceEquality.EQUAL_TO, "", 50)),
         PLAYER_ENTITY_IN_RANGE(113, new PlayerEntityInRangeCond(AmbienceEquality.EQUAL_TO, "", 8D)),
         PLAYER_UNDERWATER(114, new PlayerUnderwaterCond(AmbienceEquality.EQUAL_TO)),
+        PLAYER_LUMINOSITY(115, new PlayerLuminosityCond(AmbienceTest.GREATER_THAN, 7)),
         WORLD_WEATHER(200, new WorldWeatherCond(AmbienceEquality.EQUAL_TO, AmbienceWeather.CLEAR)),
         WORLD_DAYTIME(201, new WorldDaytimeCond(AmbienceTest.GREATER_THAN, 0)),
         WORLD_IS_DAY(202, new WorldNeedDayCond(AmbienceEquality.EQUAL_TO)),
