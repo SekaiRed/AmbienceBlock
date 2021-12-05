@@ -4,6 +4,7 @@ item.ambience_compendium.name=Ambience Compendium
 
 //Blocks
 tile.ambience_block.name=Ambience Block
+tile.wooden_ambience_block.name=Wooden Ambience Block
 tile.invisible_ambience_block.name=Invisible Ambience Block
 
 //Creative tab

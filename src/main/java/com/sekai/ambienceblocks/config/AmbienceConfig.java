@@ -33,6 +33,10 @@ public class AmbienceConfig {
     @Config.RangeInt(min = 0)
     public static int targetCountdownAmount = 400;
 
+    @Config.Comment({"The maximal amount of ticks the client will keep track of whether or not you're within a structure."})
+    @Config.RangeInt(min = 0)
+    public static int structureCountdownAmount = 20;
+
     @Mod.EventBusSubscriber(modid = Main.MODID)
     private static class ConfigEventHandler {
         @SubscribeEvent

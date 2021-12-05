@@ -115,6 +115,15 @@ public class AmbienceSlot {
             forceStop();
     }
 
+    //The sound hasn't ended yet, you can still resume if you enter it's zone again
+    public void resume() {
+        if(AmbienceFadeState.FADE_OUT.equals(stateFade) && source.getData().getFadeIn() != 0) {
+            float cacheVolumeMult = multVolume;
+            setFadeState(AmbienceFadeState.FADE_IN);
+            fadeCounter = (int) ((cacheVolumeMult) * source.getData().getFadeIn());
+        }
+    }
+
     private void setFadeState(AmbienceFadeState state) {
         fadeCounter = 0;
         //if i don't do this it explodes in your ears when it starts playing

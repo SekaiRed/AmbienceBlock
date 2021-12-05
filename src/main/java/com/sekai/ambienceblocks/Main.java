@@ -7,6 +7,7 @@ import com.sekai.ambienceblocks.init.ModTab;
 import com.sekai.ambienceblocks.proxy.CommonProxy;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.util.PacketHandler;
+import com.sekai.ambienceblocks.util.StructureUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -75,6 +76,14 @@ public class Main
         //apparently this is a legal move
         MinecraftForge.EVENT_BUS.register(new AmbienceController());
     }
+
+    /*@Mod.EventHandler
+    @SideOnly(Side.SERVER)
+    public static void initServer(FMLInitializationEvent event)
+    {
+        //apparently this is a legal move
+        MinecraftForge.EVENT_BUS.register(StructureUtil.class);
+    }*/
 
     /*@Mod.EventHandler
     public void onServerStart(FMLServerStartingEvent event) {

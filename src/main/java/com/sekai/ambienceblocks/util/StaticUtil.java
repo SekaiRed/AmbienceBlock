@@ -4,8 +4,12 @@ import com.sekai.ambienceblocks.ambience.util.AmbienceEnumName;
 import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
 import com.sekai.ambienceblocks.ambience.util.AmbienceType;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class StaticUtil {
     public static ArrayList<String> getListOfAmbienceType() {
@@ -49,5 +53,16 @@ public class StaticUtil {
         }
         return values[0];
         //TODO make a version with a default value and one without
+    }
+
+    public static StructureBoundingBox growBoundingBox(StructureBoundingBox playerBB, double range) {
+        StructureBoundingBox bb = new StructureBoundingBox(playerBB);
+        bb.maxX += range/2;
+        bb.maxY += range/2;
+        bb.maxZ += range/2;
+        bb.minX -= range/2;
+        bb.minY -= range/2;
+        bb.minZ -= range/2;
+        return bb;
     }
 }

@@ -1,12 +1,11 @@
 package com.sekai.ambienceblocks.ambience.sync.target;
 
+import com.sekai.ambienceblocks.ambience.sync.Countdown;
 import com.sekai.ambienceblocks.config.AmbienceConfig;
 import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import java.util.HashMap;
 import java.util.Map;

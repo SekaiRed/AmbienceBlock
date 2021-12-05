@@ -7,6 +7,10 @@ import com.sekai.ambienceblocks.packets.ambiencedata.ServerAmbienceDataHandler;
 import com.sekai.ambienceblocks.packets.compendium.ClientCompendiumHandler;
 import com.sekai.ambienceblocks.packets.compendium.PacketCompendium;
 import com.sekai.ambienceblocks.packets.compendium.ServerCompendiumHandler;
+import com.sekai.ambienceblocks.packets.sync.structure.PacketIsItInStructure;
+import com.sekai.ambienceblocks.packets.sync.structure.PacketIsItInStructureHandler;
+import com.sekai.ambienceblocks.packets.sync.structure.PacketItIsInStructure;
+import com.sekai.ambienceblocks.packets.sync.structure.PacketItIsInStructureHandler;
 import com.sekai.ambienceblocks.packets.sync.target.nottargeting.PacketNotTargeting;
 import com.sekai.ambienceblocks.packets.sync.target.nottargeting.PacketNotTargetingHandler;
 import com.sekai.ambienceblocks.packets.sync.target.targeting.PacketTargeting;
@@ -30,5 +34,8 @@ public class PacketHandler {
 
         NETWORK.registerMessage(PacketTargetingHandler.class, PacketTargeting.class, 4, Side.CLIENT);
         NETWORK.registerMessage(PacketNotTargetingHandler.class, PacketNotTargeting.class, 5, Side.CLIENT);
+
+        NETWORK.registerMessage(PacketIsItInStructureHandler.class, PacketIsItInStructure.class, 6, Side.SERVER);
+        NETWORK.registerMessage(PacketItIsInStructureHandler.class, PacketItIsInStructure.class, 7, Side.CLIENT);
     }
 }

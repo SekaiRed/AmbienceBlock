@@ -63,6 +63,7 @@ public class CompendiumGUI extends AmbienceScreen {
         super.initGui();
 
         if(!initialized) {
+            //System.out.println("firstinit");
             firstInit();
             initialized = true;
         }
@@ -71,6 +72,7 @@ public class CompendiumGUI extends AmbienceScreen {
     //Move firstInit as it's own method in AmbienceScreen because it fixes most issues I had with re-registering widgets
     public void firstInit() {
         //super.initGui();
+        clearWidgets();
 
         xTopLeft = (this.width - texWidth) / 2;
         yTopLeft = (this.height - texHeight) / 2;
@@ -82,6 +84,9 @@ public class CompendiumGUI extends AmbienceScreen {
         addWidget(addEntry);
 
         editEntry = new Button(xTopLeft + outerOffset, getGenericButtonY(1), buttonWidth, buttonHeight, new TextComponentString("Edit"), button -> {
+            if(internalCompendium.getAllEntries().size() == 0)
+                return;
+
             forceIndexUpdate();
             AmbienceGUI gui = new AmbienceGUI(internalCompendium.getAllEntries().get(index));
             gui.setPreviousScreen(this);

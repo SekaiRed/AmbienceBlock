@@ -3,9 +3,11 @@ package com.sekai.ambienceblocks.client.gui.ambience;
 import com.sekai.ambienceblocks.Main;
 import com.sekai.ambienceblocks.ambience.util.messenger.*;
 import com.sekai.ambienceblocks.client.gui.ambience.tabs.CondTab;
+import com.sekai.ambienceblocks.client.gui.widgets.CheckboxWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.ScrollListWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Button;
+import com.sekai.ambienceblocks.client.gui.widgets.ambience.Checkbox;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.TextField;
 import com.sekai.ambienceblocks.client.gui.widgets.ambience.Widget;
 import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
@@ -14,6 +16,7 @@ import com.sekai.ambienceblocks.util.ParsingUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 
 import java.util.ArrayList;
@@ -143,6 +146,11 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
                 AmbienceWidgetSound widget = (AmbienceWidgetSound) messenger;
                 widget.setValue(value);
             }
+            if(messenger instanceof AmbienceWidgetCheckbox) {
+                boolean value = ((Checkbox) widgetLink.get(messenger).get()).isChecked();
+                AmbienceWidgetCheckbox widget = (AmbienceWidgetCheckbox) messenger;
+                widget.setValue(value);
+            }
             data.add(messenger);
         }
         newCond.getDataFromWidgets(data);
@@ -218,6 +226,25 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
                 addWidget(holder);
                 addWidget(button);
                 //addButton(button.get());
+                widgetLink.put(widget, holder);
+            }
+            if(widget instanceof AmbienceWidgetScroll) {
+                AmbienceWidgetScroll wScroll = (AmbienceWidgetScroll) widget;
+                AmbienceWidgetHolder holder = new AmbienceWidgetHolder(widget.getKey(), new ScrollListWidget(0, 0, widget.getWidth(), 20, 4, 16, 5, wScroll.getValues(), this, new ScrollListWidget.IPressable() {
+                    @Override
+                    public void onChange(ScrollListWidget list, int index, String name) {
+                        wScroll.setValue(name);
+                    }
+                }));
+                ScrollListWidget scrollListWidget = (ScrollListWidget) holder.get();
+                scrollListWidget.setSelectionByString(wScroll.getValue());
+                addWidget(holder);
+                widgetLink.put(widget, holder);
+            }
+            if(widget instanceof AmbienceWidgetCheckbox) {
+                AmbienceWidgetCheckbox wCheck = (AmbienceWidgetCheckbox) widget;
+                AmbienceWidgetHolder holder = new AmbienceWidgetHolder(widget.getKey(), new Checkbox(0, 0, widget.getWidth(), 20, new TextComponentString(""), wCheck.getValue()));
+                addWidget(holder);
                 widgetLink.put(widget, holder);
             }
         }
