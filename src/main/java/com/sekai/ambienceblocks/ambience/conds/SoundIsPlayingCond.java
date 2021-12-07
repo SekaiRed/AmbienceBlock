@@ -48,7 +48,7 @@ public class SoundIsPlayingCond extends AbstractCond {
     @Override
     public boolean isTrue(PlayerEntity player, World worldIn, IAmbienceSource sourceIn) {
         //return equal.testFor(AmbienceController.instance.isSoundPlaying(sound));
-        return AmbienceController.instance.reflection.isPlaying(sound);
+        return equal.testFor(AmbienceController.instance.reflection.isPlaying(sound));
         //return true;
     }
 

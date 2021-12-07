@@ -38,10 +38,14 @@ public class RenderingEventHandler {
 
     @SubscribeEvent
     public static void renderDebug(RenderGameOverlayEvent.Post event) {
+        System.out.println(event.getType());
         if(!AmbienceController.debugMode)
             return;
 
         if(Minecraft.getInstance().gameSettings.showDebugInfo)
+            return;
+
+        if(!event.getType().equals(RenderGameOverlayEvent.ElementType.ALL))
             return;
 
         RenderSystem.defaultBlendFunc();
@@ -173,6 +177,7 @@ public class RenderingEventHandler {
             c[2] *= brightness;
 
             renderBlockOutlineAt(ms, RenderTypeHelper.LINE_BUFFERS, tile.getPos(), c);
+            //renderSphereAt(ms, RenderTypeHelper.LINE_BUFFERS, tile.getPos(), c);
         }
 
         ms.pop();
@@ -243,5 +248,73 @@ public class RenderingEventHandler {
 
         buffer.pos(mat, ax, ay, iz).color(r, g, b, a).endVertex();
         buffer.pos(mat, ax, ay, az).color(r, g, b, a).endVertex();
+    }
+
+    private static void renderSphereAt(MatrixStack ms, IRenderTypeBuffer.Impl lineBuffers, BlockPos pos, float[] c) {
+        double renderPosX = Minecraft.getInstance().getRenderManager().info.getProjectedView().getX();
+        double renderPosY = Minecraft.getInstance().getRenderManager().info.getProjectedView().getY();
+        double renderPosZ = Minecraft.getInstance().getRenderManager().info.getProjectedView().getZ();
+
+        ms.push();
+        ms.translate(-renderPosX, -renderPosY, -renderPosZ);
+        //ms.translate(pos.getX() - renderPosX, pos.getY() - renderPosY, pos.getZ() - renderPosZ + 1);
+
+        ms.scale(1F, 1F, 1F);
+
+        renderSphereAt(ms.getLast().getMatrix(), lineBuffers.getBuffer(RenderTypeHelper.LINE_NO_DEPTH_TEST), pos, c);
+
+        ms.pop();
+    }
+
+    private static void renderSphereAt(Matrix4f mat, IVertexBuilder buffer, BlockPos pos, float[] c) {
+        float ix = (float) pos.getX();
+        float iy = (float) pos.getY();
+        float iz = (float) pos.getZ();
+        float ax = (float) pos.getX() + 1;
+        float ay = (float) pos.getY() + 1;
+        float az = (float) pos.getZ() + 1;
+        float a = c[3];
+        float r = c[0];
+        float g = c[1];
+        float b = c[2];
+
+        double theta = 0;
+        double phi = 0;
+        double deltaTheta = Math.PI/12;
+        double deltaPhi = 2*Math.PI/10;
+        //drawVertex(0,0,1) //north pole end cap
+        buffer.pos(mat, ix, iy, iz + 1).color(r, g, b, a).endVertex();
+        for(int ring = 0; ring < 10; ring++){ //move to a new z - offset
+            theta += deltaTheta;
+            for(int point = 0; point < 10; point++){ // draw a ring
+                phi += deltaPhi;
+                /*x = sin(theta) * cos(phi)
+                y = sin(theta) * sin(phi)
+                z = cos(theta)
+                drawVertex(x,y,z)*/
+                buffer.pos(mat,
+                        (float) (ix + Math.sin(theta) * Math.cos(phi)),
+                        (float) (iy + Math.sin(theta) * Math.sin(phi)),
+                        (float) (iz + Math.cos(theta)))
+                        .color(r, g, b, a).endVertex();
+            }
+        }
+        //drawVertex(0, 0, -1) //south pole end cap
+        buffer.pos(mat, ix, iy, iz - 1).color(r, g, b, a).endVertex();
+
+        /*buffer.pos(mat, ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ix, ay, iz).color(r, g, b, a).endVertex();
+
+        buffer.pos(mat, ix, ay, iz).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ax, ay, iz).color(r, g, b, a).endVertex();
+
+        buffer.pos(mat, ax, ay, iz).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ax, iy, iz).color(r, g, b, a).endVertex();
+
+        buffer.pos(mat, ax, iy, iz).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ix, iy, iz).color(r, g, b, a).endVertex();
+
+        buffer.pos(mat, ix, iy, az).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ix, ay, az).color(r, g, b, a).endVertex();*/
     }
 }
