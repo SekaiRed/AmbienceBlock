@@ -3,7 +3,7 @@
   "modid": "ambienceblocks",
   "name": "Ambience Blocks",
   "description": "A mod that adds blocks that can play any sounds in the game on loop or not. Works with custom sounds aswell.",
-  "version": "1.3.2",
+  "version": "1.3.2b",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",

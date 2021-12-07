@@ -47,6 +47,9 @@ public class RenderingEventHandler {
         if(Minecraft.getMinecraft().gameSettings.showDebugInfo)
             return;
 
+        if(!event.getType().equals(RenderGameOverlayEvent.ElementType.ALL))
+            return;
+
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
 
         GlStateManager.pushMatrix();
