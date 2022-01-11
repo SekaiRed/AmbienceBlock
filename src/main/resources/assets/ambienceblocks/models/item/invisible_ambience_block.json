@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "ambienceblocks:items/invisible_ambience_block"
+    }
+}
