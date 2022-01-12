@@ -48,6 +48,7 @@ public class AmbienceData {
     private boolean usePriority = false;
     private int priority = 0;
     private int channel = 0;
+    private boolean allowSamePriority = true;
 
     //bounds
     private AbstractBounds bounds = new SphereBounds(16D);
@@ -95,6 +96,7 @@ public class AmbienceData {
         if(usePriority) {
             compound.putInt("priority", this.priority);
             compound.putInt("channel", this.channel);
+            compound.putBoolean("allowSamePriority", this.allowSamePriority);
         }
 
         compound.putInt("space", space.ordinal());
@@ -162,6 +164,7 @@ public class AmbienceData {
         if(usePriority) {
             this.priority = compound.getInt("priority");
             this.channel = compound.getInt("channel");
+            this.allowSamePriority = compound.getBoolean("allowSamePriority");
         }
 
         this.space = AmbienceWorldSpace.values()[compound.getInt("space") < AmbienceEquality.values().length ? compound.getInt("space") : 0];
@@ -248,6 +251,7 @@ public class AmbienceData {
         if(usePriority) {
             buf.writeInt(this.priority);
             buf.writeInt(this.channel);
+            buf.writeBoolean(this.allowSamePriority);
         }
 
         //buf.writeDouble(this.offDistance);
@@ -310,6 +314,7 @@ public class AmbienceData {
         if(usePriority) {
             this.priority = buf.readInt();
             this.channel = buf.readInt();
+            this.allowSamePriority = buf.readBoolean();
         }
 
         //yeowch
@@ -485,6 +490,14 @@ public class AmbienceData {
 
     public void setUsePriority(boolean usePriority) {
         this.usePriority = usePriority;
+    }
+
+    public boolean canPlayAtSamePriority() {
+        return allowSamePriority;
+    }
+
+    public void setCanPlayAtSamePriority(boolean allowSamePriority) {
+        this.allowSamePriority = allowSamePriority;
     }
 
     public boolean isUsingCondition() {

@@ -35,7 +35,6 @@ public class AmbienceTileEntity extends BlockEntity implements IAmbienceSource {
     public CompoundTag save(CompoundTag compound) {
         data.toNBT(compound);
         compound = super.save(compound);
-        System.out.println("save " + compound);
         return compound;
         //return super.save(compound);
     }
@@ -48,7 +47,6 @@ public class AmbienceTileEntity extends BlockEntity implements IAmbienceSource {
 
     @Override
     public void load(CompoundTag compound) {
-        System.out.println("load " + compound);
         super.load(compound);
         data.fromNBT(compound);
     }
@@ -76,7 +74,6 @@ public class AmbienceTileEntity extends BlockEntity implements IAmbienceSource {
 
     @Override
     public void onDataPacket(net.minecraft.network.Connection net, net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket pkt) {
-        System.out.println(pkt.getTag());
         load(pkt.getTag());
     }
 

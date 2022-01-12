@@ -54,8 +54,4 @@ public class RegistryHandler {
             TILE_ENTITY_TYPE.register("invisible_ambience_block", () -> BlockEntityType.Builder.of(AmbienceTileEntity::new, INVISIBLE_AMBIENCE_BLOCK.get()).build(null));
     public static final RegistryObject<BlockEntityType<?>> WOODEN_AMBIENCE_TILE_ENTITY =
             TILE_ENTITY_TYPE.register("wooden_ambience_block", () -> BlockEntityType.Builder.of(AmbienceTileEntity::new, WOODEN_AMBIENCE_BLOCK.get()).build(null));
-
-    //Particles
-    public static final RegistryObject<SimpleParticleType> PARTICLE_SPEAKER =
-            PARTICLE_TYPE.register("invisible_ambience_block", () -> new SimpleParticleType(false));
 }
