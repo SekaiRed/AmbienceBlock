@@ -174,7 +174,6 @@ public class AmbienceGUI extends AmbienceScreen {
         PacketHandler.NET.sendToServer(new PacketUpdateAmbienceTE(target.getPos(), data));*/
 
         if(isSourceTypeTileEntity()) {
-            System.out.println(getData());
             PacketHandler.NET.sendToServer(new PacketUpdateAmbienceTE(((AmbienceTileEntity) source).getBlockPos(), getData()));
         } else {
             //quit(minecraft);

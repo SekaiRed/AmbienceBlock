@@ -11,6 +11,7 @@ public class JsonUtil {
     static {
         GsonBuilder builder = new GsonBuilder();
 
+        builder.serializeNulls();
         builder.setPrettyPrinting();
 
         //builder.excludeFieldsWithoutExposeAnnotation();
@@ -44,6 +45,7 @@ public class JsonUtil {
     static {
         GsonBuilder builder = new GsonBuilder();
 
+        builder.serializeNulls();
         builder.setPrettyPrinting();
 
         builder.addSerializationExclusionStrategy(new HiddenStrategy());
