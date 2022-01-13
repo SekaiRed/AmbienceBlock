@@ -91,7 +91,7 @@ public class PlayerBlockCond extends AbstractCond {
         list.add(new AmbienceWidgetString(Z, "Z :", 50, Double.toString(z), 8, ParsingUtil.negativeDecimalNumberFilter));
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
         list.add(new AmbienceWidgetEnum<>(SPACE, "",20, space));
-        list.add(new AmbienceWidgetString(BLOCK, "Block :", 120, block));
+        list.add(new AmbienceWidgetString(BLOCK, "Block :", 120, block, StaticUtil.LENGTH_COND_INPUT));
         return list;
     }
 
@@ -141,7 +141,7 @@ public class PlayerBlockCond extends AbstractCond {
         buf.writeDouble(z);
         buf.writeInt(equal.ordinal());
         buf.writeInt(space.ordinal());
-        buf.writeString(block, 50);
+        buf.writeString(block, StaticUtil.LENGTH_COND_INPUT);
     }
 
     @Override
@@ -151,7 +151,7 @@ public class PlayerBlockCond extends AbstractCond {
         z = buf.readDouble();
         equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
         space = StaticUtil.getEnumValue(buf.readInt(), AmbienceWorldSpace.values());
-        block = buf.readString(50);
+        block = buf.readString(StaticUtil.LENGTH_COND_INPUT);
     }
 
     @Override

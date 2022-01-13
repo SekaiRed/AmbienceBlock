@@ -105,7 +105,7 @@ public class PlayerStructureCond extends AbstractCond {
     @Override
     public void toBuff(PacketBuffer buf) {
         buf.writeInt(equal.ordinal());
-        buf.writeString(structure, 50);
+        buf.writeString(structure, StaticUtil.LENGTH_COND_INPUT);
         buf.writeDouble(range);
         buf.writeBoolean(full);
     }
@@ -113,7 +113,7 @@ public class PlayerStructureCond extends AbstractCond {
     @Override
     public void fromBuff(PacketBuffer buf) {
         this.equal = AmbienceEquality.values()[buf.readInt()];
-        this.structure = buf.readString(50);
+        this.structure = buf.readString(StaticUtil.LENGTH_COND_INPUT);
         this.range = buf.readDouble();
         this.full = buf.readBoolean();
     }

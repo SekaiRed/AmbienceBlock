@@ -10,6 +10,7 @@ import com.sekai.ambienceblocks.config.AmbienceConfig;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.CondsUtil;
 import com.sekai.ambienceblocks.util.NBTHelper;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -230,7 +231,7 @@ public class AmbienceData {
     //Buffer util
     public void toBuff(PacketBuffer buf) {
         //Encode the data for the buffer
-        buf.writeString(this.soundName, 50);
+        buf.writeString(this.soundName, StaticUtil.LENGTH_SOUND);
         buf.writeString(this.category, 20);
         buf.writeString(this.type, 10);
         buf.writeString(this.tag, 5);
@@ -238,8 +239,8 @@ public class AmbienceData {
 
         if(AmbienceType.MUSIC.getName().equals(type)) {
             buf.writeBoolean(this.shouldFuse);
-            buf.writeString(this.introName);
-            buf.writeString(this.outroName);
+            buf.writeString(this.introName, StaticUtil.LENGTH_SOUND);
+            buf.writeString(this.outroName, StaticUtil.LENGTH_SOUND);
         }
 
         buf.writeFloat(this.volume);
@@ -290,7 +291,7 @@ public class AmbienceData {
 
     public void fromBuff(PacketBuffer buf) {
         //Decode the data from the buffer
-        this.soundName = buf.readString(50);
+        this.soundName = buf.readString(StaticUtil.LENGTH_SOUND);
         this.category = buf.readString(20);
         this.type = buf.readString(10);
         this.tag = buf.readString(5);
@@ -298,8 +299,8 @@ public class AmbienceData {
 
         if(AmbienceType.MUSIC.getName().equals(type)) {
             this.shouldFuse = buf.readBoolean();
-            this.introName = buf.readString(50);
-            this.outroName = buf.readString(50);
+            this.introName = buf.readString(StaticUtil.LENGTH_SOUND);
+            this.outroName = buf.readString(StaticUtil.LENGTH_SOUND);
         }
 
         this.volume = buf.readFloat();

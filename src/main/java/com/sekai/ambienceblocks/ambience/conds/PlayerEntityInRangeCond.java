@@ -69,7 +69,7 @@ public class PlayerEntityInRangeCond extends AbstractCond {
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
-        list.add(new AmbienceWidgetString(ENTITY, "Entity :", 160, entity));
+        list.add(new AmbienceWidgetString(ENTITY, "Entity :", 160, entity, StaticUtil.LENGTH_COND_INPUT));
         list.add(new AmbienceWidgetString(RANGE, "Range :", 80, Double.toString(range), 8, ParsingUtil.negativeDecimalNumberFilter));
         return list;
     }
@@ -105,14 +105,14 @@ public class PlayerEntityInRangeCond extends AbstractCond {
     @Override
     public void toBuff(PacketBuffer buf) {
         buf.writeInt(equal.ordinal());
-        buf.writeString(entity, 50);
+        buf.writeString(entity, StaticUtil.LENGTH_COND_INPUT);
         buf.writeDouble(range);
     }
 
     @Override
     public void fromBuff(PacketBuffer buf) {
         this.equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
-        this.entity = buf.readString(50);
+        this.entity = buf.readString(StaticUtil.LENGTH_COND_INPUT);
         this.range = buf.readDouble();
     }
 

@@ -81,7 +81,7 @@ public class AmbienceSlotAmountCond extends AbstractCond {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(TEST, "", 20, test));
         list.add(new AmbienceWidgetString(VALUE, "Amount of playing ambiences :", 30, Integer.toString(value), 3, ParsingUtil.numberFilter));
-        list.add(new AmbienceWidgetString(SOUND, "Name :", 110, sound, 50));
+        list.add(new AmbienceWidgetString(SOUND, "Name :", 110, sound, StaticUtil.LENGTH_COND_INPUT));
         list.add(new AmbienceWidgetString(TAG, "Tag :", 40, tag, 5));
         return list;
     }
@@ -122,7 +122,7 @@ public class AmbienceSlotAmountCond extends AbstractCond {
     public void toBuff(PacketBuffer buf) {
         buf.writeInt(test.ordinal());
         buf.writeInt(value);
-        buf.writeString(sound, 50);
+        buf.writeString(sound, StaticUtil.LENGTH_COND_INPUT);
         buf.writeString(tag, 5);
     }
 
@@ -130,7 +130,7 @@ public class AmbienceSlotAmountCond extends AbstractCond {
     public void fromBuff(PacketBuffer buf) {
         this.test = StaticUtil.getEnumValue(buf.readInt(), AmbienceTest.values());
         this.value = buf.readInt();
-        this.sound = buf.readString(50);
+        this.sound = buf.readString(StaticUtil.LENGTH_COND_INPUT);
         this.tag = buf.readString(5);
     }
 
