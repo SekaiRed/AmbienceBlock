@@ -99,7 +99,7 @@ public class ServerCompendium extends BaseCompendium {
         }
         catch (IOException e){
             logger.error("Failed IO.", e);
-        } catch (JsonSyntaxException e) {
+        } catch (JsonSyntaxException | NullPointerException e) {
             logger.error("JSON file failed to parse.", e);
         }
     }

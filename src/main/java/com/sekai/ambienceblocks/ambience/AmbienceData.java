@@ -47,6 +47,7 @@ public class AmbienceData
     private boolean usePriority = false;
     private int priority = 0;
     private int channel = 0;
+    private boolean allowSamePriority = true;
 
     //bounds
     private AbstractBounds bounds = new SphereBounds(16D);
@@ -94,6 +95,7 @@ public class AmbienceData
         if(usePriority) {
             compound.setInteger("priority", this.priority);
             compound.setInteger("channel", this.channel);
+            compound.setBoolean("allowSamePriority", this.allowSamePriority);
         }
 
         compound.setInteger("space", space.ordinal());
@@ -156,6 +158,8 @@ public class AmbienceData
         if(usePriority) {
             this.priority = compound.getInteger("priority");
             this.channel = compound.getInteger("channel");
+            //this.allowSamePriority = compound.getBoolean("allowSamePriority");
+            this.allowSamePriority = compound.hasKey("allowSamePriority") ? compound.getBoolean("allowSamePriority") : true;
         }
 
         this.space = AmbienceWorldSpace.values()[compound.getInteger("space") < AmbienceEquality.values().length ? compound.getInteger("space") : 0];
@@ -252,6 +256,7 @@ public class AmbienceData
         if(usePriority) {
             buf.writeInt(this.priority);
             buf.writeInt(this.channel);
+            buf.writeBoolean(this.allowSamePriority);
         }
 
         //buf.writeDouble(this.offDistance);
@@ -316,6 +321,7 @@ public class AmbienceData
         if(usePriority) {
             this.priority = buf.readInt();
             this.channel = buf.readInt();
+            this.allowSamePriority = buf.readBoolean();
         }
 
         //yeowch
@@ -477,6 +483,14 @@ public class AmbienceData
 
     public void setUsePriority(boolean usePriority) {
         this.usePriority = usePriority;
+    }
+
+    public boolean canPlayAtSamePriority() {
+        return allowSamePriority;
+    }
+
+    public void setCanPlayAtSamePriority(boolean allowSamePriority) {
+        this.allowSamePriority = allowSamePriority;
     }
 
     public boolean isUsingCondition() {

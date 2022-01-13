@@ -7,29 +7,14 @@ import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
 import com.sekai.ambienceblocks.util.json.*;
 
 public class JsonUtil {
-    public static final Gson GSON;// = new GsonBuilder().setPrettyPrinting().create();
+    public static final Gson GSON;
     static {
         GsonBuilder builder = new GsonBuilder();
 
+        builder.serializeNulls();
         builder.setPrettyPrinting();
 
-        //builder.excludeFieldsWithoutExposeAnnotation();
-
         builder.addSerializationExclusionStrategy(new HiddenStrategy());
-
-        /*builder.addSerializationExclusionStrategy(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(FieldAttributes f) {
-                return f.hasModifier(Modifier.FINAL);
-                //if(f.hasModifier(Modifier.PRIVATE))
-                //return false;
-            }
-
-            @Override
-            public boolean shouldSkipClass(Class<?> clazz) {
-                return false;
-            }
-        });*/
 
         builder.registerTypeAdapter(AbstractBounds.class, new BoundsSerializer());
         builder.registerTypeAdapter(AbstractBounds.class, new BoundsDeserializer());
@@ -40,27 +25,14 @@ public class JsonUtil {
         GSON = builder.create();
     }
 
-    public static final Gson GSON_NO_CUSTOM;// = new GsonBuilder().setPrettyPrinting().create();
+    public static final Gson GSON_NO_CUSTOM;
     static {
         GsonBuilder builder = new GsonBuilder();
 
+        builder.serializeNulls();
         builder.setPrettyPrinting();
 
         builder.addSerializationExclusionStrategy(new HiddenStrategy());
-
-        //builder.excludeFieldsWithoutExposeAnnotation();
-
-        /*builder.addSerializationExclusionStrategy(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(FieldAttributes f) {
-                return f.hasModifier(Modifier.FINAL);
-            }
-
-            @Override
-            public boolean shouldSkipClass(Class<?> clazz) {
-                return false;
-            }
-        });*/
 
         GSON_NO_CUSTOM = builder.create();
     }

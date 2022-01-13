@@ -6,10 +6,15 @@ import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.util.Vector3d;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+
+import javax.annotation.Nullable;
 
 public class AmbienceTileEntity extends TileEntity implements IAmbienceSource {
     //public AmbienceTileEntityData data;
+    public static final int MAGIC_PACKET_NUM = 420;
     public AmbienceData data;
 
     public AmbienceTileEntity() {
@@ -40,6 +45,20 @@ public class AmbienceTileEntity extends TileEntity implements IAmbienceSource {
     public void handleUpdateTag(NBTTagCompound tag) {
         super.handleUpdateTag(tag);
         data.fromNBT(tag);
+    }
+
+    @Nullable
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket() {
+        //return new SUpdateTileEntityPacket(this.pos, 6, this.getUpdateTag());
+        return new SPacketUpdateTileEntity(this.pos, MAGIC_PACKET_NUM, this.getUpdateTag());
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+        //read(this.getBlockState(), pkt.getNbtCompound());
+        super.onDataPacket(net, pkt);
+        data.fromNBT(pkt.getNbtCompound());
     }
 
     //fancy
