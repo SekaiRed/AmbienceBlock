@@ -10,6 +10,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.ArrayList;
 
 public class StaticUtil {
+    public static final int LENGTH_SOUND = 100;
+    public static final int LENGTH_COND_INPUT = 200;
+
     public static <T extends Enum<T>> T getEnumValue(int index, T[] values) {
         //index %= values.length;
         //return values[index >= 0 ? index : -index];

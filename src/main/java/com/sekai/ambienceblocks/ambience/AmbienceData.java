@@ -10,6 +10,7 @@ import com.sekai.ambienceblocks.config.AmbienceConfig;
 import com.sekai.ambienceblocks.util.BoundsUtil;
 import com.sekai.ambienceblocks.util.CondsUtil;
 import com.sekai.ambienceblocks.util.NBTHelper;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -230,7 +231,7 @@ public class AmbienceData {
     //Buffer util
     public void toBuff(FriendlyByteBuf buf) {
         //Encode the data for the buffer
-        buf.writeUtf(this.soundName, 50);
+        buf.writeUtf(this.soundName, StaticUtil.LENGTH_SOUND);
         buf.writeUtf(this.category, 20);
         buf.writeUtf(this.type, 10);
         buf.writeUtf(this.tag, 5);
@@ -238,8 +239,8 @@ public class AmbienceData {
 
         if(AmbienceType.MUSIC.getName().equals(type)) {
             buf.writeBoolean(this.shouldFuse);
-            buf.writeUtf(this.introName);
-            buf.writeUtf(this.outroName);
+            buf.writeUtf(this.introName, StaticUtil.LENGTH_SOUND);
+            buf.writeUtf(this.outroName, StaticUtil.LENGTH_SOUND);
         }
 
         buf.writeFloat(this.volume);
@@ -291,7 +292,7 @@ public class AmbienceData {
     public void fromBuff(FriendlyByteBuf buf) {
         //Decode the data from the buffer
         //TOD readUTF could be not right
-        this.soundName = buf.readUtf(50);
+        this.soundName = buf.readUtf(StaticUtil.LENGTH_SOUND);
         this.category = buf.readUtf(20);
         this.type = buf.readUtf(10);
         this.tag = buf.readUtf(5);
@@ -301,8 +302,8 @@ public class AmbienceData {
             this.shouldFuse = buf.readBoolean();
             /*this.introName = buf.readString(50);
             this.outroName = buf.readString(50);*/
-            this.introName = buf.readUtf(50);
-            this.outroName = buf.readUtf(50);
+            this.introName = buf.readUtf(StaticUtil.LENGTH_SOUND);
+            this.outroName = buf.readUtf(StaticUtil.LENGTH_SOUND);
         }
 
         this.volume = buf.readFloat();

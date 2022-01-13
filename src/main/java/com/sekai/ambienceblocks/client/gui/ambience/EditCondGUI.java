@@ -182,11 +182,11 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
             if(widget instanceof AmbienceWidgetString) {
                 AmbienceWidgetHolder holder = new AmbienceWidgetHolder(widget.getKey(), new CustomTextField(0, 0, widget.getWidth(), 20, ""));
                 CustomTextField text = (CustomTextField) holder.get();
-                text.setValue(((AmbienceWidgetString) widget).getValue());
-                text.setFilter(((AmbienceWidgetString) widget).getValidator());
                 if(((AmbienceWidgetString) widget).getCharLimit() > 0) {
                     text.setMaxLength(((AmbienceWidgetString) widget).getCharLimit());
                 }
+                text.setValue(((AmbienceWidgetString) widget).getValue());
+                text.setFilter(((AmbienceWidgetString) widget).getValidator());
                 addWidget(holder);
                 //widgetMessengers.add(widget);
                 widgetLink.put(widget, holder);

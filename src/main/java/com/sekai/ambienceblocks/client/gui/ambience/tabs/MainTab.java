@@ -90,7 +90,7 @@ public class MainTab extends AbstractTab {
 
     @Override
     public void initialInit() {
-        soundName.setMaxLength(50);
+        soundName.setMaxLength(StaticUtil.LENGTH_SOUND);
 
         soundVolume.setFilter(ParsingUtil.decimalNumberFilter);
         soundVolume.setMaxLength(6);
