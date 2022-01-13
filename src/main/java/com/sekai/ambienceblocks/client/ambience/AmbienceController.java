@@ -177,7 +177,6 @@ public class AmbienceController {
                 if (aboutToStopAndNeedToFuse(ambienceSources, slot))
                     continue;
 
-                //only doing this disgusting thing to avoid the costly canTilePlayFailureContext, it's like checking canTilePlay twice, like please don't
                 stopMusic(slot, result.getContext());
                 continue;
             }
@@ -600,11 +599,11 @@ public class AmbienceController {
         DELAY_STOP_PREVIOUS("delay stopped it since it's playing again", RenderingEventHandler.cRed),
         OWNER_NOT_LOADED("the owner doesn't exist", RenderingEventHandler.cRed),
         ENTRY_NOT_LOADED("the entry doesn't exist", RenderingEventHandler.cRed),
-        PACKET_RECEIVED("forcefully stopped, updated by server?", RenderingEventHandler.cRed),
+        PACKET_RECEIVED("forcefully stopped, updated by server", RenderingEventHandler.cRed),
         OUT_OF_BOUNDS("not within bounds", RenderingEventHandler.cRed),
         CONDITION_IS_FALSE("at least one condition returned false", RenderingEventHandler.cRed),
         OUT_PRIORITIZED("lower priority than the highest one on this channel", RenderingEventHandler.cRed),
-        UNKNOWN("no idea why that happened", RenderingEventHandler.cWhite);
+        UNKNOWN("no idea how that happened", RenderingEventHandler.cWhite);
 
         private final String comment;
         private final int color;

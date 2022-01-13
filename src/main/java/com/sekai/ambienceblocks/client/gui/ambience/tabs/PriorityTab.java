@@ -90,7 +90,6 @@ public class PriorityTab extends AbstractTab {
         if(allowSamePriority.isHoveredOrFocused()) {
             list.add(ChatFormatting.RED + "Can play at the same priority");
             list.add("Should this ambience source be able to play if another one has the same priority.");
-            list.add(ChatFormatting.DARK_GRAY + "0 to 9");
             drawHoveringText(matrix, list, mouseX + 3, mouseY + 3, width, height, width / 2);
         }
     }
