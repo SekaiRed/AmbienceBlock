@@ -144,12 +144,12 @@ public class AmbienceController {
 
             if (isOwnerLoaded(ambienceSources, slot)) continue;
 
-            if (!canTilePlay(slot.getSource())) {
+            CanPlayResult result = canTileKeepPlaying(slot.getSource());
+            if (!result.succeeded()) {
                 if (aboutToStopAndNeedToFuse(ambienceSources, slot))
                     continue;
 
-                //only doing this disgusting thing to avoid the costly canTilePlayFailureContext, it's like checking canTilePlay twice, like please don't
-                stopMusic(slot, debugMode ? canTilePlayFailureContext(slot.getSource()) : EventContext.UNKNOWN);
+                stopMusic(slot, result.getContext());
                 continue;
             }
 
@@ -163,7 +163,7 @@ public class AmbienceController {
                 //tileEntityList.removeIf(lambda -> !(lambda instanceof AmbienceTileEntity));
                 List<IAmbienceSource> sourceList = getListOfAmbienceSources();
                 //only keep tiles that can fuse, possess the same music and is able to play right now
-                sourceList.removeIf(tile -> !tile.getData().shouldFuse() || !hasSameMusics(slot.getSource().getData(), tile.getData()) || !canTilePlay(tile));
+                sourceList.removeIf(tile -> !tile.getData().shouldFuse() || !hasSameMusics(slot.getSource().getData(), tile.getData()) || !canTilePlay(tile).succeeded());
                 for (IAmbienceSource source : sourceList) {
                     volume += getVolumeFromTileEntity(source);
                     totalBias += source.getPercentageHowCloseIsPlayer(mc.player);
@@ -205,7 +205,7 @@ public class AmbienceController {
             }
 
             //this tile can play
-            if (canTilePlay(source)) {
+            if (canTilePlay(source).succeeded()) {
                 ambienceSourcesToPlay.add(source);
             }
         }
@@ -300,7 +300,7 @@ public class AmbienceController {
     private boolean aboutToStopAndNeedToFuse(List<IAmbienceSource> ambienceSources, AmbienceSlot slot) {
         if (slot.getData().shouldFuse()) {
             List<IAmbienceSource> ambienceTileEntityList = new ArrayList<>(ambienceSources);
-            ambienceTileEntityList.removeIf(source -> !source.getData().shouldFuse() || !hasSameMusics(source.getData(), slot.getData()) || !canTilePlay(source) || slot.getSource().equals(source));
+            ambienceTileEntityList.removeIf(source -> !source.getData().shouldFuse() || !hasSameMusics(source.getData(), slot.getData()) || !canTilePlay(source).succeeded() || slot.getSource().equals(source));
 
             if(ambienceTileEntityList.size() != 0) {
                 swapOwner(slot, ambienceTileEntityList.get(0));
@@ -438,43 +438,33 @@ public class AmbienceController {
             return "RegistryEntry";
     }
 
-    public boolean canTilePlay(IAmbienceSource source) {
-        if(!source.isWithinBounds(mc.player))
-            return false;
-
-        if(source.getData().isUsingCondition()) {
-            List<AbstractCond> conditions = source.getData().getConditions();
-            for (AbstractCond condition : conditions) {
-                if (!condition.isTrue(mc.player, mc.world, source))
-                    return false;
-            }
-        }
-
-        int priority = getHighestPriorityByChannel(source.getData().getChannel());
-        if (source.getData().isUsingPriority() && source.getData().getPriority() < priority)
-            return false;
-
-        return true;
+    public CanPlayResult canTilePlay(IAmbienceSource source) {
+        return canTilePlayInternal(source, false);
     }
 
-    private EventContext canTilePlayFailureContext(IAmbienceSource source) {
+    public CanPlayResult canTileKeepPlaying(IAmbienceSource source) {
+        return canTilePlayInternal(source, true);
+    }
+
+    public CanPlayResult canTilePlayInternal(IAmbienceSource source, boolean alreadyStarted) {
         if(!source.isWithinBounds(mc.player))
-            return EventContext.OUT_OF_BOUNDS;
+            return CanPlayResult.fail(EventContext.OUT_OF_BOUNDS);
 
         if(source.getData().isUsingCondition()) {
             List<AbstractCond> conditions = source.getData().getConditions();
             for (AbstractCond condition : conditions) {
                 if (!condition.isTrue(mc.player, mc.world, source))
-                    return EventContext.CONDITION_IS_FALSE;
+                    return CanPlayResult.fail(EventContext.CONDITION_IS_FALSE);
             }
         }
 
         int priority = getHighestPriorityByChannel(source.getData().getChannel());
-        if (source.getData().isUsingPriority() && source.getData().getPriority() < priority)
-            return EventContext.OUT_PRIORITIZED;
-            //return "lower priority than the maximal one : slot priority " + source.getData().getPriority() + " and max priority " + priority;
+        //if (source.getData().isUsingPriority() && source.getData().getPriority() < priority)
+        if(source.getData().isUsingPriority() && ((source.getData().canPlayAtSamePriority() || alreadyStarted) ? (source.getData().getPriority() < priority) : (source.getData().getPriority() <= priority)))
+            return CanPlayResult.fail(EventContext.OUT_PRIORITIZED);
+        //return "lower priority than the maximal one : slot priority " + source.getData().getPriority() + " and max priority " + priority;
 
-        return EventContext.UNKNOWN;
+        return CanPlayResult.succeed();
     }
 
     public List<IAmbienceSource> getListOfAmbienceSources() {
@@ -493,7 +483,7 @@ public class AmbienceController {
     }
 
     public int getHighestPriorityByChannel(int index) {
-        int highest = 0;
+        int highest = -1;
         for (AmbienceSlot slot : soundsList) {
             if (slot.getSource().getData().isUsingPriority() && slot.getSource().getData().getChannel() == index && slot.getSource().getData().getPriority() > highest)
                 highest = slot.getSource().getData().getPriority();
@@ -575,11 +565,11 @@ public class AmbienceController {
         DELAY_STOP_PREVIOUS("delay stopped it since it's playing again", RenderingEventHandler.cRed),
         OWNER_NOT_LOADED("the owner doesn't exist", RenderingEventHandler.cRed),
         ENTRY_NOT_LOADED("the entry doesn't exist", RenderingEventHandler.cRed),
-        PACKET_RECEIVED("forcefully stopped, updated by server?", RenderingEventHandler.cRed),
+        PACKET_RECEIVED("forcefully stopped, updated by server", RenderingEventHandler.cRed),
         OUT_OF_BOUNDS("not within bounds", RenderingEventHandler.cRed),
         CONDITION_IS_FALSE("at least one condition returned false", RenderingEventHandler.cRed),
         OUT_PRIORITIZED("lower priority than the highest one on this channel", RenderingEventHandler.cRed),
-        UNKNOWN("no idea why that happened", RenderingEventHandler.cWhite);
+        UNKNOWN("no idea how that happened", RenderingEventHandler.cWhite);
 
         private final String comment;
         private final int color;
@@ -595,6 +585,32 @@ public class AmbienceController {
 
         public int getColor() {
             return color;
+        }
+    }
+
+    public static class CanPlayResult {
+        boolean success;
+        EventContext context;
+
+        private CanPlayResult(boolean success, EventContext context) {
+            this.success = success;
+            this.context = context;
+        }
+
+        protected static CanPlayResult succeed() {
+            return new CanPlayResult(true, EventContext.UNKNOWN);
+        }
+
+        protected static CanPlayResult fail(EventContext context) {
+            return new CanPlayResult(false, context);
+        }
+
+        public boolean succeeded() {
+            return success;
+        }
+
+        public EventContext getContext() {
+            return context;
         }
     }
 }

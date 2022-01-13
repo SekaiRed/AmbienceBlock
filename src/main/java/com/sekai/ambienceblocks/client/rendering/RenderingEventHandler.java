@@ -38,7 +38,6 @@ public class RenderingEventHandler {
 
     @SubscribeEvent
     public static void renderDebug(RenderGameOverlayEvent.Post event) {
-        System.out.println(event.getType());
         if(!AmbienceController.debugMode)
             return;
 
@@ -183,6 +182,7 @@ public class RenderingEventHandler {
         ms.pop();
         RenderSystem.disableDepthTest();
         RenderTypeHelper.LINE_BUFFERS.finish();
+        //RenderTypeHelper.BOUNDS_BUFFERS.finish();
     }
 
     private static void renderBlockOutlineAt(MatrixStack ms, IRenderTypeBuffer.Impl lineBuffers, BlockPos pos, float[] c) {
@@ -261,18 +261,16 @@ public class RenderingEventHandler {
 
         ms.scale(1F, 1F, 1F);
 
-        renderSphereAt(ms.getLast().getMatrix(), lineBuffers.getBuffer(RenderTypeHelper.LINE_NO_DEPTH_TEST), pos, c);
+        renderSphereAt(ms.getLast().getMatrix(), lineBuffers.getBuffer(RenderTypeHelper.BOUNDS), pos, c);
 
         ms.pop();
     }
 
     private static void renderSphereAt(Matrix4f mat, IVertexBuilder buffer, BlockPos pos, float[] c) {
-        float ix = (float) pos.getX();
-        float iy = (float) pos.getY();
-        float iz = (float) pos.getZ();
-        float ax = (float) pos.getX() + 1;
-        float ay = (float) pos.getY() + 1;
-        float az = (float) pos.getZ() + 1;
+        float ix = (float) pos.getX() + 0.5f;
+        float iy = (float) pos.getY() + 0.5f;
+        float iz = (float) pos.getZ() + 0.5f;
+        float radius = 1f;
         float a = c[3];
         float r = c[0];
         float g = c[1];
@@ -280,27 +278,27 @@ public class RenderingEventHandler {
 
         double theta = 0;
         double phi = 0;
-        double deltaTheta = Math.PI/12;
-        double deltaPhi = 2*Math.PI/10;
+        double deltaTheta = Math.PI/(12*5);
+        double deltaPhi = 2*Math.PI/(10*5);
         //drawVertex(0,0,1) //north pole end cap
-        buffer.pos(mat, ix, iy, iz + 1).color(r, g, b, a).endVertex();
-        for(int ring = 0; ring < 10; ring++){ //move to a new z - offset
+        buffer.pos(mat, ix, iy, iz + 0.5f * radius).color(r, g, b, a).endVertex();
+        for(int ring = 0; ring < 10 * 5; ring++){ //move to a new z - offset
             theta += deltaTheta;
-            for(int point = 0; point < 10; point++){ // draw a ring
+            for(int point = 0; point < 10 * 5; point++){ // draw a ring
                 phi += deltaPhi;
                 /*x = sin(theta) * cos(phi)
                 y = sin(theta) * sin(phi)
                 z = cos(theta)
                 drawVertex(x,y,z)*/
                 buffer.pos(mat,
-                        (float) (ix + Math.sin(theta) * Math.cos(phi)),
-                        (float) (iy + Math.sin(theta) * Math.sin(phi)),
-                        (float) (iz + Math.cos(theta)))
+                        (float) (ix + Math.sin(theta) * Math.cos(phi)) * radius,
+                        (float) (iy + Math.sin(theta) * Math.sin(phi)) * radius,
+                        (float) (iz + Math.cos(theta)) * radius)
                         .color(r, g, b, a).endVertex();
             }
         }
         //drawVertex(0, 0, -1) //south pole end cap
-        buffer.pos(mat, ix, iy, iz - 1).color(r, g, b, a).endVertex();
+        buffer.pos(mat, ix, iy, iz - 0.5f * radius).color(r, g, b, a).endVertex();
 
         /*buffer.pos(mat, ix, iy, iz).color(r, g, b, a).endVertex();
         buffer.pos(mat, ix, ay, iz).color(r, g, b, a).endVertex();

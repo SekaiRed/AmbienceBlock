@@ -65,6 +65,7 @@ public class PacketUpdateAmbienceTE {
 
                 AmbienceTileEntity finalTile = (AmbienceTileEntity) tile;
                 finalTile.data = pkt.data;
+                finalTile.markDirty();
 
                 PacketHandler.NET.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> ctx.get().getSender()), new PacketUpdateAmbienceTE(finalTile.getPos(), finalTile.data));
             }

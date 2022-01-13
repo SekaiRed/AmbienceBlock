@@ -101,7 +101,7 @@ public class AmbienceGUI extends AmbienceScreen {
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();
-            GL11.glColor4f(0.0f, 1.0f, 1.0f, 0.2f);
+            GL11.glColor4f(0.0f, 1.0f, 1.0f, 0.1f);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
             buffer.pos(left, bottom, 0).endVertex();
             buffer.pos(right, bottom, 0).endVertex();
@@ -128,7 +128,7 @@ public class AmbienceGUI extends AmbienceScreen {
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();
-            GL11.glColor4f(1.0f, 0.0f, 1.0f, 0.2f);
+            GL11.glColor4f(1.0f, 0.0f, 1.0f, 0.1f);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
             buffer.pos(left, bottom, 0).endVertex();
             buffer.pos(right, bottom, 0).endVertex();

@@ -2,6 +2,7 @@ package com.sekai.ambienceblocks.client.gui.ambience.tabs;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
+import com.sekai.ambienceblocks.client.gui.widgets.CheckboxWidget;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
 import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.util.ParsingUtil;
@@ -18,6 +19,8 @@ public class PriorityTab extends AbstractTab {
     public TextFieldWidget priority = new TextFieldWidget(font, getNeighbourX(textPriority), getRowY(0), 40, 20, new StringTextComponent(""));
     public TextInstance textChannel = new TextInstance(getNeighbourX(priority), getRowY(0) + getOffsetY(font.FONT_HEIGHT), 0xFFFFFF, I18n.format("ui.ambienceblocks.channel") + " :", font);
     public TextFieldWidget channel = new TextFieldWidget(font, getNeighbourX(textChannel), getRowY(0), 20, 20, new StringTextComponent(""));
+
+    public CheckboxWidget allowSamePriority = new CheckboxWidget(getBaseX(), getRowY(1), 20 + font.getStringWidth("Can play at the same priority"), 20, "Can play at the same priority", true);
 
     public PriorityTab(AmbienceGUI guiRef) {
         super(guiRef);
@@ -44,6 +47,8 @@ public class PriorityTab extends AbstractTab {
         channel.setValidator(ParsingUtil.numberFilter);
         channel.setMaxStringLength(1);
         channel.setText(String.valueOf(0));
+
+        addWidget(allowSamePriority);
     }
 
     @Override
@@ -52,6 +57,7 @@ public class PriorityTab extends AbstractTab {
         priority.x = getNeighbourX(textPriority); priority.y = getRowY(0);
         textChannel.x = getNeighbourX(priority); textChannel.y = getRowY(0) + getOffsetY(font.FONT_HEIGHT);
         channel.x = getNeighbourX(textChannel); channel.y = getRowY(0);
+        allowSamePriority.x = getBaseX(); allowSamePriority.y = getRowY(1);
     }
 
     @Override
@@ -61,6 +67,8 @@ public class PriorityTab extends AbstractTab {
 
         textChannel.render(matrix, mouseX, mouseY);
         channel.render(matrix, mouseX, mouseY, partialTicks);
+
+        allowSamePriority.render(matrix, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -79,6 +87,11 @@ public class PriorityTab extends AbstractTab {
             list.add(TextFormatting.DARK_GRAY + "0 to 9");
             drawHoveringText(matrix, list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
         }
+        if(allowSamePriority.isHovered()) {
+            list.add(TextFormatting.RED + "Can play at the same priority");
+            list.add("Should this ambience source be able to play if another one has the same priority.");
+            drawHoveringText(matrix, list, mouseX + 3, mouseY + 3, width, height, width / 2, font);
+        }
     }
 
     @Override
@@ -91,12 +104,14 @@ public class PriorityTab extends AbstractTab {
     public void setFieldFromData(AmbienceData data) {
         priority.setText(String.valueOf(data.getPriority()));
         channel.setText(String.valueOf(data.getChannel()));
+        allowSamePriority.setChecked(data.canPlayAtSamePriority());
     }
 
     @Override
     public void setDataFromField(AmbienceData data) {
         data.setPriority(ParsingUtil.tryParseInt(priority.getText()));
         data.setChannel(ParsingUtil.tryParseInt(channel.getText()));
+        data.setCanPlayAtSamePriority(allowSamePriority.isChecked());
     }
 
     @Override

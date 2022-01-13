@@ -6,11 +6,16 @@ import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.util.RegistryHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.vector.Vector3d;
 
+import javax.annotation.Nullable;
+
 public class AmbienceTileEntity extends TileEntity implements IAmbienceSource {
+    public static final int MAGIC_PACKET_NUM = 420;
     public AmbienceData data = new AmbienceData();
 
     public AmbienceTileEntity(final TileEntityType<?> tileEntityTypeIn) {
@@ -25,6 +30,20 @@ public class AmbienceTileEntity extends TileEntity implements IAmbienceSource {
     public CompoundNBT write(CompoundNBT compound) {
         data.toNBT(compound);
         return super.write(compound);
+    }
+
+    @Nullable
+    @Override
+    public SUpdateTileEntityPacket getUpdatePacket() {
+        //return new SUpdateTileEntityPacket(this.pos, 6, this.getUpdateTag());
+        return new SUpdateTileEntityPacket(this.pos, MAGIC_PACKET_NUM, this.getUpdateTag());
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+        //read(this.getBlockState(), pkt.getNbtCompound());
+        super.onDataPacket(net, pkt);
+        data.fromNBT(pkt.getNbtCompound());
     }
 
     @Override
