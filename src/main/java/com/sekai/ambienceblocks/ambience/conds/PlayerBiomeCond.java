@@ -55,7 +55,7 @@ public class PlayerBiomeCond extends AbstractCond {
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
-        list.add(new AmbienceWidgetString(BIOME, "Biome :", 160, biome));
+        list.add(new AmbienceWidgetString(BIOME, "Biome :", 160, biome, StaticUtil.LENGTH_COND_INPUT));
         return list;
     }
 
@@ -86,13 +86,13 @@ public class PlayerBiomeCond extends AbstractCond {
     @Override
     public void toBuff(FriendlyByteBuf buf) {
         buf.writeInt(equal.ordinal());
-        buf.writeUtf(biome, 50);
+        buf.writeUtf(biome, StaticUtil.LENGTH_COND_INPUT);
     }
 
     @Override
     public void fromBuff(FriendlyByteBuf buf) {
         this.equal = AmbienceEquality.values()[buf.readInt()];
-        this.biome = buf.readUtf(50);
+        this.biome = buf.readUtf(StaticUtil.LENGTH_COND_INPUT);
     }
 
     @Override

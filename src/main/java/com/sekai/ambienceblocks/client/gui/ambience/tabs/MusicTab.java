@@ -5,6 +5,7 @@ import com.sekai.ambienceblocks.ambience.AmbienceData;
 import com.sekai.ambienceblocks.client.gui.ambience.AmbienceGUI;
 import com.sekai.ambienceblocks.client.gui.ambience.ChooseSoundGUI;
 import com.sekai.ambienceblocks.client.gui.widgets.TextInstance;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -76,11 +77,11 @@ public class MusicTab extends AbstractTab {
 
     @Override
     public void initialInit() {
-        introName.setMaxLength(50);
+        introName.setMaxLength(StaticUtil.LENGTH_SOUND);
         addWidget(introName);
         addButton(introButton);
 
-        outroName.setMaxLength(50);
+        outroName.setMaxLength(StaticUtil.LENGTH_SOUND);
         addWidget(outroName);
         addButton(outroButton);
         //addButton(copy);

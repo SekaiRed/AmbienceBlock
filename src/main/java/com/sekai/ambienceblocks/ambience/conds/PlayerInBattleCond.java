@@ -71,7 +71,7 @@ public class PlayerInBattleCond extends AbstractCond {
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
-        list.add(new AmbienceWidgetString(ENTITY, "Entity :", 160, entity));
+        list.add(new AmbienceWidgetString(ENTITY, "Entity :", 160, entity, StaticUtil.LENGTH_COND_INPUT));
         list.add(new AmbienceWidgetString(TIME, "Time :", 40, Integer.toString(time), 5, ParsingUtil.numberFilter));
         return list;
     }
@@ -107,14 +107,14 @@ public class PlayerInBattleCond extends AbstractCond {
     @Override
     public void toBuff(FriendlyByteBuf buf) {
         buf.writeInt(equal.ordinal());
-        buf.writeUtf(entity, 50);
+        buf.writeUtf(entity, StaticUtil.LENGTH_COND_INPUT);
         buf.writeInt(time);
     }
 
     @Override
     public void fromBuff(FriendlyByteBuf buf) {
         this.equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
-        this.entity = buf.readUtf(50);
+        this.entity = buf.readUtf(StaticUtil.LENGTH_COND_INPUT);
         this.time = buf.readInt();
     }
 
