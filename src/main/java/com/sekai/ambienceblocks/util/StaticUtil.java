@@ -12,6 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class StaticUtil {
+    public static final int LENGTH_SOUND = 100;
+    public static final int LENGTH_COND_INPUT = 200;
+
     public static ArrayList<String> getListOfAmbienceType() {
         ArrayList<String> list = new ArrayList<String>();
         for(AmbienceType value : AmbienceType.values())

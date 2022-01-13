@@ -92,7 +92,7 @@ public class AmbienceIsPlayingCond extends AbstractCond {
     @Override
     public void fromBuff(PacketBuffer buf) {
         this.equal = StaticUtil.getEnumValue(buf.readInt(), AmbienceEquality.values());
-        this.sound = buf.readString(50);
+        this.sound = buf.readString(StaticUtil.LENGTH_SOUND);
     }
 
     @Override

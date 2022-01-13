@@ -122,7 +122,7 @@ public class PlayerBlockDensityCond extends AbstractCond {
         list.add(new AmbienceWidgetEnum<>(SPACE, "",20, space));
         list.add(new AmbienceWidgetEnum<>(TEST, "",20, test));
         list.add(new AmbienceWidgetString(COUNT, "Count :", 100, Integer.toString(count), 5, ParsingUtil.numberFilter));
-        list.add(new AmbienceWidgetString(BLOCK, "Block :", 140, block));
+        list.add(new AmbienceWidgetString(BLOCK, "Block :", 140, block, StaticUtil.LENGTH_COND_INPUT));
         return list;
     }
 
@@ -209,7 +209,7 @@ public class PlayerBlockDensityCond extends AbstractCond {
         space = StaticUtil.getEnumValue(buf.readInt(), AmbienceWorldSpace.values());
         test = StaticUtil.getEnumValue(buf.readInt(), AmbienceTest.values());
         count = buf.readInt();
-        block = buf.readString(50);
+        block = buf.readString(StaticUtil.LENGTH_COND_INPUT);
 
         //updateBoundingBox();
     }

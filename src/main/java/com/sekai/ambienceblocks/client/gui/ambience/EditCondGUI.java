@@ -13,6 +13,7 @@ import com.sekai.ambienceblocks.client.gui.widgets.ambience.Widget;
 import com.sekai.ambienceblocks.ambience.conds.AbstractCond;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWidgetHolder;
 import com.sekai.ambienceblocks.util.ParsingUtil;
+import com.sekai.ambienceblocks.util.StaticUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
@@ -172,11 +173,11 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
             if(widget instanceof AmbienceWidgetString) {
                 AmbienceWidgetHolder holder = new AmbienceWidgetHolder(widget.getKey(), new TextField(font, 0, 0, widget.getWidth(), 20, new TextComponentString("")));
                 TextField text = (TextField) holder.get();
-                text.setText(((AmbienceWidgetString) widget).getValue());
-                text.setValidator(((AmbienceWidgetString) widget).getValidator());
                 if(((AmbienceWidgetString) widget).getCharLimit() > 0) {
                     text.setMaxStringLength(((AmbienceWidgetString) widget).getCharLimit());
                 }
+                text.setText(((AmbienceWidgetString) widget).getValue());
+                text.setValidator(((AmbienceWidgetString) widget).getValidator());
                 addWidget(holder);
                 //widgetMessengers.add(widget);
                 widgetLink.put(widget, holder);
@@ -212,7 +213,7 @@ public class EditCondGUI extends AmbienceScreen implements IFetchCond {
                 }));
                 TextField text = (TextField) holder.get();
                 //System.out.println(text);
-                text.setMaxStringLength(50);
+                text.setMaxStringLength(StaticUtil.LENGTH_SOUND);
                 if(isFieldBeingEdited) {
                     //this is a lazy fix lol
                     //System.out.println("new" + fieldBeingEdited + ", " + fieldBeingEdited.getText());

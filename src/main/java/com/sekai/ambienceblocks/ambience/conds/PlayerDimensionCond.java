@@ -54,7 +54,7 @@ public class PlayerDimensionCond extends AbstractCond {
     public List<AbstractAmbienceWidgetMessenger> getWidgets() {
         List<AbstractAmbienceWidgetMessenger> list = new ArrayList<>();
         list.add(new AmbienceWidgetEnum<>(EQUAL, "", 20, equal));
-        list.add(new AmbienceWidgetString(DIMENSION, "Dimension :", 130, dimension));
+        list.add(new AmbienceWidgetString(DIMENSION, "Dimension :", 130, dimension, StaticUtil.LENGTH_COND_INPUT));
         return list;
     }
 
@@ -91,7 +91,7 @@ public class PlayerDimensionCond extends AbstractCond {
     @Override
     public void fromBuff(PacketBuffer buf) {
         this.equal = AmbienceEquality.values()[buf.readInt()];
-        this.dimension = buf.readString(50);
+        this.dimension = buf.readString(StaticUtil.LENGTH_COND_INPUT);
     }
 
     @Override

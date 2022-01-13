@@ -7,10 +7,7 @@ import com.sekai.ambienceblocks.ambience.util.AmbienceEquality;
 import com.sekai.ambienceblocks.ambience.util.AmbienceType;
 import com.sekai.ambienceblocks.ambience.util.AmbienceWorldSpace;
 import com.sekai.ambienceblocks.config.AmbienceConfig;
-import com.sekai.ambienceblocks.util.BoundsUtil;
-import com.sekai.ambienceblocks.util.CondsUtil;
-import com.sekai.ambienceblocks.util.NBTHelper;
-import com.sekai.ambienceblocks.util.Vector3d;
+import com.sekai.ambienceblocks.util.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -298,7 +295,7 @@ public class AmbienceData
         /*this.soundName = ByteBufUtils.readUTF8String(buf);
         this.category = ByteBufUtils.readUTF8String(buf);
         this.type = ByteBufUtils.readUTF8String(buf);*/
-        this.soundName = buf.readString(50);
+        this.soundName = buf.readString(StaticUtil.LENGTH_SOUND);
         this.category = buf.readString(20);
         this.type = buf.readString(20);
         this.tag = buf.readString(5);
@@ -308,8 +305,8 @@ public class AmbienceData
             this.shouldFuse = buf.readBoolean();
             /*this.introName = ByteBufUtils.readUTF8String(buf);
             this.outroName = ByteBufUtils.readUTF8String(buf);*/
-            this.introName = buf.readString(50);
-            this.outroName = buf.readString(50);
+            this.introName = buf.readString(StaticUtil.LENGTH_SOUND);
+            this.outroName = buf.readString(StaticUtil.LENGTH_SOUND);
         }
 
         this.volume = buf.readFloat();
