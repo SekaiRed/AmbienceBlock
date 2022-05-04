@@ -31,13 +31,13 @@ public class AmbienceTileEntity extends BlockEntity implements IAmbienceSource {
         super(RegistryHandler.AMBIENCE_TILE_ENTITY.get(), p_155229_, p_155230_);
     }
 
-    @Override
+    /*@Override
     public CompoundTag save(CompoundTag compound) {
         data.toNBT(compound);
         compound = super.save(compound);
         return compound;
         //return super.save(compound);
-    }
+    }*/
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
@@ -55,7 +55,7 @@ public class AmbienceTileEntity extends BlockEntity implements IAmbienceSource {
     public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
         data.toNBT(tag);
-        super.save(tag);
+        super.saveAdditional(tag);
         return tag;
     }
 
@@ -82,7 +82,7 @@ public class AmbienceTileEntity extends BlockEntity implements IAmbienceSource {
     public CompoundTag getTileData() {
         CompoundTag tag = new CompoundTag();
         data.toNBT(tag);
-        super.save(tag);
+        super.saveAdditional(tag);
         return tag;
     }
 

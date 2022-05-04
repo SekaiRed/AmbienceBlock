@@ -48,7 +48,7 @@ public class PlayerBiomeCond extends AbstractCond {
     @Override
     public boolean isTrue(Player player, Level worldIn, IAmbienceSource sourceIn) {
         //return equal.testFor(worldIn.getBiome(new BlockPos(playerPos)).getRegistryName().toString().contains(biome));
-        return equal.testFor(stringValidation(worldIn.getBiome(player.blockPosition()).getRegistryName().toString(), biome));
+        return equal.testFor(stringValidation(worldIn.getBiome(player.blockPosition()).value().toString(), biome));
     }
 
     @Override

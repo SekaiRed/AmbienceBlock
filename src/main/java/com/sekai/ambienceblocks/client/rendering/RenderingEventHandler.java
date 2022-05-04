@@ -1,17 +1,20 @@
 package com.sekai.ambienceblocks.client.rendering;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
+import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
 import com.sekai.ambienceblocks.Main;
+import com.sekai.ambienceblocks.ambience.bounds.AbstractBounds;
+import com.sekai.ambienceblocks.ambience.bounds.SphereBounds;
 import com.sekai.ambienceblocks.client.ambience.AmbienceController;
 import com.sekai.ambienceblocks.tileentity.AmbienceTileEntity;
 import com.sekai.ambienceblocks.util.RegistryHandler;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
@@ -22,6 +25,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +40,7 @@ public class RenderingEventHandler {
     private final static float scale = 2f;
     private final static int eventListLimit = 20;
     private final static List<AmbienceEvent> eventList = new ArrayList<>();
+    public static final float BOUND_SEPARATION = 0.998f;
 
     @SubscribeEvent
     public static void renderDebug(RenderGameOverlayEvent.Post event) {
@@ -154,7 +159,9 @@ public class RenderingEventHandler {
         if(!holdingFinder)
             return;
 
-        PoseStack ms = event.getPoseStack();
+        //TODO Showing block bounds with the finder should be optional with the right click or something
+
+        /*PoseStack ms = event.getPoseStack();
         ms.pushPose();
 
         for(AmbienceTileEntity tile : AmbienceController.instance.getListOfLoadedAmbienceTiles()) {
@@ -175,7 +182,165 @@ public class RenderingEventHandler {
         //RenderTypeHelper.LINE_BUFFERS.endBatch(RenderTypeHelper.LINE_NO_DEPTH_TEST);
         ms.popPose();
         //RenderSystem.disableDepthTest();
-        RenderTypeHelper.LINE_BUFFERS.endBatch();
+        RenderTypeHelper.LINE_BUFFERS.endBatch();*/
+
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        RenderSystem.depthMask(true);
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableTexture();
+
+        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        PoseStack stack = RenderSystem.getModelViewStack();
+        stack.pushPose();
+        stack.scale(0.998f, 0.998f, 0.998f); // fixes z fighting by pulling all faces slightly closer to the camera
+
+        stack.mulPose(new Quaternion(Vector3f.XP, camera.getXRot(), true));
+        stack.mulPose(new Quaternion(Vector3f.YP, camera.getYRot() + 180f, true));
+        //PoseStack stack = event.getPoseStack();
+        //stack.pushPose();
+
+        double renderPosX = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().x;
+        double renderPosY = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().y;
+        double renderPosZ = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().z;
+        stack.translate(-renderPosX, -renderPosY, -renderPosZ);
+
+        RenderSystem.applyModelViewMatrix();
+
+        for(AmbienceTileEntity tile : AmbienceController.instance.getListOfLoadedAmbienceTiles()) {
+            float[] c = tile.data.getColor();
+
+            BoundRenderer.renderBounds(tile);
+
+            /*long timeDiff = context.world().getTime() - positionData.time;
+            float a = ((WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime()) * 0.6f;
+
+            Vec3d finalPos = cameraPos.subtract(positionData.pos.getX(), positionData.pos.getY(), positionData.pos.getZ()).negate();
+            if (finalPos.lengthSquared() > 4096) { // if it's more than 64 blocks away, scale it so distant ones are still visible
+                finalPos = finalPos.normalize().multiply(64);
+            }*/
+
+            RenderSystem.disableDepthTest();
+
+            // Bright boxes, in front of terrain but blocked by it
+            //if (!simpleRendering) {
+                RenderSystem.enableDepthTest();
+
+                buffer.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
+
+                //renderBlockBoundShape(buffer, tile, c);
+                //renderBlockOutline(buffer, tile.getBlockPos(), c);
+
+                tessellator.end();
+
+                RenderSystem.disableDepthTest();
+            //}
+
+            RenderSystem.depthFunc(GL11.GL_ALWAYS);
+
+            // Translucent boxes, behind terrain but always visible
+            buffer.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+            RenderSystem.lineWidth(4);
+
+            /*drawShape(buffer, positionData.shape,
+                    finalPos.x,
+                    finalPos.y,
+                    finalPos.z,
+                    c[0],
+                    c[1],
+                    c[2],
+                    c[3] * 0.6f);*/
+            c[3] *= 5f;
+            ////renderBlockBoundShape(buffer, tile, c);
+            ////renderBlockOutline(buffer, tile.getBlockPos(), c);
+
+            //tessellator.draw();
+            tessellator.end();
+
+            RenderSystem.depthFunc(GL11.GL_LEQUAL);
+
+            /*if (timeDiff >= WhereIsIt.CONFIG.getFadeoutTime()) {
+                toRemove.add(entry.getKey());
+            }*/
+        }
+
+        stack.popPose();
+        RenderSystem.applyModelViewMatrix();
+    }
+
+    private static void renderBlockBoundShape(BufferBuilder buffer, AmbienceTileEntity tile, float[] c) {
+        AbstractBounds bounds = tile.getData().getBounds();
+        if(!(bounds instanceof SphereBounds))
+            return;
+
+        float ox = (float) tile.getOrigin().x;
+        float oy = (float) tile.getOrigin().y;
+        float oz = (float) tile.getOrigin().z;
+
+        float a = c[3] * 0.1f;
+        float r = c[0];
+        float g = c[1];
+        float b = c[2];
+
+        double radius = ((SphereBounds) bounds).getRadius();
+
+        float ax, ay, az, ix, iy, iz, alpha, beta; // Storage for coordinates and angles
+        int gradation = 10;
+        float abx, aby, aplusbx, aplusby, abplusx, abplusy, aplusbplusx, aplusbplusy, abz, aplusbz;
+
+        for (alpha = (float) 0.0; alpha + Math.PI/gradation < Math.PI; alpha += Math.PI/gradation)
+        {
+            for (beta = (float) 0.0; beta < 2*Math.PI; beta += Math.PI/gradation)
+            {
+                /*x = (float) (radius * Math.cos(beta) * Math.sin(alpha)) + ox;
+                y = (float) (radius * Math.sin(beta) * Math.sin(alpha)) + oy;
+                z = (float) (radius * Math.cos(alpha)) + oz;
+                buffer.vertex(x, y, z).color(r, g, b, a).endVertex();
+                //glVertex3f(x, y, z);
+                x = (float) (radius * Math.cos(beta)* Math.sin(alpha + Math.PI/gradation)) + ox;
+                y = (float) (radius * Math.sin(beta) * Math.sin(alpha + Math.PI/gradation)) + oy;
+                z = (float) (radius * Math.cos(alpha + Math.PI/gradation)) + oz;
+                buffer.vertex(x, y, z).color(r, g, b, a).endVertex();
+                //glVertex3f(x, y, z);*/
+
+                abx = (float) (radius * Math.cos(beta) * Math.sin(alpha));
+                aby = (float) (radius * Math.sin(beta) * Math.sin(alpha));
+                aplusbx = (float) (radius * Math.cos(beta) * Math.sin(alpha + Math.PI/gradation));
+                aplusby = (float) (radius * Math.sin(beta) * Math.sin(alpha + Math.PI/gradation));
+                abplusx = (float) (radius * Math.cos(beta + Math.PI/gradation) * Math.sin(alpha));
+                abplusy = (float) (radius * Math.sin(beta + Math.PI/gradation) * Math.sin(alpha));
+                aplusbplusx = (float) (radius * Math.cos(beta + Math.PI/gradation) * Math.sin(alpha + Math.PI/gradation));
+                aplusbplusy = (float) (radius * Math.sin(beta + Math.PI/gradation) * Math.sin(alpha + Math.PI/gradation));
+
+                abz = (float) (radius * Math.cos(alpha));
+                aplusbz = (float) (radius * Math.cos(alpha + Math.PI/gradation));
+
+                /*buffer.vertex(aplusbx + ox, aplusby + oy, aplusbz + oz).color(r, g, b, a).endVertex();
+                buffer.vertex(aplusbplusx + ox, aplusbplusy + oy, aplusbz + oz).color(r, g, b, a).endVertex();
+                buffer.vertex(abplusx + ox, abplusy + oy, abz + oz).color(r, g, b, a).endVertex();
+
+                buffer.vertex(abplusx + ox, abplusy + oy, abz + oz).color(r, g, b, a).endVertex();
+                buffer.vertex(abx + ox, aby + oy, abz + oz).color(r, g, b, a).endVertex();
+                buffer.vertex(aplusbx + ox, aplusby + oy, aplusbz + oz).color(r, g, b, a).endVertex();*/
+
+                buffer.vertex(abplusx * BOUND_SEPARATION + ox, abplusy * BOUND_SEPARATION + oy, abz * BOUND_SEPARATION + oz).color(r, g, b, a).endVertex();
+                buffer.vertex(aplusbplusx * BOUND_SEPARATION + ox, aplusbplusy * BOUND_SEPARATION + oy, aplusbz * BOUND_SEPARATION + oz).color(r, g, b, a).endVertex();
+                buffer.vertex(aplusbx * BOUND_SEPARATION + ox, aplusby * BOUND_SEPARATION + oy, aplusbz * BOUND_SEPARATION + oz).color(r, g, b, a).endVertex();
+
+                buffer.vertex(aplusbx * BOUND_SEPARATION + ox, aplusby * BOUND_SEPARATION + oy, aplusbz * BOUND_SEPARATION + oz).color(r, g, b, a).endVertex();
+                buffer.vertex(abx * BOUND_SEPARATION + ox, aby * BOUND_SEPARATION + oy, abz * BOUND_SEPARATION + oz).color(r, g, b, a).endVertex();
+                buffer.vertex(abplusx * BOUND_SEPARATION + ox, abplusy * BOUND_SEPARATION + oy, abz * BOUND_SEPARATION + oz).color(r, g, b, a).endVertex();
+
+                /*buffer.vertex(ix, iy, iz).color(r, g, b, a).endVertex();
+                buffer.vertex(ax, ay, az).color(r, g, b, a).endVertex();
+                buffer.vertex(ax, ay, az).color(r, g, b, a).endVertex();
+                buffer.vertex(ix, iy, iz).color(r, g, b, a).endVertex();*/
+                //glVertex3f(x, y, z);
+            }
+        }
     }
 
     private static void renderBlockOutlineAt(PoseStack ms, MultiBufferSource.BufferSource lineBuffers, BlockPos pos, float[] c) {
@@ -200,7 +365,7 @@ public class RenderingEventHandler {
         ms.popPose();
     }
 
-    private static void renderBlockOutline(Matrix4f mat, Matrix3f normal, VertexConsumer buffer, BlockPos pos, float[] c) {
+    private static void renderBlockOutline(BufferBuilder buffer, BlockPos pos, float[] c) {
         float ix = (float) pos.getX();
         float iy = (float) pos.getY();
         float iz = (float) pos.getZ();
@@ -212,78 +377,144 @@ public class RenderingEventHandler {
         float g = c[1];
         float b = c[2];
 
-        buffer.vertex(mat, ix, iy, iz).color(r, g, b, a).normal(normal, 0f, 1f, 0f).endVertex();
-        buffer.vertex(mat, ix, ay, iz).color(r, g, b, a).endVertex();
+        /*buffer.vertex(ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, iz).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ix, ay, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, iz).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ax, ay, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, iz).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ax, iy, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, iy, iz).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ix, iy, az).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ix, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ix, iy, az).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ax, iy, az).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ix, ay, az).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ix, iy, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ix, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, iy, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ix, ay, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ix, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ax, iy, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ax, ay, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, az).color(r, g, b, a).endVertex();*/
+        //bottom / -y
+        buffer.vertex(ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, iy, az).color(r, g, b, a).endVertex();
 
-        /*buffer.vertex(mat, ix, iy, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ix, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ix, ay, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, ay, iz).color(r, g, b, a).endVertex();
+        //top / +y
+        buffer.vertex(ix, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ax, ay, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, iz).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ax, iy, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ix, iy, iz).color(r, g, b, a).endVertex();
+        //west / -x
+        buffer.vertex(ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ix, iy, az).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ix, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, iz).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ix, iy, az).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, iy, az).color(r, g, b, a).endVertex();
+        //east / +x
+        buffer.vertex(ax, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ax, iy, az).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ix, ay, az).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, ay, az).color(r, g, b, a).endVertex();
+        //west / -x
+        buffer.vertex(ix, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ix, iy, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ix, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, az).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ix, ay, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ix, ay, az).color(r, g, b, a).endVertex();
+        //west / -x
+        buffer.vertex(ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, iy, iz).color(r, g, b, a).endVertex();
 
-        buffer.vertex(mat, ax, iy, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, iy, az).color(r, g, b, a).endVertex();
-
-        buffer.vertex(mat, ax, ay, iz).color(r, g, b, a).endVertex();
-        buffer.vertex(mat, ax, ay, az).color(r, g, b, a).endVertex();*/
+        buffer.vertex(ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ix, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(ax, ay, iz).color(r, g, b, a).endVertex();
     }
+
+    /*private static void renderBlockOutline(Matrix4f mat, VertexConsumer buffer, BlockPos pos, float[] c) {
+        float ix = (float) pos.getX();
+        float iy = (float) pos.getY();
+        float iz = (float) pos.getZ();
+        float ax = (float) pos.getX() + 1;
+        float ay = (float) pos.getY() + 1;
+        float az = (float) pos.getZ() + 1;
+        float a = c[3];
+        float r = c[0];
+        float g = c[1];
+        float b = c[2];
+
+        buffer.vertex(mat, ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(mat, ix, ay, iz).color(r, g, b, a).endVertex();
+
+        buffer.vertex(mat, ix, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(mat, ax, ay, iz).color(r, g, b, a).endVertex();
+
+        buffer.vertex(mat, ax, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(mat, ax, iy, iz).color(r, g, b, a).endVertex();
+
+        buffer.vertex(mat, ax, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(mat, ix, iy, iz).color(r, g, b, a).endVertex();
+
+        buffer.vertex(mat, ix, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(mat, ix, ay, az).color(r, g, b, a).endVertex();
+
+        buffer.vertex(mat, ix, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(mat, ax, iy, az).color(r, g, b, a).endVertex();
+
+        buffer.vertex(mat, ax, iy, az).color(r, g, b, a).endVertex();
+        buffer.vertex(mat, ax, ay, az).color(r, g, b, a).endVertex();
+
+        buffer.vertex(mat, ix, ay, az).color(r, g, b, a).endVertex();
+        buffer.vertex(mat, ax, ay, az).color(r, g, b, a).endVertex();
+
+        buffer.vertex(mat, ix, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(mat, ix, iy, az).color(r, g, b, a).endVertex();
+
+        buffer.vertex(mat, ix, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(mat, ix, ay, az).color(r, g, b, a).endVertex();
+
+        buffer.vertex(mat, ax, iy, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(mat, ax, iy, az).color(r, g, b, a).endVertex();
+
+        buffer.vertex(mat, ax, ay, iz).color(r, g, b, a).endVertex();
+        buffer.vertex(mat, ax, ay, az).color(r, g, b, a).endVertex();
+    }*/
 
     //public static void
 }

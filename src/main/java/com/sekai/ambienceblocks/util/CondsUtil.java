@@ -79,7 +79,7 @@ public class CondsUtil {
         PLAYER_GAMEMODE(108, new PlayerGamemodeCond(AmbienceEquality.EQUAL_TO, GameType.SURVIVAL)),
         PLAYER_BIOME(109, new PlayerBiomeCond(AmbienceEquality.EQUAL_TO, Biomes.PLAINS.location().toString())),
         PLAYER_DIMENSION(110, new PlayerDimensionCond(AmbienceEquality.EQUAL_TO, Level.OVERWORLD.location().toString())),
-        PLAYER_STRUCTURE(111, new PlayerStructureCond(AmbienceEquality.EQUAL_TO, "minecraft:" + StructureFeature.VILLAGE.getFeatureName().toLowerCase(), 0D, false)),
+        PLAYER_STRUCTURE(111, new PlayerStructureCond(AmbienceEquality.EQUAL_TO, "minecraft:" + StructureFeature.VILLAGE.getRegistryName().toString().toLowerCase(), 0D, false)),
         PLAYER_IN_BATTLE(112, new PlayerInBattleCond(AmbienceEquality.EQUAL_TO, "", 50)),
         PLAYER_ENTITY_IN_RANGE(113, new PlayerEntityInRangeCond(AmbienceEquality.EQUAL_TO, "", 8D)),
         PLAYER_UNDERWATER(114, new PlayerUnderwaterCond(AmbienceEquality.EQUAL_TO)),
