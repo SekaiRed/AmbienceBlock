@@ -128,6 +128,9 @@ public class AmbienceSlot {
             float cacheVolumeMult = multVolume;
             setFadeState(AmbienceFadeState.FADE_IN);
             fadeCounter = (int) ((cacheVolumeMult) * source.getData().getFadeIn());
+        } else {
+            //float cacheVolumeMult = multVolume;
+            setFadeState(AmbienceFadeState.MAIN);
         }
     }
 
